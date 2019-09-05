@@ -13,6 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisities
 
 * Powershell [AZ Module](https://www.powershellgallery.com/packages/Az) - tested with version 2.4.0
+* PowerShell [powershell-yaml Module](https://www.powershellgallery.com/packages/powershell-yaml/0.3.1) - tested with version 2.4.0
 
 ### Installing
 
