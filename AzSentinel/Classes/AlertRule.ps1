@@ -38,7 +38,6 @@ class AlertProp {
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [ValidatePattern("[1-10000]")]
     [Int] $TriggerThreshold
 
     [Parameter(Mandatory)]

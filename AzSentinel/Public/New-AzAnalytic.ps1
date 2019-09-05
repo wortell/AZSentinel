@@ -60,8 +60,7 @@ function New-AzAnalytic {
         if (($SettingsFile.Split('.')[-1]) -eq 'json') {
             try {
                 if (Test-Path $SettingsFile) {
-                    #$analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
-                    $item = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
+                    $analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
                     Write-Verbose "Found $($analytics.count) rules"
                 }
                 else {
@@ -109,22 +108,27 @@ function New-AzAnalytic {
                     Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
                 }
 
-                $bodyAlertProp = [alertProp]::new(
-                    $item.name,
-                    $item.displayName,
-                    $item.description,
-                    $item.severity,
-                    $item.enabled,
-                    $item.query,
-                    $item.queryFrequency,
-                    $item.queryPeriod,
-                    $item.triggerOperator,
-                    $item.triggerThreshold,
-                    $item.suppressionDuration,
-                    $item.suppressionEnabled,
-                    $item.tactics
-                )
-                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                try {
+                    $bodyAlertProp = [alertProp]::new(
+                        $item.name,
+                        $item.displayName,
+                        $item.description,
+                        $item.severity,
+                        $item.enabled,
+                        $item.query,
+                        $item.queryFrequency,
+                        $item.queryPeriod,
+                        $item.triggerOperator,
+                        $item.triggerThreshold,
+                        $item.suppressionDuration,
+                        $item.suppressionEnabled,
+                        $item.tactics
+                    )
+                    $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                }
+                catch {
+                    Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
+                }
 
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
 
