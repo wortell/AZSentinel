@@ -1,0 +1,40 @@
+{
+    "analytics": [
+        {
+            "displayName": "Rule09",
+            "description": "test",
+            "severity": "High",
+            "enabled": true,
+            "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+            "queryFrequency": "5H",
+            "queryPeriod": "5H",
+            "triggerOperator": "GreaterThan",
+            "triggerThreshold": 5,
+            "suppressionDuration": "6H",
+            "suppressionEnabled": false,
+            "tactics": [
+              "Persistence",
+              "LateralMovement",
+              "Collection"
+            ]
+        },
+        {
+          "displayName": "Rule01",
+          "description": "test",
+          "severity": "High",
+          "enabled": true,
+          "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+          "queryFrequency": "5H",
+          "queryPeriod": "5H",
+          "triggerOperator": "GreaterThan",
+          "triggerThreshold": 5,
+          "suppressionDuration": "6H",
+          "suppressionEnabled": false,
+          "tactics": [
+            "Persistence",
+            "LateralMovement",
+            "Collection"
+          ]
+      }
+    ]
+}

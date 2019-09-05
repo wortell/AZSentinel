@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Test-ModuleManifest",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Invoke-Pester",
+            "args": ["${workspaceFolder}/Tests/Test-ModuleManifest.Tests.ps1", "-Show All"]
+        },
+        {
+            "name": "Test-ModuleFunction",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "Invoke-Pester",
+            "args": ["${workspaceFolder}/Tests/Test-ModuleFunction.Tests.ps1", "-Show All"]
+        }
+    ]
+}
