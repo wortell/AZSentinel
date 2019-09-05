@@ -4,7 +4,7 @@
 
 using module Az.Accounts
 
-function New-AzAnalytic {
+function New-AzSentinelAlertRule {
     <#
     .SYNOPSIS
     Manage Azure Sentinal Alert Rules
@@ -20,11 +20,14 @@ function New-AzAnalytic {
     .PARAMETER SettingsFile
     Path to the JSON or YAML file for the AlertRules
     .EXAMPLE
-    New-AzAnalytic -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -Verbose
-    Deploy example, this module support Json and Yaml format
+    New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -verbose
+    in this example all the rules configured in the JSON file will be created or updated
+    .EXAMPLE
+    Get-Item .\examples\*.json | New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace ""
+    In this example you can select multiple JSON files and Pipeline it to the module
     #>
 
-    [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
     param (
         # Parameter help description
         [Parameter(Mandatory)]
@@ -39,7 +42,8 @@ function New-AzAnalytic {
         [string]$Workspace,
 
         # Parameter help description
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,
+            ValueFromPipeline)]
         [string]$SettingsFile
     )
 
@@ -60,8 +64,7 @@ function New-AzAnalytic {
         if (($SettingsFile.Split('.')[-1]) -eq 'json') {
             try {
                 if (Test-Path $SettingsFile) {
-                    #$analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
-                    $item = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
+                    $analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json).analytics
                     Write-Verbose "Found $($analytics.count) rules"
                 }
                 else {
@@ -109,22 +112,27 @@ function New-AzAnalytic {
                     Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
                 }
 
-                $bodyAlertProp = [alertProp]::new(
-                    $item.name,
-                    $item.displayName,
-                    $item.description,
-                    $item.severity,
-                    $item.enabled,
-                    $item.query,
-                    $item.queryFrequency,
-                    $item.queryPeriod,
-                    $item.triggerOperator,
-                    $item.triggerThreshold,
-                    $item.suppressionDuration,
-                    $item.suppressionEnabled,
-                    $item.tactics
-                )
-                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                try {
+                    $bodyAlertProp = [alertProp]::new(
+                        $item.name,
+                        $item.displayName,
+                        $item.description,
+                        $item.severity,
+                        $item.enabled,
+                        $item.query,
+                        $item.queryFrequency,
+                        $item.queryPeriod,
+                        $item.triggerOperator,
+                        $item.triggerThreshold,
+                        $item.suppressionDuration,
+                        $item.suppressionEnabled,
+                        $item.tactics
+                    )
+                    $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                }
+                catch {
+                    Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
+                }
 
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
 
