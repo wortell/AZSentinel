@@ -1,14 +1,10 @@
 # Azure Sentinel
 
-Azure Sentinel Preview is a cloud-native SIEM that provides intelligent security analytics for your entire enterprise at cloud scale. Get limitless cloud speed and scale to help focus on what really matters. Easily collect data from all your cloud or on-premises assets, Office 365, Azure resources, and other clouds. Effectively detect threats with built-in machine learning from Microsoft’s security analytics experts. Automate threat response, using built-in orchestration and automation playbooks. [read more](https://docs.microsoft.com/en-us/azure/sentinel/overview)
-
-## Manageability
-
-At the moment there is no documented API, ARM or PowerShell code to configure Azure Sentinel
+Azure Sentinel is a cloud-native SIEM that provides intelligent security analytics for your entire enterprise at cloud scale. Get limitless cloud speed and scale to help focus on what really matters. Easily collect data from all your cloud or on-premises assets, Office 365, Azure resources, and other clouds. Effectively detect threats with built-in machine learning from Microsoft’s security analytics experts. Automate threat response, using built-in orchestration and automation playbooks. [read more](https://docs.microsoft.com/en-us/azure/sentinel/overview)
 
 ## Why this PowerShell Module
 
-Well at the moment there is simply no PS module or well documented API reference fore creating managing Azure Sentinel. After doing some reverse engineering I was able to find the API's that are currently being used by the Azure Portal and based on that I have written a PowerShell module so that we can manage Azure Sentinel trough PowerShell.
+At the moment there is no documented API, ARM or PowerShell module to configure Azure Sentinel. After doing some research we were able to find the API's that are currently being used by the Azure Portal and based on that we've written a PowerShell module to manage Azure Sentinel through PowerShell.
 
 ## Getting Started
 
@@ -20,7 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installing
 
-A step by step Guid how to install module
+A step by step guide how to install module
 
 ```PowerShell
 Install-Module .\AzSentinel -Force
@@ -30,7 +26,7 @@ Install-Module .\AzSentinel -Force
 
 #### Parameters
 
-See [docs](https://github.com/pkhabazi/AzSentinel/tree/master/docs) folder for documentation regarding the Functions and the available parameters
+See [docs](https://github.com/wortell/AzSentinel/tree/master/docs) folder for documentation regarding the Functions and the available parameters
 
 ## JSON format
 
