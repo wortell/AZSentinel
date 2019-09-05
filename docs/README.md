@@ -2,4 +2,4 @@
 
 1. [Get-AuthToken](Get-AuthToken.md)
 2. [Set-AzSentinel](Set-AzSentinel.md)
-3. [New-AzAnalytic](New-AzSentinelAlertRule.md)
+3. [New-AzSentinelAlertRule](New-AzSentinelAlertRule.md)
