@@ -12,7 +12,7 @@
 RootModule = 'AzSentinel.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.1'
+ModuleVersion = '0.0.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'Pouyan Khabazi'
 CompanyName = 'Wortell'
 
 # Copyright statement for this module
-Copyright = '(c) Pouyan Khabazi. All rights reserved.'
+Copyright = '(c) Wortell Enterprise Security BV. All rights reserved.'
 
 # Description of the functionality provided by this module
  Description = 'PowerShell module for Azure Sentinel'
@@ -70,7 +70,7 @@ Copyright = '(c) Pouyan Khabazi. All rights reserved.'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
-    'Get-AuthToken', 'New-AzAnalytic', 'precheck', 'Set-AzSentinel'
+    'Get-AuthToken', 'New-AzSentinelAlertRule', 'precheck', 'Set-AzSentinel'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
