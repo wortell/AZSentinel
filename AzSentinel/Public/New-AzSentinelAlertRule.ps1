@@ -62,7 +62,8 @@ function New-AzSentinelAlertRule {
             }
         } elseif ($SettingsFile.Extension -in '.yaml', 'yml') {
             try {
-                $analytics = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop) | Add-Member -MemberType AliasProperty -Name DisplayName -Value name -PassThru
+                $analytics = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
+                $analytics | Add-Member -MemberType NoteProperty -Name DisplayName -Value $analytics.name
                 Write-Verbose -Message 'Found compatibel yaml file'
             } catch {
                 Write-Verbose $_
@@ -94,7 +95,6 @@ function New-AzSentinelAlertRule {
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
                     $item | Add-Member -NotePropertyName Id -NotePropertyValue "/subscriptions/$Subscription/resourceGroups/$ResourceGroup/providers/Microsoft.OperationalInsights/workspaces/$Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
-
                     $uri = "https://management.azure.com/subscriptions/$Subscription/resourceGroups/$ResourceGroup/providers/Microsoft.OperationalInsights/workspaces/$Workspace/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
                 }
             } catch {
