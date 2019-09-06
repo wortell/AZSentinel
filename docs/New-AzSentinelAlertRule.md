@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# New-AzAnalytic
+# New-AzSentinelAlertRule
 
 ## SYNOPSIS
 Manage Azure Sentinal Alert Rules
@@ -13,7 +13,7 @@ Manage Azure Sentinal Alert Rules
 ## SYNTAX
 
 ```
-New-AzAnalytic [-Subscription] <String> [-ResourceGroup] <String> [-Workspace] <String>
+New-AzSentinelAlertRule [-Subscription] <String> [-ResourceGroup] <String> [-Workspace] <String>
  [-SettingsFile] <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
@@ -25,7 +25,12 @@ This way you can manage your Alert rules dynamic from one JSON or multiple YAML 
 
 ### EXAMPLE 1
 ```
-New-AzAnalytic -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -Verbose
+New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -Verbose
+```
+
+### EXAMPLE 2
+```
+Get-Item .\examples\*.json | New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace ""
 ```
 
 Deploy example, this module support Json and Yaml format
@@ -88,7 +93,7 @@ Aliases:
 Required: True
 Position: 4
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 

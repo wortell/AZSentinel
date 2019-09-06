@@ -4,7 +4,7 @@
 
 using module Az.Accounts
 
-function New-AzAnalytic {
+function New-AzSentinelAlertRule {
     <#
     .SYNOPSIS
     Manage Azure Sentinal Alert Rules
@@ -20,11 +20,14 @@ function New-AzAnalytic {
     .PARAMETER SettingsFile
     Path to the JSON or YAML file for the AlertRules
     .EXAMPLE
-    New-AzAnalytic -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -Verbose
-    Deploy example, this module support Json and Yaml format
+    New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -verbose
+    in this example all the rules configured in the JSON file will be created or updated
+    .EXAMPLE
+    Get-Item .\examples\*.json | New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace ""
+    In this example you can select multiple JSON files and Pipeline it to the module
     #>
 
-    [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [cmdletbinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
     param (
         # Parameter help description
         [Parameter(Mandatory)]
@@ -39,7 +42,8 @@ function New-AzAnalytic {
         [string]$Workspace,
 
         # Parameter help description
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,
+            ValueFromPipeline)]
         [string]$SettingsFile
     )
 
