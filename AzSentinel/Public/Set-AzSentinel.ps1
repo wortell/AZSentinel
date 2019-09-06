@@ -1,3 +1,6 @@
+#requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
+#requires -version 6.2
+
 function Set-AzSentinel {
     <#
     .SYNOPSIS
@@ -20,27 +23,24 @@ function Set-AzSentinel {
     Run in Test mode and verbose mode, no changes will be applied
     #>
 
-    [cmdletbinding()]
+    [CmdletBinding()]
     param (
-        # Parameter help description
         [Parameter(Mandatory)]
-        [string]$Subscription,
+        [ValidateNotNullOrEmpty()]
+        [string] $Subscription,
 
         [Parameter(Mandatory)]
-        [string]$ResourceGroup,
+        [ValidateNotNullOrEmpty()]
+        [string] $ResourceGroup,
 
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Workspace,
 
-        # Parameter help description
-        [Parameter(Mandatory = $false)]
-        [bool]
-        $Test = $false
+        [Parameter()]
+        [bool] $Test = $false
     )
     begin {
-        if (!$authHeader) {
-            $authHeader = Get-AuthToken
-        }
         precheck
     }
 
@@ -58,7 +58,7 @@ function Set-AzSentinel {
 
         $workspaceUrl = "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$($workspace)?api-version=2015-11-01-preview"
         try {
-            $workspaceResult = ((Invoke-webrequest -Uri $workspaceUrl -Method Get -Headers $authHeader).Content | ConvertFrom-Json)
+            $workspaceResult = ((Invoke-webrequest -Uri $workspaceUrl -Method Get -Headers $script:authHeader).Content | ConvertFrom-Json)
         }
         catch {
             Write-Verbose $_.Exception.Message
@@ -83,7 +83,7 @@ function Set-AzSentinel {
             }
 
             try {
-                $solutionResult = Invoke-webrequest -Uri $uri -Method Get -Headers $authHeader
+                $solutionResult = Invoke-webrequest -Uri $uri -Method Get -Headers $script:authHeader
                 Write-Verbose "Sentinel is already enableb on $Workspace and status is: $($solutionResult.StatusDescription)"
             }
             catch {
@@ -97,7 +97,7 @@ function Set-AzSentinel {
                     else {
                         try {
                             Write-Verbose "Enabling Sentinel"
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $authHeader -Body ($body | ConvertTo-Json)
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
                             return $result
                         }
                         catch {
