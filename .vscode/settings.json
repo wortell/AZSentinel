@@ -1,48 +1,14 @@
 {
-    // Wortkbench settings
-    "workbench.activityBar.visible": true,
-    "window.zoomLevel": 0,
-
-    // Extensions
-    "gitlens.advanced.messages": {
-        "suppressShowKeyBindingsNotice": true
-    },
-    "gitlens.showWhatsNewAfterUpgrades": false,
-    "trailing-spaces.highlightCurrentLine": true,
-    "team.showWelcomeMessage": false,
-    "git.autofetch": true,
-    "json.format.enable": true,
-    "markdown.extension.tableFormatter.enabled": true,
-
-    // Workbench - left side
-    "workbench.tree.renderIndentGuides": "always",
-
-    // Edittor Settings
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
-    "editor.detectIndentation": false,
-    "editor.renderWhitespace": "boundary",
-    "editor.fontLigatures": true,
-
-    // Files Setings
     "files.defaultLanguage": "powershell",
-    "files.autoSave": "afterDelay",
     "files.trimTrailingWhitespace": true,
     "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
-
-    // Terminal settings
-    "terminal.integrated.cursorBlinking": true,
-
-    "[powershell]": {
-        "editor.tabSize": 4,
-        "editor.autoClosingBrackets": "always",
-        "editor.cursorBlinking": "expand"
-    },
     "[json]": {
         "editor.tabSize": 2
     },
     "[markdown]": {
         "editor.tabSize": 2
     }
-  }
+}
