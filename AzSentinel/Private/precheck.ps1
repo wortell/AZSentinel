@@ -1,27 +1,13 @@
 function precheck {
-    <#
-    .SYNOPSIS
-    This function is used to cover the prechecks
-    .DESCRIPTION
-    This function is used to cover the prechecks
-    .EXAMPLE
-    precheck
-    #>
-
-    [cmdletbinding()]
-    param (
-
-    )
-    try {
-       if (! (Get-Module Az.accounts -ListAvailable)){
-           Import-Module Az.Accounts -Force
-       }
-       else {
-           Write-Verbose "Module is already loaded"
-       }
+    if ($null -eq $script:accessToken) {
+        Get-AuthToken
+    } elseif ([datetime]::UtcNow.AddMinutes(5) -lt $script.accessToken.ExpiresOn.DateTime ) {
+        # if token expires within 5 minutes, request a new one
+        Get-AuthToken
     }
-    catch {
-        Write-Verbose $_.Exception.Message
-        Write-Error "AZ Module needed for authentication" -ErrorAction Stop
+
+    $script:authHeader = @{
+        'Content-Type' = 'application/json'
+        Authorization = 'Bearer ' + $script:accessToken.AccessToken
     }
 }
