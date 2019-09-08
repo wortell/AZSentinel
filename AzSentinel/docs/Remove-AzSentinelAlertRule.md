@@ -5,28 +5,49 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-AzSentinel
+# Remove-AzSentinelAlertRule
 
 ## SYNOPSIS
-Enable Azure Sentinel
+Manage Azure Sentinal Alert Rules
 
 ## SYNTAX
 
 ```
-Set-AzSentinel [-SubscriptionId <String>] -WorkspaceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function enables Azure Sentinel on a existing Workspace
+With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-AzSentinel -WorkspaceName ""
+Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
 ```
 
-This example will enable Azure Sentinel for the provided workspace
+In this example the defined rule will be removed from Azure Sentinel
+
+### EXAMPLE 2
+```
+Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
+```
+
+In this example you can define multiple rules that will be removed
+
+### EXAMPLE 3
+```
+Remove-AzSentinelAlertRule -WorkspaceName ""
+```
+
+In this example no rule is specified, all rules will be removed one by one.
+For each rule you need to confirm the action
+
+### EXAMPLE 4
+```
+Remove-AzSentinelAlertRule -WorkspaceName "" -SubscriptionId ""
+```
 
 ## PARAMETERS
 
@@ -57,6 +78,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RuleName
+Enter the name of the rule that you wnat to remove
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 

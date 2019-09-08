@@ -13,7 +13,7 @@ class AlertProp {
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("Medium" , "High", "Low" , "Informational")]
+    [ValidateSet("Medium", "High", "Low", "Informational")]
     [string] $Severity
 
     [Parameter(Mandatory)]

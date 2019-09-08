@@ -5,28 +5,43 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-AzSentinel
+# Get-AzSentinelAlertRule
 
 ## SYNOPSIS
-Enable Azure Sentinel
+Manage Azure Sentinal Alert Rules
 
 ## SYNTAX
 
 ```
-Set-AzSentinel [-SubscriptionId <String>] -WorkspaceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function enables Azure Sentinel on a existing Workspace
+With this function you can get the configuration of the Azure Sentinel Alert rule from Azure Sentinel
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-AzSentinel -WorkspaceName ""
+Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
 ```
 
-This example will enable Azure Sentinel for the provided workspace
+in this example all the rules configured in the JSON file will be created or updated
+
+### EXAMPLE 2
+```
+Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "" -SubscriptionId ""
+```
+
+in this example all the rules configured in the JSON file will be created or updated
+
+### EXAMPLE 3
+```
+Get-AzSentinelAlertRule -WorkspaceName "" -subscriptionid ""
+```
+
+In this example you can select multiple JSON files and Pipeline it to the module
 
 ## PARAMETERS
 
@@ -57,6 +72,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RuleName
+Enter the name of the Alert rule
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 

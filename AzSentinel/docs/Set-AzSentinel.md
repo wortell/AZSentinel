@@ -13,62 +13,39 @@ Enable Azure Sentinel
 ## SYNTAX
 
 ```
-Set-AzSentinel [-Subscription] <String> [-ResourceGroup] <String> [-Workspace] <String> [[-Test] <Boolean>]
- [<CommonParameters>]
+Set-AzSentinel [-SubscriptionId <String>] -WorkspaceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function enables Azure Sentinel trough Rest API Call
+This function enables Azure Sentinel on a existing Workspace
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-AzSentinel -Subscription "" -ResourceGroup "" -Workspace ""
+Set-AzSentinel -WorkspaceName ""
 ```
 
-Run in production mode, changes will be applied
-
-### EXAMPLE 2
-```
-Set-AzSentinel -Subscription "" -ResourceGroup "" -Workspace "" -Test $true -Verbose
-```
-
-Run in Test mode and verbose mode, no changes will be applied
+This example will enable Azure Sentinel for the provided workspace
 
 ## PARAMETERS
 
-### -Subscription
-Enter the subscription ID where the Workspace is deployed
+### -SubscriptionId
+Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: 1
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ResourceGroup
-Enter the resourceGroup name where the Workspace is deployed
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Workspace
+### -WorkspaceName
 Enter the Workspace name
 
 ```yaml
@@ -77,23 +54,39 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Test
-Set $true if you want to run in tests mode without pushing any change
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
 
 ```yaml
-Type: Boolean
+Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: wi
 
 Required: False
-Position: 4
-Default value: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
