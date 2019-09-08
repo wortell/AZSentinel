@@ -1,16 +1,15 @@
 function Compare-Policy {
     <#
     .SYNOPSIS
-        coming soon
+    Compare PS Objects
     .DESCRIPTION
-        coming soon
+    This function is used for  comparison to see if a rule needs to be updated
     .PARAMETER ReferenceTemplate
-        Coming soon
+    Reference template is the data of the AlertRule as active on Azure
     .PARAMETER DifferenceTemplate
-    Coming soon
+    Difference template is data that is generated and will be uploaded to Azure
     .EXAMPLE
-    Compare-Policy -ReferenceTemplate $ref -DifferenceTemplate $diff
-
+    Compare-Policy -ReferenceTemplate  -DifferenceTemplate
     .NOTES
     NAME: Compare-Policy
     #>
