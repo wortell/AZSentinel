@@ -1,13 +1,13 @@
 {
   "analytics": [
     {
-      "displayName": "Rule09",
+      "displayName": "Rule01",
       "description": "test",
       "severity": "High",
       "enabled": true,
       "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
       "queryFrequency": "5H",
-      "queryPeriod": "5H",
+      "queryPeriod": "6H",
       "triggerOperator": "GreaterThan",
       "triggerThreshold": 5,
       "suppressionDuration": "6H",
@@ -19,13 +19,13 @@
       ]
     },
     {
-      "displayName": "Rule01",
+      "displayName": "Rule02",
       "description": "test",
       "severity": "High",
       "enabled": true,
       "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
       "queryFrequency": "5H",
-      "queryPeriod": "5H",
+      "queryPeriod": "6H",
       "triggerOperator": "GreaterThan",
       "triggerThreshold": 5,
       "suppressionDuration": "6H",
