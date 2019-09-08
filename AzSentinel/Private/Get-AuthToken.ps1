@@ -25,6 +25,8 @@ function Get-AuthToken {
             $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
             $profileClient = [Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient]::new($azProfile)
             $script:accessToken = $profileClient.AcquireAccessToken($azContext.Subscription.TenantId)
+            $script:subscriptionId = $azContext.Subscription.Id
+            $script:tenantId = $azContext.Tenant.Id
         } else {
             throw 'No subscription available, Please use Connect-AzAccount to login and select the right subscription'
         }
