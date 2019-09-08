@@ -8,66 +8,47 @@ schema: 2.0.0
 # New-AzSentinelAlertRule
 
 ## SYNOPSIS
-Manage Azure Sentinal Alert Rules
+Create Azure Sentinal Alert Rules
 
 ## SYNTAX
 
 ```
-New-AzSentinelAlertRule [-Subscription] <String> [-ResourceGroup] <String> [-Workspace] <String>
- [-SettingsFile] <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
+ -Description <String> -Severity <String> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
+ [-QueryPeriod <String>] -TriggerOperator <String> -TriggerThreshold <Int32> -SuppressionDuration <String>
+ -SuppressionEnabled <Boolean> -Tactics <Array> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function creates Azure Sentinal Alert rules from JSON and YAML config files.
-This way you can manage your Alert rules dynamic from one JSON or multiple YAML files
+This function creates Azure Sentinal Alert rules from provided CMDLET
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace "" -SettingsFile ".\examples\AlertRules.json" -Verbose
+New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity "" -Enabled  -Query '' -QueryFrequency ""  -QueryPeriod "" -TriggerOperator "" -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
 ```
 
-### EXAMPLE 2
-```
-Get-Item .\examples\*.json | New-AzSentinelAlertRule -Subscription "" -ResourceGroup "" -Workspace ""
-```
-
-Deploy example, this module support Json and Yaml format
+In this example you create a new Alert rule by defining the rule properties from CMDLET
 
 ## PARAMETERS
 
-### -Subscription
-Enter the subscription ID where the Workspace is deployed
+### -SubscriptionId
+Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: 1
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ResourceGroup
-Enter the resourceGroup name where the Workspace is deployed
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Workspace
+### -WorkspaceName
 Enter the Workspace name
 
 ```yaml
@@ -76,14 +57,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SettingsFile
-Path to the JSON or YAML file for the AlertRules
+### -DisplayName
+Enter the Display name for the Alert rule
 
 ```yaml
 Type: String
@@ -91,9 +72,174 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: 4
+Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Description
+Enter the Description for the Alert rule
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Severity
+Enter the Severity, valid values: Medium", "High", "Low", "Informational"
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Enabled
+Set $true to enable the Alert Rule or $false to disable Alert Rule
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Query
+Enter the Query that you want to use
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -QueryFrequency
+Enter the query frequency, example: 5H or 5M (H stands for Hour and M stands for Minute)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -QueryPeriod
+Enter the quury period, exmaple: 5H or 5M (H stands for Hour and M stands for Minute)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TriggerOperator
+Select the triggert Operator, valid values are: "GreaterThan", "FewerThan", "EqualTo", "NotEqualTo"
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -TriggerThreshold
+Enter the trigger treshold
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SuppressionDuration
+Enter the suppression duration, example: 5H or 5M (H stands for Hour and M stands for Minute)
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SuppressionEnabled
+Set $true to enable Suppression or $false to disable Suppression
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tactics
+Provide the needed tactics
+
+```yaml
+Type: Array
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

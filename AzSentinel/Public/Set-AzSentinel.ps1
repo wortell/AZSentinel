@@ -6,64 +6,53 @@ function Set-AzSentinel {
     .SYNOPSIS
     Enable Azure Sentinel
     .DESCRIPTION
-    This function enables Azure Sentinel trough Rest API Call
-    .PARAMETER Subscription
-    Enter the subscription ID where the Workspace is deployed
-    .PARAMETER ResourceGroup
-    Enter the resourceGroup name where the Workspace is deployed
-    .PARAMETER Workspace
+    This function enables Azure Sentinel on a existing Workspace
+    .PARAMETER SubscriptionId
+    Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
+    .PARAMETER WorkspaceName
     Enter the Workspace name
-    .PARAMETER Test
-    Set $true if you want to run in tests mode without pushing any change
     .EXAMPLE
-    Set-AzSentinel -Subscription "" -ResourceGroup "" -Workspace ""
-    Run in production mode, changes will be applied
-    .EXAMPLE
-    Set-AzSentinel -Subscription "" -ResourceGroup "" -Workspace "" -Test $true -Verbose
-    Run in Test mode and verbose mode, no changes will be applied
+    Set-AzSentinel -WorkspaceName ""
+    This example will enable Azure Sentinel for the provided workspace
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $false,
+            ParameterSetName = "Sub")]
         [ValidateNotNullOrEmpty()]
-        [string] $Subscription,
+        [string] $SubscriptionId,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string] $ResourceGroup,
+        [string]$WorkspaceName
 
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Workspace,
-
-        [Parameter()]
-        [bool] $Test = $false
     )
     begin {
         precheck
     }
 
     process {
+        switch ($PsCmdlet.ParameterSetName) {
+            Sub {
+                $arguments = @{
+                    WorkspaceName  = $WorkspaceName
+                    SubscriptionId = $SubscriptionId
+                }
+            }
+            default {
+                $arguments = @{
+                    WorkspaceName = $WorkspaceName
+                }
+            }
+        }
+        $workspaceResult = Get-LogAnalyticWorkspace @arguments -FullObject
+
         # Variables
         $errorResult = ''
 
-        if ($Test) {
-            Write-Output "Running in test mode, no changes will be made"
-        }
+        Write-Output $Script:workspace
 
-        $uri = "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resourceGroup/providers/Microsoft.OperationsManagement/solutions/SecurityInsights($workspace)?api-version=2015-11-01-preview"
-
-        Write-Verbose $uri
-
-        $workspaceUrl = "https://management.azure.com/subscriptions/$subscription/resourceGroups/$resourceGroup/providers/Microsoft.OperationalInsights/workspaces/$($workspace)?api-version=2015-11-01-preview"
-        try {
-            $workspaceResult = ((Invoke-webrequest -Uri $workspaceUrl -Method Get -Headers $script:authHeader).Content | ConvertFrom-Json)
-        }
-        catch {
-            Write-Verbose $_.Exception.Message
-            Write-Error "Unable to find Workspace $Workspace in RG $ResourceGroup and in SUB $Subscription" -ErrorAction Stop
-        }
         if ($workspaceResult.properties.provisioningState -eq 'Succeeded') {
             $body = @{
                 'id'         = ''
@@ -81,31 +70,33 @@ function Set-AzSentinel {
                     'promotionCode' = ''
                 }
             }
+            $uri = "$(($Script:baseUri).Split('microsoft.operationalinsights')[0])Microsoft.OperationsManagement/solutions/SecurityInsights($WorkspaceName)?api-version=2015-11-01-preview"
 
             try {
                 $solutionResult = Invoke-webrequest -Uri $uri -Method Get -Headers $script:authHeader
-                Write-Verbose "Sentinel is already enableb on $Workspace and status is: $($solutionResult.StatusDescription)"
+                Write-Output "Azure Sentinel is already enabled on $WorkspaceName and status is: $($solutionResult.StatusDescription)"
             }
             catch {
                 $errorReturn = $_
                 $errorResult = ($errorReturn | ConvertFrom-Json ).error
                 if ($errorResult.Code -eq 'ResourceNotFound') {
-                    Write-Verbose "Sentinetal is not enabled on workspace $($Workspace)"
-                    if ($Test) {
-                        Write-Output ($body | Format-Table | Out-String)
-                    }
-                    else {
-                        try {
-                            Write-Verbose "Enabling Sentinel"
+                    Write-Output "Azure Sentinetal is not enabled on workspace: $($WorkspaceName)"
+                    try {
+                        if ($PSCmdlet.ShouldProcess("Do you want to enable Sentinel for Workspace: $workspace")) {
                             $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                            Write-Output "Successfully enabled Sentinel on workspae: $WorkspaceName"
                             return $result
                         }
-                        catch {
-                            $errorReturn = $_
-                            $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                            Write-Error "unable to enable Sentinel on $Workspace with error message: $($errorResult.message)"
+                        else {
+                            Write-Output "No change have been made for rule $WorkspaceName, deployment aborted"
                         }
                     }
+                    catch {
+                        $errorReturn = $_
+                        $errorResult = ($errorReturn | ConvertFrom-Json ).error
+                        Write-Error "Unable to enable Sentinel on $WorkspaceName with error message: $($errorResult.message)"
+                    }
+
                 }
                 else {
                     Write-Verbose $_
@@ -115,7 +106,7 @@ function Set-AzSentinel {
 
         }
         else {
-            Write-Error "Workspace $Workspace is currently in $workspaceResult.properties.provisioningState status, setup canceled"
+            Write-Error "Workspace $WorkspaceName is currently in $($workspaceResult.properties.provisioningState) status, setup canceled"
         }
     }
 }
