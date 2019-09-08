@@ -5,28 +5,36 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-AzSentinel
+# Get-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Enable Azure Sentinel
+Get Azure Sentinel Hunting rule
 
 ## SYNTAX
 
 ```
-Set-AzSentinel [-SubscriptionId <String>] -WorkspaceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
+ [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function enables Azure Sentinel on a existing Workspace
+With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-AzSentinel -WorkspaceName ""
+Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
 ```
 
-This example will enable Azure Sentinel for the provided workspace
+In this example you can get configuration of multiple Huntinh rules
+
+### EXAMPLE 2
+```
+Get-AzSentinelHuntingRule -WorkspaceName ""
+```
+
+In this example you can get configuration of all the Hunting rules in once
 
 ## PARAMETERS
 
@@ -54,6 +62,36 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RuleName
+Enter the name of the Hunting rule name
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Filter
+{{ Fill Filter Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

@@ -5,28 +5,44 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-AzSentinel
+# Get-AzSentinelIncident
 
 ## SYNOPSIS
-Enable Azure Sentinel
+Get Azure Sentinel Incident
 
 ## SYNTAX
 
 ```
-Set-AzSentinel [-SubscriptionId <String>] -WorkspaceName <String> [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> [-IncidentName <String[]>]
+ [-CaseNumber <Int32[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function enables Azure Sentinel on a existing Workspace
+With this function you can get a list of open incidents from Azure Sentinel.
+You can can also filter to Incident with speciefiek case namber or Case name
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Set-AzSentinel -WorkspaceName ""
+Get-AzSentinelIncident -WorkspaceName ""
 ```
 
-This example will enable Azure Sentinel for the provided workspace
+Get a list of all open Incidents
+
+### EXAMPLE 2
+```
+Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
+```
+
+Get information of a specifiek incident with providing the casenumber
+
+### EXAMPLE 3
+```
+Get-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
+```
+
+Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
 
 ## PARAMETERS
 
@@ -57,6 +73,36 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncidentName
+Enter incident name, this is the same name as the alert rule that triggered the incident
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -CaseNumber
+Enter the case number to get specfiek details of a open case
+
+```yaml
+Type: Int32[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
