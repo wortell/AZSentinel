@@ -7,11 +7,11 @@ function New-AzSentinelAlertRule {
     .SYNOPSIS
     Create Azure Sentinal Alert Rules
     .DESCRIPTION
-    This function creates Azure Sentinal Alert rules from provided CMDLET
+    Use this function creates Azure Sentinal Alert rules from provided CMDLET
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
-        Enter the Workspace name
+    Enter the Workspace name
     .PARAMETER DisplayName
     Enter the Display name for the Alert rule
     .PARAMETER Description
@@ -35,7 +35,7 @@ function New-AzSentinelAlertRule {
     .PARAMETER SuppressionEnabled
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
-    Provide the needed tactics
+    Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity "" -Enabled  -Query '' -QueryFrequency ""  -QueryPeriod "" -TriggerOperator "" -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
     In this example you create a new Alert rule by defining the rule properties from CMDLET
@@ -61,8 +61,7 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Medium", "High", "Low", "Informational")]
-        [string] $Severity,
+        [Severity] $Severity,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -81,8 +80,7 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("GreaterThan", "FewerThan", "EqualTo", "NotEqualTo")]
-        [string] $TriggerOperator,
+        [TriggerOperator] $TriggerOperator,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -97,7 +95,7 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [array]$Tactics
+        [Tactics[]] $Tactics
     )
 
     begin {
@@ -123,17 +121,15 @@ function New-AzSentinelAlertRule {
         $item = @{ }
 
         Write-Verbose -Message "Creating new rule: $($DisplayName)"
-
-
         try {
             Write-Verbose -Message "Get rule $DisplayName"
-            $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -ErrorAction SilentlyContinue
+            $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -WarningAction SilentlyContinue
 
             if ($content) {
                 Write-Verbose -Message "Rule $($DisplayName) exists in Azure Sentinel"
 
                 $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
-                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.eTag -Force
                 $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
 
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
@@ -222,6 +218,5 @@ function New-AzSentinelAlertRule {
                 Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
             }
         }
-
     }
 }

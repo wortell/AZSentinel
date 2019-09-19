@@ -13,8 +13,7 @@ class AlertProp {
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("Medium", "High", "Low", "Informational")]
-    [string] $Severity
+    [Severity] $Severity
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -33,8 +32,7 @@ class AlertProp {
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("GreaterThan", "FewerThan", "EqualTo", "NotEqualTo")]
-    [string] $TriggerOperator
+    [TriggerOperator] $TriggerOperator
 
     [Parameter(Mandatory)]
     [ValidateNotNullOrEmpty()]
@@ -49,7 +47,7 @@ class AlertProp {
 
     [Parameter(Mandatory)]
     [AllowEmptyCollection()]
-    [array]$Tactics
+    [Tactics[]] $Tactics
 
     AlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics) {
         $this.name = $Name

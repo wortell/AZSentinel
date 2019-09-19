@@ -1,5 +1,15 @@
-<# INSERT HEADER ABOVE #>
-##Import Classes
+$Enums = @( Get-ChildItem -Path $PSScriptRoot\Enums\*.ps1 -ErrorAction SilentlyContinue )
+Foreach ($import in @($Enums)) {
+    Try {
+        Write-Verbose "Importing $($import.FullName)"
+        . $import.fullname
+    }
+    Catch {
+        Write-Error -Message "Failed to import function $($import.fullname): $_"
+    }
+}
+
+# Import Classes
 if (Test-Path "$PSScriptRoot\Classes\classes.psd1") {
     $ClassLoadOrder = Import-PowerShellDataFile -Path "$PSScriptRoot\Classes\classes.psd1" -ErrorAction SilentlyContinue
 }
@@ -11,11 +21,11 @@ foreach ($class in $ClassLoadOrder.order) {
     }
 }
 
-#Get public and private function definition files.
+# Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
-#Dot source the files
+# Dot source the files
 Foreach ($import in @($Public + $Private)) {
     Try {
         Write-Verbose "Importing $($Import.FullName)"
@@ -27,4 +37,5 @@ Foreach ($import in @($Public + $Private)) {
 }
 
 Export-ModuleMember -Function $Public.Basename
+
 <# INSERT FOOTER BELOW #>
