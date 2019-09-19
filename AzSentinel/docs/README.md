@@ -7,3 +7,7 @@
 5. [Remove-AzSentinelAlertRule](Remove-AzSentinelAlertRule.md)
 6. [Get-AzSentinelHuntingRule](Get-AzSentinelHuntingRule.md)
 7. [Get-AzSentinelIncident](Get-AzSentinelIncident.md)
+8. [Get-AzSentinelHuntingRule](Get-AzSentinelHuntingRule.md)
+9. [New-AzSentinelHuntingRule](New-AzSentinelHuntingRule.md)
+10. [Remove-AzSentinelHuntingRule](Remove-AzSentinelHuntingRule.md)
+11. [Import-AzSentinelHuntingRule](Import-AzSentinelHuntingRule.md)

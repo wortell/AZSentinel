@@ -9,31 +9,31 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule = 'AzSentinel.psm1'
+    RootModule           = 'AzSentinel.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.5.0'
+    ModuleVersion        = '0.6.0'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Core', 'Desktop'
 
     # ID used to uniquely identify this module
-    GUID = '82a6a020-d628-41d1-ac34-5e90df53b10d'
+    GUID                 = '82a6a020-d628-41d1-ac34-5e90df53b10d'
 
     # Author of this module
-    Author = 'Pouyan Khabazi'
+    Author               = 'Pouyan Khabazi'
 
     # Company or vendor of this module
-    CompanyName = 'Wortell'
+    CompanyName          = 'Wortell'
 
     # Copyright statement for this module
-    Copyright = '(c) Wortell Enterprise Security BV. All rights reserved.'
+    Copyright            = '(c) Wortell Enterprise Security BV. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module for Azure Sentinel'
+    Description          = 'PowerShell module for Azure Sentinel'
 
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion = '6.2'
+    PowerShellVersion    = '6.2'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -51,13 +51,13 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules = @(
+    RequiredModules      = @(
         @{
-            ModuleName = 'Az.Accounts'
+            ModuleName    = 'Az.Accounts'
             ModuleVersion = '1.5.2'
         }
         @{
-            ModuleName = 'powershell-yaml'
+            ModuleName    = 'powershell-yaml'
             ModuleVersion = '0.4.0'
         }
     )
@@ -78,18 +78,28 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @(
-        'New-AzSentinelAlertRule', 'Set-AzSentinel', 'Get-AzSentinelAlertRule','Import-AzSentinelAlertRule', 'Remove-AzSentinelAlertRule'
-     )
+    FunctionsToExport    = @(
+        'Set-AzSentinel',
+        'New-AzSentinelAlertRule',
+        'Get-AzSentinelAlertRule',
+        'Import-AzSentinelAlertRule',
+        'Remove-AzSentinelAlertRule',
+        'Import-AzSentinelAlertRule',
+        'Get-AzSentinelHuntingRule',
+        'New-AzSentinelHuntingRule',
+        'Import-AzSentinelHuntingRule',
+        'Remove-AzSentinelHuntingRule',
+        'Get-AzSentinelIncident'
+    )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport = @()
+    CmdletsToExport      = @()
 
     # Variables to export from this module
     # VariablesToExport = '*'
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport = @()
+    AliasesToExport      = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -101,10 +111,10 @@
     # FileList = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData = @{
+    PrivateData          = @{
         PSData = @{
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @(
+            Tags       = @(
                 'Azure Sentinel',
                 'Sentinel',
                 'Azure'

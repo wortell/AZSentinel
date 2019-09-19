@@ -1,7 +1,7 @@
 {
   "analytics": [
     {
-      "displayName": "Rule01",
+      "displayName": "AlertRule01",
       "description": "test",
       "severity": "High",
       "enabled": true,
@@ -14,12 +14,12 @@
       "suppressionEnabled": false,
       "tactics": [
         "Persistence",
-        "LateralMovement",
+        "LateralMovementt",
         "Collection"
       ]
     },
     {
-      "displayName": "Rule02",
+      "displayName": "AlertRule02",
       "description": "test",
       "severity": "High",
       "enabled": true,

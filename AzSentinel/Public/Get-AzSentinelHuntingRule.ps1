@@ -21,7 +21,7 @@ function Get-AzSentinelHuntingRule {
     In this example you can get configuration of multiple Huntinh rules
     .EXAMPLE
     Get-AzSentinelHuntingRule -WorkspaceName ""
-    In this example you can get configuration of all the Hunting rules in once
+    In this example you can get a list of all the Hunting rules in once
     #>
 
     [cmdletbinding(SupportsShouldProcess)]
