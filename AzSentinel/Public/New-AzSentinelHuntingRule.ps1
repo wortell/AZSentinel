@@ -143,8 +143,6 @@ function New-AzSentinelHuntingRule {
             }
         }
 
-        #return $body | ConvertTo-Json -Depth 10
-
         #return $content
         if ($content) {
             $compareResult1 = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, Tags, Version) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, Tags, Version)
