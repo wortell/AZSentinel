@@ -14,13 +14,14 @@ Create Azure Sentinal Alert Rules
 
 ```
 New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
- -Description <String> -Severity <String> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
- [-QueryPeriod <String>] -TriggerOperator <String> -TriggerThreshold <Int32> -SuppressionDuration <String>
- -SuppressionEnabled <Boolean> -Tactics <Array> [-WhatIf] [-Confirm] [<CommonParameters>]
+ -Description <String> -Severity <Severity> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
+ [-QueryPeriod <String>] -TriggerOperator <TriggerOperator> -TriggerThreshold <Int32>
+ -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <Tactics[]> [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function creates Azure Sentinal Alert rules from provided CMDLET
+Use this function creates Azure Sentinal Alert rules from provided CMDLET
 
 ## EXAMPLES
 
@@ -97,9 +98,10 @@ Accept wildcard characters: False
 Enter the Severity, valid values: Medium", "High", "Low", "Informational"
 
 ```yaml
-Type: String
+Type: Severity
 Parameter Sets: (All)
 Aliases:
+Accepted values: Medium, High, Low, Informational
 
 Required: True
 Position: Named
@@ -172,9 +174,10 @@ Accept wildcard characters: False
 Select the triggert Operator, valid values are: "GreaterThan", "FewerThan", "EqualTo", "NotEqualTo"
 
 ```yaml
-Type: String
+Type: TriggerOperator
 Parameter Sets: (All)
 Aliases:
+Accepted values: GreaterThan, FewerThan, EqualTo, NotEqualTo
 
 Required: True
 Position: Named
@@ -229,12 +232,13 @@ Accept wildcard characters: False
 ```
 
 ### -Tactics
-Provide the needed tactics
+Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
 
 ```yaml
-Type: Array
+Type: Tactics[]
 Parameter Sets: (All)
 Aliases:
+Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
 
 Required: True
 Position: Named

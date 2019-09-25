@@ -4,21 +4,24 @@
 
 using module Az.Accounts
 
-function Get-AzSentinelAlertRule {
+function Get-AzSentinelHuntingRule {
     <#
     .SYNOPSIS
-    Get Azure Sentinel Alert Rules
+    Get Azure Sentinel Hunting rule
     .DESCRIPTION
-    With this function you can get the configuration of the Azure Sentinel Alert rule from Azure Sentinel
+    With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
     Enter the Workspace name
     .PARAMETER RuleName
-    Enter the name of the Alert rule
+    Enter the name of the Hunting rule name
     .EXAMPLE
-    Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-    In this example you can get configuration of multiple alert rules in once
+    Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
+    In this example you can get configuration of multiple Hunting rules
+    .EXAMPLE
+    Get-AzSentinelHuntingRule -WorkspaceName ""
+    In this example you can get a list of all the Hunting rules in once
     #>
 
     [cmdletbinding(SupportsShouldProcess)]
@@ -35,7 +38,11 @@ function Get-AzSentinelAlertRule {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$RuleName
+        [string[]]$RuleName,
+
+        [Parameter(Mandatory = $false)]
+        [validateset("HuntingQueries", "GeneralExploration", "LogManagement")]
+        [string]$Filter
     )
 
     begin {
@@ -58,7 +65,8 @@ function Get-AzSentinelAlertRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2019-01-01-preview"
+        $uri = "$script:baseUri/savedSearches?api-version=2017-04-26-preview"
+
         Write-Verbose -Message "Using URI: $($uri)"
         $alertRules = Invoke-webrequest -Uri $uri -Method get -Headers $script:authHeader
         Write-Verbose "Found $((($alertRules.Content | ConvertFrom-Json).value).count) Alert rules"
@@ -67,16 +75,16 @@ function Get-AzSentinelAlertRule {
         if ($alertRules) {
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = ($alertRules.Content | ConvertFrom-Json).value | Where-Object { $_.properties.displayName -eq $rule }
+                    [PSCustomObject]$temp = ($alertRules.Content | ConvertFrom-Json).value | Where-Object {$_.properties.displayName -eq $rule}
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
-                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
 
-                        $return += $temp.properties
+                        $return += $temp.Properties
                     }
                     else {
-                        Write-Error "Unable to find Rule: $rule"
+                        Write-Warning "Unable to find Rule: $rule"
                     }
                 }
                 return $return
@@ -84,6 +92,8 @@ function Get-AzSentinelAlertRule {
             else {
                 ($alertRules.Content | ConvertFrom-Json).value | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                    $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                    $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
                     return $_.properties
                 }
             }

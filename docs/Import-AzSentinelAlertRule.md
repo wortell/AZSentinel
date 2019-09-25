@@ -8,7 +8,7 @@ schema: 2.0.0
 # Import-AzSentinelAlertRule
 
 ## SYNOPSIS
-Manage Azure Sentinal Alert Rules
+Import Azure Sentinal Alert rule
 
 ## SYNTAX
 

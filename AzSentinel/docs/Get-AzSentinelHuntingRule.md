@@ -5,44 +5,36 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelAlertRule
+# Get-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Remove Azure Sentinal Alert Rules
+Get Azure Sentinel Hunting rule
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
+ [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
+Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
 ```
 
-In this example the defined rule will be removed from Azure Sentinel
+In this example you can get configuration of multiple Hunting rules
 
 ### EXAMPLE 2
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
+Get-AzSentinelHuntingRule -WorkspaceName ""
 ```
 
-In this example you can define multiple rules that will be removed
-
-### EXAMPLE 3
-```
-Remove-AzSentinelAlertRule -WorkspaceName ""
-```
-
-In this example no rule is specified, all rules will be removed one by one.
-For each rule you need to confirm the action
+In this example you can get a list of all the Hunting rules in once
 
 ## PARAMETERS
 
@@ -77,7 +69,7 @@ Accept wildcard characters: False
 ```
 
 ### -RuleName
-Enter the name of the rule that you wnat to remove
+Enter the name of the Hunting rule name
 
 ```yaml
 Type: String[]
@@ -88,6 +80,21 @@ Required: False
 Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Filter
+{{ Fill Filter Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

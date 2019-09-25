@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-AzSentinelAlertRule
 
 ## SYNOPSIS
-Manage Azure Sentinal Alert Rules
+Get Azure Sentinel Alert Rules
 
 ## SYNTAX
 
@@ -27,21 +27,7 @@ With this function you can get the configuration of the Azure Sentinel Alert rul
 Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
 ```
 
-in this example all the rules configured in the JSON file will be created or updated
-
-### EXAMPLE 2
-```
-Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "" -SubscriptionId ""
-```
-
-in this example all the rules configured in the JSON file will be created or updated
-
-### EXAMPLE 3
-```
-Get-AzSentinelAlertRule -WorkspaceName "" -subscriptionid ""
-```
-
-In this example you can select multiple JSON files and Pipeline it to the module
+In this example you can get configuration of multiple alert rules in once
 
 ## PARAMETERS
 

@@ -11,7 +11,7 @@ function Get-LogAnalyticWorkspace {
     .PARAMETER FullObject
     If you want to return the full object data
     .EXAMPLE
-    Get-LogAnalyticWorkspace -WorkspaceName "pkm02"
+    Get-LogAnalyticWorkspace -WorkspaceName ""
     This example will get the Workspace and set workspace and baseuri param on Script scope level
     .EXAMPLE
     Get-LogAnalyticWorkspace -WorkspaceName "" -FullObject
@@ -64,7 +64,7 @@ function Get-LogAnalyticWorkspace {
             Write-Verbose "Found Workspace $WorkspaceName in RG $($workspaceObject.id.Split('/')[4])"
         }
         else {
-            Write-Error "Unable to find worrkspace $WorkspaceName under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
+            Write-Error "Unable to find workspace $WorkspaceName under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
         }
     }
 }
