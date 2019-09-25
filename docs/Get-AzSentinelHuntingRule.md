@@ -27,7 +27,7 @@ With this function you can get the configuration of the Azure Sentinel Hunting r
 Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
 ```
 
-In this example you can get configuration of multiple Huntinh rules
+In this example you can get configuration of multiple Hunting rules
 
 ### EXAMPLE 2
 ```
