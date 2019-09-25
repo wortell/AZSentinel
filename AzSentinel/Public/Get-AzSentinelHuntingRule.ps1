@@ -18,7 +18,7 @@ function Get-AzSentinelHuntingRule {
     Enter the name of the Hunting rule name
     .EXAMPLE
     Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
-    In this example you can get configuration of multiple Huntinh rules
+    In this example you can get configuration of multiple Hunting rules
     .EXAMPLE
     Get-AzSentinelHuntingRule -WorkspaceName ""
     In this example you can get a list of all the Hunting rules in once

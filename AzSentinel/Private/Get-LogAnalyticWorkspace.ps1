@@ -64,7 +64,7 @@ function Get-LogAnalyticWorkspace {
             Write-Verbose "Found Workspace $WorkspaceName in RG $($workspaceObject.id.Split('/')[4])"
         }
         else {
-            Write-Error "Unable to find worrkspace $WorkspaceName under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
+            Write-Error "Unable to find workspace $WorkspaceName under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
         }
     }
 }
