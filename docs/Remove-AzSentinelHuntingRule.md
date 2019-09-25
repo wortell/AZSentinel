@@ -5,43 +5,43 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelAlertRule
+# Remove-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Remove Azure Sentinal Alert Rules
+Remove Azure Sentinal Hunting Rules
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Remove-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+With this function you can remove Azure Sentinal hunting rules from Powershell, if you don't provide andy Hunting rule name all rules will be removed
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
+Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName ""
 ```
 
-In this example the defined rule will be removed from Azure Sentinel
+In this example the defined hunting rule will be removed from Azure Sentinel
 
 ### EXAMPLE 2
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
+Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName "","", ""
 ```
 
-In this example you can define multiple rules that will be removed
+In this example you can define multiple hunting rules that will be removed
 
 ### EXAMPLE 3
 ```
-Remove-AzSentinelAlertRule -WorkspaceName ""
+Remove-AzSentinelHuntingRule -WorkspaceName ""
 ```
 
-In this example no rule is specified, all rules will be removed one by one.
+In this example no hunting rule is specified, all hunting rules will be removed one by one.
 For each rule you need to confirm the action
 
 ## PARAMETERS

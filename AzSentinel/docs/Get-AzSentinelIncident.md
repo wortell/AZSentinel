@@ -5,44 +5,44 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelAlertRule
+# Get-AzSentinelIncident
 
 ## SYNOPSIS
-Remove Azure Sentinal Alert Rules
+Get Azure Sentinel Incident
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Get-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> [-IncidentName <String[]>]
+ [-CaseNumber <Int32[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+With this function you can get a list of open incidents from Azure Sentinel.
+You can can also filter to Incident with speciefiek case namber or Case name
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
+Get-AzSentinelIncident -WorkspaceName ""
 ```
 
-In this example the defined rule will be removed from Azure Sentinel
+Get a list of all open Incidents
 
 ### EXAMPLE 2
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
+Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
 ```
 
-In this example you can define multiple rules that will be removed
+Get information of a specifiek incident with providing the casenumber
 
 ### EXAMPLE 3
 ```
-Remove-AzSentinelAlertRule -WorkspaceName ""
+Get-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
 ```
 
-In this example no rule is specified, all rules will be removed one by one.
-For each rule you need to confirm the action
+Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
 
 ## PARAMETERS
 
@@ -76,11 +76,26 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RuleName
-Enter the name of the rule that you wnat to remove
+### -IncidentName
+Enter incident name, this is the same name as the alert rule that triggered the incident
 
 ```yaml
 Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -CaseNumber
+Enter the case number to get specfiek details of a open case
+
+```yaml
+Type: Int32[]
 Parameter Sets: (All)
 Aliases:
 

@@ -5,44 +5,29 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelAlertRule
+# New-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Remove Azure Sentinal Alert Rules
+Create Azure Sentinal Hunting Rule
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+New-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
+ -Query <String> -Description <String> -Tactics <Tactics[]> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+Use this function to creates Azure Sentinal Hunting rule
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
+New-AzSentinelHuntingRule -WorkspaceName "" -DisplayName "" -Description "" -Tactics "","" -Query ''
 ```
 
-In this example the defined rule will be removed from Azure Sentinel
-
-### EXAMPLE 2
-```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
-```
-
-In this example you can define multiple rules that will be removed
-
-### EXAMPLE 3
-```
-Remove-AzSentinelAlertRule -WorkspaceName ""
-```
-
-In this example no rule is specified, all rules will be removed one by one.
-For each rule you need to confirm the action
+In this example you create a new hunting rule by defining the rule properties from CMDLET
 
 ## PARAMETERS
 
@@ -76,18 +61,64 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RuleName
-Enter the name of the rule that you wnat to remove
+### -DisplayName
+Enter the Display name for the hunting rule
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Query
+Enter the querry in KQL format
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Description
+Enter the Description for the hunting rule
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tactics
+Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+
+```yaml
+Type: Tactics[]
+Parameter Sets: (All)
+Aliases:
+Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

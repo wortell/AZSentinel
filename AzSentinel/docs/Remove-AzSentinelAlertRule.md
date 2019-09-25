@@ -8,7 +8,7 @@ schema: 2.0.0
 # Remove-AzSentinelAlertRule
 
 ## SYNOPSIS
-Manage Azure Sentinal Alert Rules
+Remove Azure Sentinal Alert Rules
 
 ## SYNTAX
 
@@ -43,11 +43,6 @@ Remove-AzSentinelAlertRule -WorkspaceName ""
 
 In this example no rule is specified, all rules will be removed one by one.
 For each rule you need to confirm the action
-
-### EXAMPLE 4
-```
-Remove-AzSentinelAlertRule -WorkspaceName "" -SubscriptionId ""
-```
 
 ## PARAMETERS
 

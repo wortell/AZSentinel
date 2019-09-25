@@ -2,27 +2,27 @@
 #requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
 #requires -version 6.2
 
-function Import-AzSentinelAlertRule {
+function Import-AzSentinelHuntingRule {
     <#
     .SYNOPSIS
-    Import Azure Sentinal Alert rule
+    Import Azure Sentinal Hunting rule
     .DESCRIPTION
-    This function imports Azure Sentinal Alert rules from JSON and YAML config files.
-    This way you can manage your Alert rules dynamic from JSON or multiple YAML files
+    This function imports Azure Sentinal Hunnting rules from JSON and YAML config files.
+    This way you can manage your Hunting rules dynamic from JSON or multiple YAML files
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
     Enter the Workspace name
     .PARAMETER SettingsFile
-    Path to the JSON or YAML file for the AlertRules
+    Path to the JSON or YAML file for the Hunting rules
     .EXAMPLE
-    Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\AlertRules.json"
+    Import-AzSentinelHuntingRule -WorkspaceName "infr-weu-oms-t-7qodryzoj6agu" -SettingsFile ".\examples\HuntingRules.json"
     In this example all the rules configured in the JSON file will be created or updated
     .EXAMPLE
-    Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\SuspectApplicationConsent.yaml"
+    Import-AzSentinelHuntingRule -WorkspaceName "" -SettingsFile ".\examples\HuntingRules.yaml"
     In this example all the rules configured in the YAML file will be created or updated
     .EXAMPLE
-    Get-Item .\examples\*.json | Import-AzSentinelAlertRule -WorkspaceName ""
+    Get-Item .\examples\HuntingRules*.json | Import-AzSentinelHuntingRule -WorkspaceName ""
     In this example you can select multiple JSON files and Pipeline it to the SettingsFile parameter
     #>
 
@@ -63,6 +63,7 @@ function Import-AzSentinelAlertRule {
         Get-LogAnalyticWorkspace @arguments
 
         $errorResult = ''
+        $item = @{ }
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
@@ -87,30 +88,31 @@ function Import-AzSentinelAlertRule {
         }
 
         foreach ($item in $analytics) {
-            Write-Verbose -Message "Started with rule: $($item.displayName)"
-
-            $guid = (New-Guid).Guid
+            Write-Verbose -Message "Started with Hunting rule: $($item.displayName)"
 
             try {
                 Write-Verbose -Message "Get rule $($item.description)"
-                $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
+                $content = Get-AzSentinelHuntingRule @arguments -RuleName $($item.displayName) -WarningAction SilentlyContinue
 
                 if ($content) {
-                    Write-Verbose -Message "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Verbose -Message "Hunting rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
                     $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
 
-                    $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
+                    $uri = "$script:baseUri/savedSearches/$($content.name)?api-version=2017-04-26-preview"
                 }
                 else {
-                    Write-Verbose -Message "Rule $($item.displayName) doesn't exists in Azure Sentinel"
+                    Write-Verbose -Message "Hunting rule $($item.displayName) doesn't exists in Azure Sentinel"
+
+                    $guid = (New-Guid).Guid
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
-                    $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
-                    $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+                    $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/savedSearches/$guid" -Force
+
+                    $uri = "$script:baseUri/savedSearches/$($guid)?api-version=2017-04-26-preview"
                 }
             }
             catch {
@@ -120,38 +122,48 @@ function Import-AzSentinelAlertRule {
                 Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
             }
 
-            try {
-                $bodyAlertProp = [AlertProp]::new(
-                    $item.name,
-                    $item.displayName,
-                    $item.description,
-                    $item.severity,
-                    $item.enabled,
-                    $item.query,
-                    $item.queryFrequency,
-                    $item.queryPeriod,
-                    $item.triggerOperator,
-                    $item.triggerThreshold,
-                    $item.suppressionDuration,
-                    $item.suppressionEnabled,
-                    $item.tactics
-                )
-                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
-            }
-            catch {
-                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
+            [PSCustomObject]$body = @{
+                "name"       = $item.name
+                "eTag"       = $item.etag
+                "id"         = $item.id
+                "properties" = @{
+                    'Category'             = 'Hunting Queries'
+                    'DisplayName'          = [string]$item.displayName
+                    'Query'                = [string]$item.query
+                    [pscustomobject]'Tags' = @(
+                        @{
+                            'Name'  = "description"
+                            'Value' = [string]$item.description
+                        },
+                        @{
+                            "Name"  = "tactics"
+                            "Value" = [Tactics[]] $item.tactics -join ','
+                        },
+                        @{
+                            "Name"  = "createdBy"
+                            "Value" = ""
+                        },
+                        @{
+                            "Name"  = "createdTimeUtc"
+                            "Value" = ""
+                        }
+                    )
+                }
             }
 
             if ($content) {
-                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+                $compareResult1 = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, Tags, Version) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, Tags, Version)
+                $compareResult2 = Compare-Policy -ReferenceTemplate ($content.Tags | Where-Object { $_.name -eq "tactics" }) -DifferenceTemplate ($body.Properties.Tags | Where-Object { $_.name -eq "tactics" })
+                $compareResult = [PSCustomObject]$compareResult1 + [PSCustomObject]$compareResult2
+
                 if ($compareResult) {
-                    Write-Output "Found Differences for rule: $($item.displayName)"
+                    Write-Output "Found Differences for hunting rule: $($item.displayName)"
                     Write-Output ($compareResult | Format-Table | Out-String)
 
-                    if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
+                    if ($PSCmdlet.ShouldProcess("Do you want to update hunting rule: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
-                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                            Write-Output "Successfully updated hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
@@ -162,11 +174,11 @@ function Import-AzSentinelAlertRule {
                         }
                     }
                     else {
-                        Write-Output "No change have been made for rule $($item.displayName), deployment aborted"
+                        Write-Output "No change have been made for hunting rule $($item.displayName), deployment aborted"
                     }
                 }
                 else {
-                    Write-Output "Rule $($item.displayName) is compliance, nothing to do"
+                    Write-Output "Hunting rule $($item.displayName) is compliance, nothing to do"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
             }
@@ -174,8 +186,8 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
-                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                    Write-Output "Successfully created hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {

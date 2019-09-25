@@ -4,12 +4,12 @@
 
 using module Az.Accounts
 
-function Remove-AzSentinelAlertRule {
+function Remove-AzSentinelHuntingRule {
     <#
     .SYNOPSIS
-    Remove Azure Sentinal Alert Rules
+    Remove Azure Sentinal Hunting Rules
     .DESCRIPTION
-    With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+    With this function you can remove Azure Sentinal hunting rules from Powershell, if you don't provide andy Hunting rule name all rules will be removed
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
@@ -17,14 +17,14 @@ function Remove-AzSentinelAlertRule {
     .PARAMETER RuleName
     Enter the name of the rule that you wnat to remove
     .EXAMPLE
-    Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
-    In this example the defined rule will be removed from Azure Sentinel
+    Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName ""
+    In this example the defined hunting rule will be removed from Azure Sentinel
     .EXAMPLE
-    Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
-    In this example you can define multiple rules that will be removed
+    Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName "","", ""
+    In this example you can define multiple hunting rules that will be removed
     .EXAMPLE
-    Remove-AzSentinelAlertRule -WorkspaceName ""
-    In this example no rule is specified, all rules will be removed one by one. For each rule you need to confirm the action
+    Remove-AzSentinelHuntingRule -WorkspaceName ""
+    In this example no hunting rule is specified, all hunting rules will be removed one by one. For each rule you need to confirm the action
     #>
 
     [cmdletbinding(SupportsShouldProcess, ConfirmImpact = 'High')]
@@ -67,34 +67,34 @@ function Remove-AzSentinelAlertRule {
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule -WarningAction SilentlyContinue
+                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule
                 if ($item) {
                     $uri = "$script:baseUri/savedSearches/$($item.name)?api-version=2017-04-26-preview"
 
                     if ($PSCmdlet.ShouldProcess("Do you want to remove: $rule")) {
                         Write-Output $item
                         $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                        Write-Output "Successfully removed rule: $($rule) with status: $($result.StatusDescription)"
+                        Write-Output "Successfully removed hunting rule: $($rule) with status: $($result.StatusDescription)"
                     }
                     else {
-                        Write-Output "No change have been made for rule: $rule"
+                        Write-Output "No change have been made for hunting rule: $rule"
                     }
                 }
                 else {
-                    Write-Warning "$rule not found in $WorkspaceName"
+                    Write-Warning "Hunting rule $rule not found in $WorkspaceName"
                 }
             }
         }
         else {
-            Write-Warning "No Rule selected, All rules will be removed one by one!"
+            Write-Warning "No hunting rule selected, All hunting rules will be removed one by one!"
             Get-AzSentinelHuntingRule @arguments | ForEach-Object {
                 $uri = "$script:baseUri/savedSearches/$($_.name)?api-version=2017-04-26-preview"
                 if ($PSCmdlet.ShouldProcess("Do you want to remove: $($_.displayName)")) {
                     $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                    Write-Output "Successfully removed rule: $($_.displayName) with status: $($result.StatusDescription)"
+                    Write-Output "Successfully removed hunting rule: $($_.displayName) with status: $($result.StatusDescription)"
                 }
                 else {
-                    Write-Output "No change have been made for rule: $($_.displayName)"
+                    Write-Output "No change have been made for hunting rule: $($_.displayName)"
                 }
             }
         }

@@ -5,44 +5,44 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelAlertRule
+# Import-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Remove Azure Sentinal Alert Rules
+Import Azure Sentinal Hunting rule
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Import-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> -SettingsFile <FileInfo>
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+This function imports Azure Sentinal Hunnting rules from JSON and YAML config files.
+This way you can manage your Hunting rules dynamic from JSON or multiple YAML files
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
+Import-AzSentinelHuntingRule -WorkspaceName "infr-weu-oms-t-7qodryzoj6agu" -SettingsFile ".\examples\HuntingRules.json"
 ```
 
-In this example the defined rule will be removed from Azure Sentinel
+In this example all the rules configured in the JSON file will be created or updated
 
 ### EXAMPLE 2
 ```
-Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
+Import-AzSentinelHuntingRule -WorkspaceName "" -SettingsFile ".\examples\HuntingRules.yaml"
 ```
 
-In this example you can define multiple rules that will be removed
+In this example all the rules configured in the YAML file will be created or updated
 
 ### EXAMPLE 3
 ```
-Remove-AzSentinelAlertRule -WorkspaceName ""
+Get-Item .\examples\HuntingRules*.json | Import-AzSentinelHuntingRule -WorkspaceName ""
 ```
 
-In this example no rule is specified, all rules will be removed one by one.
-For each rule you need to confirm the action
+In this example you can select multiple JSON files and Pipeline it to the SettingsFile parameter
 
 ## PARAMETERS
 
@@ -76,15 +76,15 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RuleName
-Enter the name of the rule that you wnat to remove
+### -SettingsFile
+Path to the JSON or YAML file for the Hunting rules
 
 ```yaml
-Type: String[]
+Type: FileInfo
 Parameter Sets: (All)
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: True (ByValue)
