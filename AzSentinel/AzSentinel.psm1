@@ -1,41 +1,35 @@
-$Enums = @( Get-ChildItem -Path $PSScriptRoot\Enums\*.ps1 -ErrorAction SilentlyContinue )
-Foreach ($import in @($Enums)) {
-    Try {
-        Write-Verbose "Importing $($import.FullName)"
-        . $import.fullname
-    }
-    Catch {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
-    }
+$enums = Get-ChildItem -Path $PSScriptRoot\enums\*.ps1 -ErrorAction SilentlyContinue | ForEach-Object -Process {
+    Get-Content $_.FullName
 }
 
-# Import Classes
 if (Test-Path "$PSScriptRoot\Classes\classes.psd1") {
-    $ClassLoadOrder = Import-PowerShellDataFile -Path "$PSScriptRoot\Classes\classes.psd1" -ErrorAction SilentlyContinue
+    $ClassLoadOrder = Import-PowerShellDataFile -Path "$PSScriptRoot\classes\classes.psd1" -ErrorAction SilentlyContinue
 }
 
-foreach ($class in $ClassLoadOrder.order) {
+$classes = foreach ($class in $ClassLoadOrder.order) {
     $path = '{0}\classes\{1}.ps1' -f $PSScriptRoot, $class
     if (Test-Path $path) {
-        . $path
+        Get-Content $path
     }
 }
 
-# Get public and private function definition files.
-$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
-$Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
-
-# Dot source the files
-Foreach ($import in @($Public + $Private)) {
-    Try {
-        Write-Verbose "Importing $($Import.FullName)"
-        . $import.fullname
-    }
-    Catch {
-        Write-Error -Message "Failed to import function $($import.fullname): $_"
-    }
+$public  = Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -Exclude WIP* -ErrorAction SilentlyContinue | ForEach-Object -Process {
+    Get-Content $_
+    "Export-ModuleMember -Function $($_.Basename)"
 }
 
-Export-ModuleMember -Function $Public.Basename
+$private = Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Exclude WIP* -ErrorAction SilentlyContinue | ForEach-Object -Process {
+    Get-Content $_
+}
 
-<# INSERT FOOTER BELOW #>
+$moduleContent = @'
+$DSCPullServerConnections = [System.Collections.ArrayList]::new()
+{0}
+{1}
+{2}
+{3}
+'@ -f ($enums -join "`n"), ($classes -join "`n"), ($private -join "`n"), ($public -join "`n")
+
+$scriptBlock = [scriptblock]::Create($moduleContent)
+
+New-Module -Name DSCPullServerAdmin -ScriptBlock $scriptBlock
