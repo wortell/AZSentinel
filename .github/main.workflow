@@ -1,6 +1,6 @@
 workflow "New workflow" {
   on = "push"
-  resolves = ["Run build"]
+  resolves = ["Run Build"]
 }
 
 action "Run Build" {
