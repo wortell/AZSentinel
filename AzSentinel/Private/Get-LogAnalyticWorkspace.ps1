@@ -1,3 +1,6 @@
+#requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
+#requires -version 6.2
+
 function Get-LogAnalyticWorkspace {
     <#
     .SYNOPSIS
@@ -6,7 +9,7 @@ function Get-LogAnalyticWorkspace {
     This function is used by other function for getting the workspace infiormation and seting the right values for $script:workspace and $script:baseUri
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
-    .PARAMETER workspace
+    .PARAMETER WorkspaceName
     Enter the Workspace name
     .PARAMETER FullObject
     If you want to return the full object data
