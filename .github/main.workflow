@@ -5,6 +5,6 @@ workflow "New workflow" {
 
 action "Run Build" {
   uses = "./.github/build"
-  secrets = ["GithubKey", "NuGetApiKey"]
+  secrets = ["GithubKey"]
   env = {}
 }
