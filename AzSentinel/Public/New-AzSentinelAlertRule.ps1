@@ -1,5 +1,4 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
 #requires -version 6.2
 
 function New-AzSentinelAlertRule {
