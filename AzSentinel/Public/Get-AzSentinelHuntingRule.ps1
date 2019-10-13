@@ -1,5 +1,8 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -version 6.2
+#requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
+#requires -version 6.0
+
+using module Az.Accounts
 
 function Get-AzSentinelHuntingRule {
     <#
@@ -13,8 +16,6 @@ function Get-AzSentinelHuntingRule {
     Enter the Workspace name
     .PARAMETER RuleName
     Enter the name of the Hunting rule name
-    .PARAMETER Filter
-    Select which type of Hunting rule you want to get
     .EXAMPLE
     Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
     In this example you can get configuration of multiple Hunting rules
