@@ -21,7 +21,7 @@ These instructions will get you a copy of the project up and running on your loc
 A step by step guide how to install module
 
 ```PowerShell
-Install-Module AzSentinel -Scope CurrentUser -Force
+Import-Module .\AzSentinel -Force
 ```
 
 ### Usage
