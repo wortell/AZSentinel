@@ -139,7 +139,7 @@ function Import-AzSentinelAlertRule {
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
             catch {
-                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
+                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Continue
             }
 
             if ($content) {
@@ -158,7 +158,7 @@ function Import-AzSentinelAlertRule {
                             $errorReturn = $_
                             $errorResult = ($errorReturn | ConvertFrom-Json ).error
                             Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                         }
                     }
                     else {
@@ -182,7 +182,7 @@ function Import-AzSentinelAlertRule {
                     $errorReturn = $_
                     $errorResult = ($errorReturn | ConvertFrom-Json ).error
                     Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                 }
             }
         }
