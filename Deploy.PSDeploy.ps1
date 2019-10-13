@@ -42,7 +42,7 @@ $releaseData = @{
     prerelease = $false
 }
 $releaseParams = @{
-    Uri             = "https://api.github.com/repos/wortell/AzSentinel/releases?access_token=$env:GithubKey"
+    Uri             = "https://api.github.com/repos/pkhabazi/AzSentinel-1/releases?access_token=$env:GithubKey"
     Method          = 'POST'
     ContentType     = 'application/json'
     Body            = (ConvertTo-Json $releaseData -Compress)
