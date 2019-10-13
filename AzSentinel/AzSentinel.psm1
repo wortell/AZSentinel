@@ -1,35 +1,41 @@
-$enums = Get-ChildItem -Path $PSScriptRoot\enums\*.ps1 -ErrorAction SilentlyContinue | ForEach-Object -Process {
-    Get-Content $_.FullName
-}
-
-if (Test-Path "$PSScriptRoot\Classes\classes.psd1") {
-    $ClassLoadOrder = Import-PowerShellDataFile -Path "$PSScriptRoot\classes\classes.psd1" -ErrorAction SilentlyContinue
-}
-
-$classes = foreach ($class in $ClassLoadOrder.order) {
-    $path = '{0}\classes\{1}.ps1' -f $PSScriptRoot, $class
-    if (Test-Path $path) {
-        Get-Content $path
+$Enums = @( Get-ChildItem -Path $PSScriptRoot\Enums\*.ps1 -ErrorAction SilentlyContinue )
+Foreach ($import in @($Enums)) {
+    Try {
+        Write-Verbose "Importing $($import.FullName)"
+        . $import.fullname
+    }
+    Catch {
+        Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
 
-$public  = Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -Exclude WIP* -ErrorAction SilentlyContinue | ForEach-Object -Process {
-    Get-Content $_
-    "Export-ModuleMember -Function $($_.Basename)"
+# Import Classes
+if (Test-Path "$PSScriptRoot\Classes\classes.psd1") {
+    $ClassLoadOrder = Import-PowerShellDataFile -Path "$PSScriptRoot\Classes\classes.psd1" -ErrorAction SilentlyContinue
 }
 
-$private = Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -Exclude WIP* -ErrorAction SilentlyContinue | ForEach-Object -Process {
-    Get-Content $_
+foreach ($class in $ClassLoadOrder.order) {
+    $path = '{0}\classes\{1}.ps1' -f $PSScriptRoot, $class
+    if (Test-Path $path) {
+        . $path
+    }
 }
 
-$moduleContent = @'
-$DSCPullServerConnections = [System.Collections.ArrayList]::new()
-{0}
-{1}
-{2}
-{3}
-'@ -f ($enums -join "`n"), ($classes -join "`n"), ($private -join "`n"), ($public -join "`n")
+# Get public and private function definition files.
+$Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
+$Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
-$scriptBlock = [scriptblock]::Create($moduleContent)
+# Dot source the files
+Foreach ($import in @($Public + $Private)) {
+    Try {
+        Write-Verbose "Importing $($Import.FullName)"
+        . $import.fullname
+    }
+    Catch {
+        Write-Error -Message "Failed to import function $($import.fullname): $_"
+    }
+}
 
-New-Module -Name DSCPullServerAdmin -ScriptBlock $scriptBlock
+Export-ModuleMember -Function $Public.Basename
+
+<# INSERT FOOTER BELOW #>
