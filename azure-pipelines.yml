@@ -1,0 +1,22 @@
+pool:
+  vmImage: 'ubuntu-latest'
+
+pr:
+- master
+- releases/*
+
+steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Install-Module BuildHelpers -Scope CurrentUser'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: '.\.build.ps1 -ResolveDependency'
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'NUnit'
+    testResultsFiles: '**/**/*.xml'
+    searchFolder: '$(System.DefaultWorkingDirectory)/BuildOutput/testResults'
+  condition: always()
