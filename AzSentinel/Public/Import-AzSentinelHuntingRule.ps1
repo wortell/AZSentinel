@@ -170,7 +170,7 @@ function Import-AzSentinelHuntingRule {
                             $errorReturn = $_
                             $errorResult = ($errorReturn | ConvertFrom-Json ).error
                             Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                         }
                     }
                     else {
@@ -194,7 +194,7 @@ function Import-AzSentinelHuntingRule {
                     $errorReturn = $_
                     $errorResult = ($errorReturn | ConvertFrom-Json ).error
                     Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                 }
             }
         }
