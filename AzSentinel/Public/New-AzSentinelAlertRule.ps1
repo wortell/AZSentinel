@@ -182,7 +182,7 @@ function New-AzSentinelAlertRule {
 
                 if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                     try {
-                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"
                         Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                     }
@@ -206,7 +206,7 @@ function New-AzSentinelAlertRule {
             Write-Verbose "Creating new rule: $($DisplayName)"
 
             try {
-                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
             }

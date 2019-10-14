@@ -1,3 +1,5 @@
+#requires -version 6.2
+
 function precheck {
     if ($null -eq $script:accessToken) {
         Get-AuthToken
