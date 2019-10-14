@@ -1,9 +1,6 @@
-Add-Type -TypeDefinition @"
-    public enum Severity
-    {
-        Medium,
-        High,
-        Low,
-        Informational
-    }
-"@
+enum Severity {
+    Medium
+    High
+    Low
+    Informational
+}
