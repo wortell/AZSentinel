@@ -1,13 +1,14 @@
 # ChangeLog
+
 ## v0.6.1 - 14-10-2019
 
 ### Breaking Changes
 
--
+- nothing
 
 ### Updates and Fixes
 
-- Fixed enum issue, when ennume get converted to json int value was used instead of string value
+- Fixed enum issue, when enum get converted to json int value was used instead of string value
 - fixed Remove-AzSentinelAlertRule, wrong api was used
 
 ### Experimental Features

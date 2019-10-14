@@ -3,7 +3,7 @@
     {
       "displayName": "AlertRule01",
       "description": "test",
-      "severity": "High",
+      "severity": "Medium",
       "enabled": true,
       "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
       "queryFrequency": "5H",
@@ -14,7 +14,7 @@
       "suppressionEnabled": false,
       "tactics": [
         "Persistence",
-        "LateralMovementt",
+        "LateralMovement",
         "Collection"
       ]
     },
@@ -32,8 +32,7 @@
       "suppressionEnabled": false,
       "tactics": [
         "Persistence",
-        "LateralMovement",
-        "Collection"
+        "LateralMovement"
       ]
     }
   ]
