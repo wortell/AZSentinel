@@ -1,5 +1,4 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
 #requires -version 6.2
 
 function New-AzSentinelAlertRule {
@@ -37,7 +36,7 @@ function New-AzSentinelAlertRule {
     .PARAMETER Tactics
     Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
     .EXAMPLE
-    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity "" -Enabled  -Query '' -QueryFrequency ""  -QueryPeriod "" -TriggerOperator "" -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
+    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
@@ -123,7 +122,7 @@ function New-AzSentinelAlertRule {
         Write-Verbose -Message "Creating new rule: $($DisplayName)"
         try {
             Write-Verbose -Message "Get rule $DisplayName"
-            $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -WarningAction SilentlyContinue
+            $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -ErrorAction SilentlyContinue
 
             if ($content) {
                 Write-Verbose -Message "Rule $($DisplayName) exists in Azure Sentinel"
@@ -183,7 +182,7 @@ function New-AzSentinelAlertRule {
 
                 if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                     try {
-                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"
                         Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                     }
@@ -207,7 +206,7 @@ function New-AzSentinelAlertRule {
             Write-Verbose "Creating new rule: $($DisplayName)"
 
             try {
-                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
             }

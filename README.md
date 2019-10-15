@@ -10,7 +10,7 @@ At the moment there is no documented API, ARM or PowerShell module to configure 
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Prerequisities
+### Prerequisites
 
 * [PowerShell Core](https://github.com/PowerShell/PowerShell)
 * Powershell [AZ Module](https://www.powershellgallery.com/packages/Az) - tested with version 2.4.0
@@ -18,10 +18,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installing
 
-A step by step guide how to install module
+You can install the latest version of AzSentinel module from [PowerShell Gallery](https://www.powershellgallery.com/packages/AzSentinel)
 
 ```PowerShell
-Import-Module .\AzSentinel -Force
+Install-Module AzSentinel -Scope CurrentUser -Force
 ```
 
 ### Usage
@@ -36,21 +36,26 @@ To create a Azure Sentinel Rule, use the following JSON format.
 
 ```JSON
 {
-    "analytics": [
-        {
-            "displayName": "string",
-            "description": "string",
-            "severity": "High",
-            "enabled": true,
-            "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
-            "queryFrequency": "5H",
-            "queryPeriod": "5H",
-            "triggerOperator": "GreaterThan",
-            "triggerThreshold": 5,
-            "suppressionDuration": "6H",
-            "suppressionEnabled": false,
-        }
-    ]
+  "analytics": [
+    {
+      "displayName": "string",
+      "description": "string",
+      "severity": "High",
+      "enabled": true,
+      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+      "queryFrequency": "5H",
+      "queryPeriod": "5H",
+      "triggerOperator": "GreaterThan",
+      "triggerThreshold": 5,
+      "suppressionDuration": "6H",
+      "suppressionEnabled": false,
+      "tactics": [
+        "Persistence",
+        "LateralMovement",
+        "Collection"
+      ]
+    }
+  ]
 }
 ```
 
@@ -58,32 +63,34 @@ To create a Azure Sentinel Rule, use the following JSON format.
 
 The following tables describe the values you need to set in the schema.
 
-| Name                | Type   | Required | Allowed Values                               | Example                                                                                           |
-| ------------------- | ------ | -------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| displayName         | string | yes      | *                                            | DisplayName                                                                                       |
-| description         | string | yes      | *                                            | Description                                                                                       |
-| severity            | string | yes      | Medium, High, Low, Informational             | Medium                                                                                            |
-| enabled             | bool   | yes      | true, false                                  | true                                                                                              |
-| query               | string | yes      | special character need to be escaped by \    | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
-| queryFrequency      | string | yes      | Value must be between 5 minutes and 24 hours | 5H                                                                                                |
-| queryPeriod         | string | yes      | Value must be between 5 minutes and 24 hours | 1440M                                                                                             |
-| triggerOperator     | string | yes      | GreaterThan, FewerThan, EqualTo, NotEqualTo  | GreaterThan                                                                                       |
-| triggerThreshold    | int    | yes      | The value must be between 0 and 10000        | 5                                                                                                 |
-| suppressionDuration | string | yes      | Value must be between 5 minutes and 24 hours | 11H                                                                                               |
-| suppressionEnabled  | bool   | yes      | true, false                                  | true                                                                                              |
+| Name                | Type   | Required | Allowed Values                                                                                                                                                      | Example                                                                                           |
+| ------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| displayName         | string | yes      | *                                                                                                                                                                   | DisplayName                                                                                       |
+| description         | string | yes      | *                                                                                                                                                                   | Description                                                                                       |
+| severity            | string | yes      | Medium, High, Low, Informational                                                                                                                                    | Medium                                                                                            |
+| enabled             | bool   | yes      | true, false                                                                                                                                                         | true                                                                                              |
+| query               | string | yes      | special character need to be escaped by \                                                                                                                           | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
+| queryFrequency      | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 5H                                                                                                |
+| queryPeriod         | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 1440M                                                                                             |
+| triggerOperator     | string | yes      | GreaterThan, FewerThan, EqualTo, NotEqualTo                                                                                                                         | GreaterThan                                                                                       |
+| triggerThreshold    | int    | yes      | The value must be between 0 and 10000                                                                                                                               | 5                                                                                                 |
+| suppressionDuration | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 11H                                                                                               |
+| suppressionEnabled  | bool   | yes      | true, false                                                                                                                                                         | true                                                                                              |
+| tactics             | array  | yes      | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
 
 ## Find us
 
 * [Wortell](https://security.wortell.nl/)
 * [GitHub](https://github.com/wortell/AZSentinel)
+* [PowerShell Gallery](https://www.powershellgallery.com/packages/AzSentinel)
 
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
+## Thanks
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/wortell/AzSentinel/tags).
+* A big thank you goes out to [@bgelens](https://github.com/bgelens) and [@MauRiEEZZZ](https://github.com/MauRiEEZZZ) for their great contributions!
 
 ## Authors
 
@@ -91,10 +98,14 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 See also the list of [contributors](https://github.com/wortell/AzSentinel/contributors) who participated in this project.
 
+## Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/wortell/AzSentinel/tags).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
+* Hat tip to anyone whose code was used!

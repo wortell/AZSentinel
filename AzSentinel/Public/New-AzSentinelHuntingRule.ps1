@@ -1,5 +1,4 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
 #requires -version 6.2
 
 function New-AzSentinelHuntingRule {
@@ -157,7 +156,7 @@ function New-AzSentinelHuntingRule {
                     try {
                         Write-Output ($body.properties | Format-Table)
 
-                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                        $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                         Write-Output "Successfully updated hunting rule: $($DisplayName) with status: $($result.StatusDescription)"
                     }
                     catch {
@@ -181,7 +180,7 @@ function New-AzSentinelHuntingRule {
 
             try {
 
-                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                 Write-Output "Successfully created hunting rule: $($DisplayName) with status: $($result.StatusDescription)"
                 Write-Output ($body.properties | Format-Table)
             }

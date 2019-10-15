@@ -162,7 +162,7 @@ function Import-AzSentinelHuntingRule {
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update hunting rule: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                             Write-Output "Successfully updated hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
@@ -170,7 +170,7 @@ function Import-AzSentinelHuntingRule {
                             $errorReturn = $_
                             $errorResult = ($errorReturn | ConvertFrom-Json ).error
                             Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                         }
                     }
                     else {
@@ -186,7 +186,7 @@ function Import-AzSentinelHuntingRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                     Write-Output "Successfully created hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
@@ -194,7 +194,7 @@ function Import-AzSentinelHuntingRule {
                     $errorReturn = $_
                     $errorResult = ($errorReturn | ConvertFrom-Json ).error
                     Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                 }
             }
         }
