@@ -139,7 +139,7 @@ function Import-AzSentinelAlertRule {
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
             catch {
-                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
+                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Continue
             }
 
             if ($content) {
@@ -150,7 +150,7 @@ function Import-AzSentinelAlertRule {
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                             Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
@@ -158,7 +158,7 @@ function Import-AzSentinelAlertRule {
                             $errorReturn = $_
                             $errorResult = ($errorReturn | ConvertFrom-Json ).error
                             Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                         }
                     }
                     else {
@@ -174,7 +174,7 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
                     Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
@@ -182,7 +182,7 @@ function Import-AzSentinelAlertRule {
                     $errorReturn = $_
                     $errorResult = ($errorReturn | ConvertFrom-Json ).error
                     Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
                 }
             }
         }

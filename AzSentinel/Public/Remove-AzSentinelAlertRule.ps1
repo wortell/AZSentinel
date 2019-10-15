@@ -1,8 +1,5 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
-#requires -module @{ModuleNAme = 'powershell-yaml'; ModuleVersion = '0.4.0'}
-#requires -version 6.0
-
-using module Az.Accounts
+#requires -version 6.2
 
 function Remove-AzSentinelAlertRule {
     <#
@@ -67,9 +64,9 @@ function Remove-AzSentinelAlertRule {
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule -WarningAction SilentlyContinue
+                $item = Get-AzSentinelAlertRule @arguments -RuleName $rule -WarningAction SilentlyContinue
                 if ($item) {
-                    $uri = "$script:baseUri/savedSearches/$($item.name)?api-version=2017-04-26-preview"
+                    $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($item.name)?api-version=2019-01-01-preview"
 
                     if ($PSCmdlet.ShouldProcess("Do you want to remove: $rule")) {
                         Write-Output $item
@@ -87,8 +84,9 @@ function Remove-AzSentinelAlertRule {
         }
         else {
             Write-Warning "No Rule selected, All rules will be removed one by one!"
-            Get-AzSentinelHuntingRule @arguments | ForEach-Object {
-                $uri = "$script:baseUri/savedSearches/$($_.name)?api-version=2017-04-26-preview"
+            Get-AzSentinelAlertRule @arguments | ForEach-Object {
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($_.name)?api-version=2019-01-01-preview"
+
                 if ($PSCmdlet.ShouldProcess("Do you want to remove: $($_.displayName)")) {
                     $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
                     Write-Output "Successfully removed rule: $($_.displayName) with status: $($result.StatusDescription)"

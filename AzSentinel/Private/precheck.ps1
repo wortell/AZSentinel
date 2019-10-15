@@ -1,3 +1,6 @@
+#requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
+#requires -version 6.2
+
 function precheck {
     if ($null -eq $script:accessToken) {
         Get-AuthToken
