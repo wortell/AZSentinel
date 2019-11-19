@@ -1,6 +1,14 @@
 name: Build-Module
 
-on: [push]
+on:
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master         # Push events on master branch
 
 jobs:
   build:
