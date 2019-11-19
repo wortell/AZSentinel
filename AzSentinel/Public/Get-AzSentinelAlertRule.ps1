@@ -57,14 +57,16 @@ function Get-AzSentinelAlertRule {
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2019-01-01-preview"
         Write-Verbose -Message "Using URI: $($uri)"
-        $alertRules = Invoke-webrequest -Uri $uri -Method get -Headers $script:authHeader
-        Write-Verbose "Found $((($alertRules.Content | ConvertFrom-Json).value).count) Alert rules"
+        $alertRules = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+`
         $return = @()
 
-        if ($alertRules) {
+        if ($alertRules.value) {
+            Write-Verbose "Found $($alertRules.value.count) Alert rules"
+
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = ($alertRules.Content | ConvertFrom-Json).value | Where-Object { $_.properties.displayName -eq $rule }
+                    [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.properties.displayName -eq $rule }
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
@@ -79,7 +81,7 @@ function Get-AzSentinelAlertRule {
                 return $return
             }
             else {
-                ($alertRules.Content | ConvertFrom-Json).value | ForEach-Object {
+                $alertRules.value | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     return $_.properties
                 }

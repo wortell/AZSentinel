@@ -71,14 +71,14 @@ function Get-AzSentinelIncident {
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
         Write-Verbose -Message "Using URI: $($uri)"
-        $incident = Invoke-webrequest -Uri $uri -Method get -Headers $script:authHeader
-        Write-Verbose "Found $((($incident.Content | ConvertFrom-Json).value).count) incidents"
+        $incident = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
         $return = @()
 
         if ($incident) {
+            Write-Verbose "Found $($incident.value.count) incidents"
             if ($IncidentName.Count -ge 1) {
                 foreach ($rule in $IncidentName) {
-                    [PSCustomObject]$temp = ($incident.Content | ConvertFrom-Json).value | Where-Object { $_.properties.title -eq $rule }
+                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.title -eq $rule }
                     if ($null -ne $temp) {
                         $return += $temp.properties
                     }
@@ -90,7 +90,7 @@ function Get-AzSentinelIncident {
             }
             elseif ($CaseNumber.Count -ge 1) {
                 foreach ($rule in $CaseNumber) {
-                    [PSCustomObject]$temp = ($incident.Content | ConvertFrom-Json).value | Where-Object { $_.properties.caseNumber -eq $rule }
+                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.caseNumber -eq $rule }
                     if ($null -ne $temp) {
                         $return += $temp.properties
                     }
