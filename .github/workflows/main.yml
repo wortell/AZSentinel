@@ -1,0 +1,35 @@
+name: Build-Module
+
+on:
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master         # Push events on master branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: ./.build.ps1 -ResolveDependency
+      shell: pwsh
+      name: Run script
+      env:
+        NuGetApiKey: ${{ secrets.NuGetApiKey }}
+        GitHubKey: ${{ secrets.GitHubKey }}
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v1.0.0
+      if: always()
+      with:
+        name: testresults
+        path: BuildOutput/testResults
+    - name: Upload Compiled module
+      uses: actions/upload-artifact@v1.0.0
+      if: always()
+      with:
+        name: compiledmodule
+        path: BuildOutput/AzSentinel
