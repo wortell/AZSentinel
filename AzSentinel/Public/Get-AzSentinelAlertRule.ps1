@@ -57,8 +57,15 @@ function Get-AzSentinelAlertRule {
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2019-01-01-preview"
         Write-Verbose -Message "Using URI: $($uri)"
-        $alertRules = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
-`
+
+        try {
+            $alertRules = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+        }
+        catch {
+            Write-Verbose $_
+            Write-Error "Unable to get alert rules with error code: $($_.Exception.Message)" -ErrorAction Stop
+        }
+
         $return = @()
 
         if ($alertRules.value) {

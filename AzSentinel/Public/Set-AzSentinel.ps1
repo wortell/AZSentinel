@@ -51,8 +51,6 @@ function Set-AzSentinel {
         # Variables
         $errorResult = ''
 
-        Write-Output $Script:workspace
-
         if ($workspaceResult.properties.provisioningState -eq 'Succeeded') {
             $body = @{
                 'id'         = ''
@@ -84,23 +82,21 @@ function Set-AzSentinel {
                     try {
                         if ($PSCmdlet.ShouldProcess("Do you want to enable Sentinel for Workspace: $workspace")) {
                             $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
-                            Write-Output "Successfully enabled Sentinel on workspae: $WorkspaceName"
-                            return $result
+                            Write-Output "Successfully enabled Sentinel on workspae: $WorkspaceName with result code $($result.StatusDescription)"
                         }
                         else {
                             Write-Output "No change have been made for rule $WorkspaceName, deployment aborted"
                         }
                     }
                     catch {
-                        $errorReturn = $_
-                        $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                        Write-Error "Unable to enable Sentinel on $WorkspaceName with error message: $($errorResult.message)"
+                        Write-Verbose $_
+                        Write-Error "Unable to enable Sentinel on $WorkspaceName with error message: $($_.Exception.Message)"
                     }
 
                 }
                 else {
                     Write-Verbose $_
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                    Write-Error "Unable to Azure Sentinel with error message: $($_.Exception.Message)" -ErrorAction Stop
                 }
             }
 

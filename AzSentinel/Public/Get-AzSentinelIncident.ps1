@@ -71,7 +71,15 @@ function Get-AzSentinelIncident {
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
         Write-Verbose -Message "Using URI: $($uri)"
-        $incident = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+
+        try {
+            $incident = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+        }
+        catch {
+            Write-Verbose $_
+            Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
+        }
+
         $return = @()
 
         if ($incident) {

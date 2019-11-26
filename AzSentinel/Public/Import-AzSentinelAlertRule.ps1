@@ -62,7 +62,6 @@ function Import-AzSentinelAlertRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $errorResult = ''
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
@@ -96,7 +95,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Verbose -Message "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Host -Message "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -114,10 +113,8 @@ function Import-AzSentinelAlertRule {
                 }
             }
             catch {
-                $errorReturn = $_
-                $errorResult = ($errorReturn | ConvertFrom-Json ).error
                 Write-Verbose $_
-                Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
+                Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
             }
 
             try {
@@ -145,29 +142,27 @@ function Import-AzSentinelAlertRule {
             if ($content) {
                 $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 if ($compareResult) {
-                    Write-Output "Found Differences for rule: $($item.displayName)"
-                    Write-Output ($compareResult | Format-Table | Out-String)
+                    Write-Host "Found Differences for rule: $($item.displayName)" -ForegroundColor Yellow
+                    Write-Host ($compareResult | Format-Table | Out-String)
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
                             $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
-                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
+                            Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
-                            $errorReturn = $_
-                            $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                            Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
+                            Write-Verbose $_
+                            Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
                         }
                     }
                     else {
-                        Write-Output "No change have been made for rule $($item.displayName), deployment aborted"
+                        Write-Host "No change have been made for rule $($item.displayName), deployment aborted"
                     }
                 }
                 else {
-                    Write-Output "Rule $($item.displayName) is compliance, nothing to do"
-                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
+                    Write-Host "Rule $($item.displayName) is compliance, nothing to do"
+                    Write-Host ($body.Properties | Format-List | Format-Table | Out-String)
                 }
             }
             else {
@@ -175,14 +170,12 @@ function Import-AzSentinelAlertRule {
 
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
-                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
+                    Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {
-                    $errorReturn = $_
-                    $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                    Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
+                    Write-Verbose $_
+                    Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
                 }
             }
         }

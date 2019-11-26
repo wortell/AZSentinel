@@ -62,7 +62,6 @@ function Import-AzSentinelHuntingRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $errorResult = ''
         $item = @{ }
 
         if ($SettingsFile.Extension -eq '.json') {
@@ -88,7 +87,7 @@ function Import-AzSentinelHuntingRule {
         }
 
         foreach ($item in $analytics) {
-            Write-Verbose -Message "Started with Hunting rule: $($item.displayName)"
+            Write-Host -Message "Started with Hunting rule: $($item.displayName)"
 
             try {
                 Write-Verbose -Message "Get rule $($item.description)"
@@ -116,10 +115,8 @@ function Import-AzSentinelHuntingRule {
                 }
             }
             catch {
-                $errorReturn = $_
-                $errorResult = ($errorReturn | ConvertFrom-Json ).error
                 Write-Verbose $_
-                Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
+                Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
             }
 
             [PSCustomObject]$body = @{
@@ -167,10 +164,8 @@ function Import-AzSentinelHuntingRule {
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
-                            $errorReturn = $_
-                            $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                            Write-Verbose $_.Exception.Message
-                            Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
+                            Write-Verbose $_
+                            Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
                         }
                     }
                     else {
@@ -191,10 +186,8 @@ function Import-AzSentinelHuntingRule {
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {
-                    $errorReturn = $_
-                    $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                    Write-Verbose $_.Exception.Message
-                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Continue
+                    Write-Verbose $_
+                    Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
                 }
             }
         }
