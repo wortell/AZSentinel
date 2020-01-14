@@ -116,7 +116,6 @@ function New-AzSentinelAlertRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $errorResult = ''
         $item = @{ }
 
         Write-Verbose -Message "Creating new rule: $($DisplayName)"
@@ -146,10 +145,8 @@ function New-AzSentinelAlertRule {
             }
         }
         catch {
-            $errorReturn = $_
-            $errorResult = ($errorReturn | ConvertFrom-Json ).error
             Write-Verbose $_
-            Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
+            Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
         }
 
         try {
@@ -187,10 +184,8 @@ function New-AzSentinelAlertRule {
                         Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                     }
                     catch {
-                        $errorReturn = $_
-                        $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                        Write-Verbose $_.Exception.Message
-                        Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                        Write-Verbose $_
+                        Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
                     }
                 }
                 else {
@@ -211,10 +206,8 @@ function New-AzSentinelAlertRule {
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
             }
             catch {
-                $errorReturn = $_
-                $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                Write-Verbose $_.Exception.Message
-                Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                Write-Verbose $_
+                Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
             }
         }
     }
