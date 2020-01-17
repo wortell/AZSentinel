@@ -24,7 +24,7 @@ function Get-PlayBook {
     This example will get the workspace info from another subscrion than your "Azcontext" subscription
     .NOTES
     NAME: Get-LogicApp
-    Get-PlayBook -Name pkmsentinel
+    Get-PlayBook -Name test
     #>
     param (
         [Parameter(Mandatory = $false)]
@@ -56,7 +56,12 @@ function Get-PlayBook {
         $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object {$_.name -eq $Name}
 
         if ($playBook) {
-            return $playBook
+
+            $uri1 = "https://management.azure.com$($playBook.id)/triggers?api-version=2016-06-01"
+            Write-Host $uri1
+            $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Get -Headers $script:authHeader).value | Where-Object {$_.name -eq "When_a_response_to_an_Azure_Sentinel_alert_is_triggered"}
+
+            return $playBook.id
         }
         else {
             Write-Error "Unable to find workspace $WorkspaceName under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
