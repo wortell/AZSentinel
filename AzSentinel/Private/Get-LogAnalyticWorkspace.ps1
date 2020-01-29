@@ -60,7 +60,7 @@ function Get-LogAnalyticWorkspace {
 
         if ($workspaceObject) {
             $Script:workspace = ($workspaceObject.id).trim()
-            Write-Host $Script:workspace
+            Write-Verbose "Workspace is: $($Script:workspace)"
             $script:baseUri = "https://management.azure.com$($Script:workspace)"
             if ($FullObject) { return $workspaceObject }
             Write-Verbose ($workspaceObject | Format-List | Format-Table | Out-String)
