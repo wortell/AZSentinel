@@ -38,7 +38,7 @@ function Get-AzSentinelHuntingRule {
         [string[]]$RuleName,
 
         [Parameter(Mandatory = $false)]
-        [validateset("HuntingQueries", "GeneralExploration", "LogManagement")]
+        [validateset("Hunting Queries", "GeneralExploration", "LogManagement")]
         [string]$Filter
     )
 
@@ -65,14 +65,21 @@ function Get-AzSentinelHuntingRule {
         $uri = "$script:baseUri/savedSearches?api-version=2017-04-26-preview"
 
         Write-Verbose -Message "Using URI: $($uri)"
-        $alertRules = Invoke-webrequest -Uri $uri -Method get -Headers $script:authHeader
-        Write-Verbose "Found $((($alertRules.Content | ConvertFrom-Json).value).count) Alert rules"
+        try {
+            $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader | Where-Object $_.Category -eq $Filter)
+        }
+        catch {
+            Write-Verbose $_
+            Write-Error "Unable to get hunting rules with error code: $($_.Exception.Message)" -ErrorAction Stop
+        }
+
         $return = @()
 
-        if ($alertRules) {
+        if ($huntingRules.value) {
+            Write-Verbose "Found $($huntingRules.value.count) hunting rules"
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = ($alertRules.Content | ConvertFrom-Json).value | Where-Object {$_.properties.displayName -eq $rule}
+                    [PSCustomObject]$temp = $huntingRules.value | Where-Object { $_.properties.displayName -eq $rule }
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
@@ -81,13 +88,13 @@ function Get-AzSentinelHuntingRule {
                         $return += $temp.Properties
                     }
                     else {
-                        Write-Warning "Unable to find Rule: $rule"
+                        Write-Warning "Unable to find hunting rule: $rule"
                     }
                 }
                 return $return
             }
             else {
-                ($alertRules.Content | ConvertFrom-Json).value | ForEach-Object {
+                $huntingRules.value | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
@@ -96,7 +103,7 @@ function Get-AzSentinelHuntingRule {
             }
         }
         else {
-            Write-Warning "No rules found on $($WorkspaceName)"
+            Write-Warning "No hunting rules found on $($WorkspaceName)"
         }
     }
 }

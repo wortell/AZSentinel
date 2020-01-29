@@ -107,10 +107,8 @@ function New-AzSentinelHuntingRule {
             }
         }
         catch {
-            $errorReturn = $_
-            $errorResult = ($errorReturn | ConvertFrom-Json ).error
             Write-Verbose $_
-            Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
+            Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
         }
 
         [PSCustomObject]$body = @{
@@ -160,10 +158,8 @@ function New-AzSentinelHuntingRule {
                         Write-Output "Successfully updated hunting rule: $($DisplayName) with status: $($result.StatusDescription)"
                     }
                     catch {
-                        $errorReturn = $_
-                        $errorResult = ($errorReturn | ConvertFrom-Json).error
-                        Write-Verbose $_.Exception.Message
-                        Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                        Write-Verbose $_
+                        Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
                     }
                 }
                 else {
@@ -185,10 +181,8 @@ function New-AzSentinelHuntingRule {
                 Write-Output ($body.properties | Format-Table)
             }
             catch {
-                $errorReturn = $_
-                $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                Write-Verbose $_.Exception.Message
-                Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                Write-Verbose $_
+                Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
             }
         }
     }
