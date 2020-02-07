@@ -29,9 +29,13 @@ function Get-AzSentinelAlertRuleAction {
     [ValidateNotNullOrEmpty()]
     [string] $WorkspaceName,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [string]$RuleName
+    [string]$RuleName,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]$RuleId
   )
 
   begin {
@@ -54,15 +58,29 @@ function Get-AzSentinelAlertRuleAction {
     }
     Get-LogAnalyticWorkspace @arguments
 
-    $alertId = (Get-AzSentinelAlertRule -WorkspaceName $WorkspaceName -RuleName $RuleName).name
+    if ($RuleName){
+        $alertId = (Get-AzSentinelAlertRule @arguments -RuleName $RuleName).name
+    }
+    elseif ($RuleId) {
+        $alertId = $RuleId
+    }
+    else {
+        Write-Error "No Alert Name or ID is provided" -ErrorAction Continue
+    }
 
     if ($alertId) {
       $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions?api-version=2019-01-01-preview"
-      $action = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
-      return $action.value
+      try {
+        $return = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
+        return $return
+      }
+      catch {
+        $return = $_.Exception.Message
+        return $return
+      }
     }
     else {
-      Write-Error "No Action linked to Alert Rule $($RuleName)"
+        return "No Alert found with provided: $($alertId)"
     }
   }
 }

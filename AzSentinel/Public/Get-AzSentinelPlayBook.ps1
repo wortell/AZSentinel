@@ -12,7 +12,7 @@ function Get-AzSentinelPlayBook {
     .PARAMETER Name
     Enter the Logic App name
     .EXAMPLE
-    Get-AzSentinelPlayBook -Name ""
+    Get-AzSentinelPlayBook -Name "pkmsentinel"
     This example will get search for the Logic app within the current subscripbtio and test to see if it's compatible for Sentinel
     .NOTES
     NAME: Get-AzSentinelPlayBook
@@ -48,13 +48,18 @@ function Get-AzSentinelPlayBook {
 
     if ($playBook) {
       $uri1 = "https://management.azure.com$($playBook.id)/triggers/When_a_response_to_an_Azure_Sentinel_alert_is_triggered?api-version=2016-06-01"
-      $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Get -Headers $script:authHeader).properties
+      try {
+        $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Get -Headers $script:authHeader).properties
 
-      if ($playbookTrigger) {
-        return $playBook
+        if ($playbookTrigger) {
+          return $playBook
+        }
+        else {
+          Write-Error "Playbook doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step! " -ErrorAction Continue
+        }
       }
-      else {
-        Write-Error "Playbook doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step! " -ErrorAction Continue
+      catch {
+        Write-Error $_.Exception.Message
       }
     }
     else {
