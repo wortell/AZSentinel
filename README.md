@@ -1,6 +1,9 @@
 # Azure Sentinel
 
-![](https://github.com/wortell/AZSentinel/workflows/CI/badge.svg?branch=master)
+| branch      | status                                                                                         |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| master      | ![](https://github.com/wortell/AZSentinel/workflows/Build-Module/badge.svg?branch=master)      |
+| development | ![](https://github.com/wortell/AZSentinel/workflows/Build-Module/badge.svg?branch=development) |
 
 Azure Sentinel is a cloud-native SIEM that provides intelligent security analytics for your entire enterprise at cloud scale. Get limitless cloud speed and scale to help focus on what really matters. Easily collect data from all your cloud or on-premises assets, Office 365, Azure resources, and other clouds. Effectively detect threats with built-in machine learning from Microsoft’s security analytics experts. Automate threat response, using built-in orchestration and automation playbooks. [read more](https://docs.microsoft.com/en-us/azure/sentinel/overview)
 
