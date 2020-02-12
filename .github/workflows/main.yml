@@ -5,10 +5,12 @@ on:
     # Sequence of patterns matched against refs/heads
     branches:
       - master
+      - development
   push:
     # Sequence of patterns matched against refs/heads
     branches:
       - master         # Push events on master branch
+      - development
 
 jobs:
   build:
