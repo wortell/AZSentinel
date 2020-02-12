@@ -1,5 +1,7 @@
 # Azure Sentinel
 
+![](https://github.com/wortell/AZSentinel/workflows/CI/badge.svg?branch=master)
+
 Azure Sentinel is a cloud-native SIEM that provides intelligent security analytics for your entire enterprise at cloud scale. Get limitless cloud speed and scale to help focus on what really matters. Easily collect data from all your cloud or on-premises assets, Office 365, Azure resources, and other clouds. Effectively detect threats with built-in machine learning from Microsoft’s security analytics experts. Automate threat response, using built-in orchestration and automation playbooks. [read more](https://docs.microsoft.com/en-us/azure/sentinel/overview)
 
 ## Why this PowerShell Module
@@ -53,7 +55,8 @@ To create a Azure Sentinel Rule, use the following JSON format.
         "Persistence",
         "LateralMovement",
         "Collection"
-      ]
+      ],
+      "playbook": "PlaybookName"
     }
   ]
 }
@@ -77,6 +80,7 @@ The following tables describe the values you need to set in the schema.
 | suppressionDuration | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 11H                                                                                               |
 | suppressionEnabled  | bool   | yes      | true, false                                                                                                                                                         | true                                                                                              |
 | tactics             | array  | yes      | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
+| playbookName        | string | no       | Name of the Playbook                                                                                                                                                | playbook01                                                                                        |
 
 ## Find us
 
@@ -94,7 +98,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Authors
 
-* **Pouyan Khabazi** - *Initial work* - [GitHub](https://github.com/pkhabazi) / [Blog](https://pkm-technology.com)
+* **Pouyan Khabazi** - *Developer and Maintainer* - [GitHub](https://github.com/pkhabazi) / [Blog](https://pkm-technology.com)
 
 See also the list of [contributors](https://github.com/wortell/AzSentinel/contributors) who participated in this project.
 
