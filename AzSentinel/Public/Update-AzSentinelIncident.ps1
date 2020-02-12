@@ -123,7 +123,7 @@ function Update-AzSentinelIncident {
                         "severity"                                 = if ($Severity) { $Severity } else { $incident.severity }
                         "startTimeUtc"                             = $($incident.startTimeUtc)
                         "status"                                   = if ($Status) { $Status } else { $incident.status }
-                        "closeReason"                              = if ($Status -eq 'Closed') { if ($CloseReason) { $CloseReason } else { Write-Error "No Closed Reasen provided" -ErrorAction Stop } } else { $null }
+                        "closeReason"                              = if ($Status -eq 'Closed') { if ($null -ne [CloseReason]$CloseReason) { $CloseReason } else { Write-Error "No Close Reasen provided" -ErrorAction Stop } } else { $null }
                         "closedReasonText"                         = if ($Status -eq 'Closed') { if ($ClosedReasonText) { $ClosedReasonText } else { 'No closed comment provided' } } else { $null }
                         [pscustomobject]"labels"                   = @( $LabelsUnique)
                         "title"                                    = $($incident.title)
@@ -137,10 +137,9 @@ function Update-AzSentinelIncident {
                         }
                     }
                 }
-                #$body | ConvertTo-Json -Depth 99 -EnumsAsStrings
             }
 
-            Write-Host "Found incident with caseNumber: $($incident.caseNumber)"
+            Write-Host "Found incident with case number: $($incident.caseNumber)"
             try {
                 $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
 
