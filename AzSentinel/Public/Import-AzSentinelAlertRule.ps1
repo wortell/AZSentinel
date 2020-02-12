@@ -16,7 +16,7 @@ function Import-AzSentinelAlertRule {
     .PARAMETER SettingsFile
     Path to the JSON or YAML file for the AlertRules
     .EXAMPLE
-    Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\AlertRules.json"
+    Import-AzSentinelAlertRule -WorkspaceName "pkm02" -SettingsFile ".\examples\AlertRules.json"
     In this example all the rules configured in the JSON file will be created or updated
     .EXAMPLE
     Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\SuspectApplicationConsent.yaml"
@@ -60,8 +60,7 @@ function Import-AzSentinelAlertRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
-
+        #Get-LogAnalyticWorkspace @arguments
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
@@ -131,7 +130,8 @@ function Import-AzSentinelAlertRule {
                     $item.triggerThreshold,
                     $item.suppressionDuration,
                     $item.suppressionEnabled,
-                    $item.tactics
+                    $item.tactics,
+                    $item.playbookName
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
@@ -147,7 +147,15 @@ function Import-AzSentinelAlertRule {
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+
+                            if ($compareResult.PropertyName -contains "playbookName") {
+                                New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Name) -Confirm:$false
+                            }
+                            elseif ($null -ne $content.playbookName -and $null -eq $body.Properties.playbookName) {
+                                Write-Host "Currently Playbook configured but will be removed now"
+                            }
+
                             Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
@@ -169,7 +177,10 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+                    if ($body.Properties.playbookName) {
+                        New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
+                    }
                     Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
