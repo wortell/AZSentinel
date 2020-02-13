@@ -18,14 +18,13 @@ function Update-AzSentinelIncident {
     Update-AzSentinelIncident -WorkspaceName ""
     Get a list of all open Incidents
     .EXAMPLE
-    Update-AzSentinelIncident -WorkspaceName 'infr-weu-oms-t-7qodryzoj6agu' -CaseNumber 42293 -Labels "pouyan02"
-    Get information of a specifiek incident with providing the casenumber
+    Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Labels "NewLabel"
+    Update incident with ann Label
     .EXAMPLE
-    Update-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
-    Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
+    Update-AzSentinelIncident -WorkspaceName -CaseNumber 42293 -Status Closed -CloseReason FalsePositive -ClosedReasonText "Your input"
+    Close a Incidnet using status Closed, when status closed is selected then CloseReason and ClosedReasonText prperty are required to be filled in
     #>
 
-    [cmdletbinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -88,7 +87,6 @@ function Update-AzSentinelIncident {
 
         try {
             $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber
-
         }
         catch {
             Write-Verbose $_
@@ -124,7 +122,7 @@ function Update-AzSentinelIncident {
                         "startTimeUtc"                             = $($incident.startTimeUtc)
                         "status"                                   = if ($Status) { $Status } else { $incident.status }
                         "closeReason"                              = if ($Status -eq 'Closed') { if ($null -ne [CloseReason]$CloseReason) { $CloseReason } else { Write-Error "No Close Reasen provided" -ErrorAction Stop } } else { $null }
-                        "closedReasonText"                         = if ($Status -eq 'Closed') { if ($ClosedReasonText) { $ClosedReasonText } else { 'No closed comment provided' } } else { $null }
+                        "closedReasonText"                         = if ($Status -eq 'Closed') { if ($ClosedReasonText) { $ClosedReasonText } else { Write-Error 'No closed comment provided' } } else { $null }
                         [pscustomobject]"labels"                   = @( $LabelsUnique)
                         "title"                                    = $($incident.title)
                         "description"                              = ""
@@ -140,6 +138,7 @@ function Update-AzSentinelIncident {
             }
 
             Write-Host "Found incident with case number: $($incident.caseNumber)"
+
             try {
                 $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
 
