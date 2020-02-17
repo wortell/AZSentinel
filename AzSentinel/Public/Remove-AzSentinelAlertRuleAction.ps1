@@ -1,10 +1,10 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
 #requires -version 6.2
 
-function Get-AzSentinelAlertRuleAction {
+function Remove-AzSentinelAlertRuleAction {
     <#
       .SYNOPSIS
-      Get Azure Sentinel Alert rule Action
+      Remove Azure Sentinel Alert rule Action
       .DESCRIPTION
       This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
       .PARAMETER SubscriptionId
@@ -14,10 +14,10 @@ function Get-AzSentinelAlertRuleAction {
       .PARAMETER RuleName
       Enter the name of the Alert rule
       .EXAMPLE
-      Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+      Remove-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
       This example will get the Workspace ands return the full data object
       .NOTES
-      NAME: Get-AzSentinelAlertRuleAction
+      NAME: Remove-AzSentinelAlertRuleAction
     #>
     param (
         [Parameter(Mandatory = $false,
@@ -31,11 +31,7 @@ function Get-AzSentinelAlertRuleAction {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$RuleName,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]$RuleId
+        [string]$RuleName
     )
 
     begin {
@@ -57,21 +53,22 @@ function Get-AzSentinelAlertRuleAction {
             }
         }
 
-        if ($RuleName) {
-            $alertId = (Get-AzSentinelAlertRule @arguments -RuleName $RuleName).name
-        }
-        elseif ($RuleId) {
-            $alertId = $RuleId
-        }
-        else {
-            Write-Error "No Alert Name or ID is provided" -ErrorAction Continue
-        }
+        $result = Get-AzSentinelAlertRuleAction @arguments -RuleName $RuleName
 
-        if ($alertId) {
-            $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions?api-version=2019-01-01-preview"
+        if ($result) {
+            Write-Host
+            $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($result.id.split('asicustomalertsv3_')[-1])?api-version=2019-01-01-preview"
+            Write-Host $uri
             try {
-                $return = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
-                return $return
+                $return = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+
+                if ($return.StatusCode -eq 200) {
+                    return "Rule action $($result.properties.logicAppResourceId.Split('/')[-1]) removed for rule $($RuleName) with status: $($return.StatusCode)"
+                }
+                else {
+                    Write-Verbose $_
+                    return "Failed to remove rule action $($result.properties.logicAppResourceId.Split('/')[-1]) for rule $($RuleName) with errorcode: $($return.StatusCode)"
+                }
             }
             catch {
                 $return = $_.Exception.Message
@@ -79,7 +76,7 @@ function Get-AzSentinelAlertRuleAction {
             }
         }
         else {
-            return "No Alert found with provided: $($alertId)"
+            return "No Alert Action found for Rule: $($RuleName)"
         }
     }
 }
