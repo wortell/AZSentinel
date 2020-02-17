@@ -14,6 +14,18 @@ function Update-AzSentinelIncident {
     Enter the Workspace name
     .PARAMETER CaseNumber
     Enter the case number to get specfiek details of a open case
+    .PARAMETER Severity
+
+    .PARAMETER Status
+
+    .PARAMETER Comment
+
+    .PARAMETER Labels
+
+    .PARAMETER CloseReason
+
+    .PARAMETER ClosedReasonText
+
     .EXAMPLE
     Update-AzSentinelIncident -WorkspaceName ""
     Get a list of all open Incidents
@@ -85,13 +97,9 @@ function Update-AzSentinelIncident {
         }
         Write-Verbose -Message "Using URI: $($uri)"
 
-        try {
-            $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber
-        }
-        catch {
-            Write-Verbose $_
-            Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
-        }
+
+        $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber
+
         if ($incident) {
             if ($Comment) {
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases/$($incident.name)/comments/$(New-Guid)?api-version=2019-01-01-preview"
@@ -141,16 +149,13 @@ function Update-AzSentinelIncident {
 
             try {
                 $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
-
-                Write-Host "Successfully updated Incident $($incident.caseNumber) with status $($return.StatusDescription)"
+                return "Successfully updated Incident $($incident.caseNumber) with status $($return.StatusDescription)"
             }
             catch {
                 Write-Verbose $_
                 Write-Error "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
+                throw "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
             }
-        }
-        else {
-            Write-Warning "No incident found on $($WorkspaceName)"
         }
     }
 }
