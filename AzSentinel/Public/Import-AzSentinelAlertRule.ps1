@@ -149,11 +149,14 @@ function Import-AzSentinelAlertRule {
                         try {
                             $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
 
-                            if ($compareResult.PropertyName -contains "playbookName") {
-                                New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Name) -Confirm:$false
+                            if ( $null -ne ($compareResult.PropertyName -eq "playbookName").RefValue) {
+                                New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Name)
                             }
-                            elseif ($null -ne $content.playbookName -and $null -eq $body.Properties.playbookName) {
-                                Write-Host "Currently Playbook configured but will be removed now"
+                            elseif ( $null -ne ($compareResult.PropertyName -eq "playbookName").DiffValue) {
+                                Remove-AzSentinelAlertRuleAction @arguments -PlayBookName $($content.playbookName) -RuleId -RuleId $($body.Name)
+                            }
+                            else {
+                                # Nothing to do
                             }
 
                             Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
