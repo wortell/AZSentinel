@@ -7,7 +7,9 @@ function Update-AzSentinelIncident {
     Update Azure Sentinel Incident
     .DESCRIPTION
     With this function you can update existing Azure Sentinel Incident.
-    You can can also filter to Incident with speciefiek case namber or Case name
+    With the Update function you can achieve the following:
+    -Close Incident
+    -Update Incident
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
@@ -15,28 +17,27 @@ function Update-AzSentinelIncident {
     .PARAMETER CaseNumber
     Enter the case number to get specfiek details of a open case
     .PARAMETER Severity
-
+    Enter the Severity, you can choose from Medium, High, Low and Informational
     .PARAMETER Status
-
+    Enter the Status of the incident, you can choose from New, InProgress and Closed
     .PARAMETER Comment
-
+    Enter Comment tekst to add comment to the incident
     .PARAMETER Labels
-
+    Add Lebels to the incident, current configured Labels will be added to the existing Labels
     .PARAMETER CloseReason
-
+    When Status is equil to Closed, CloseReason is required. You can select from: TruePositive, FalsePositive
     .PARAMETER ClosedReasonText
-
+    When Status is equil to Closed, ClosedReasonText is required to be filled in.
     .EXAMPLE
     Update-AzSentinelIncident -WorkspaceName ""
     Get a list of all open Incidents
     .EXAMPLE
     Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Labels "NewLabel"
-    Update incident with ann Label
+    Add a new Label to list of Labels for a Incident
     .EXAMPLE
-    Update-AzSentinelIncident -WorkspaceName -CaseNumber 42293 -Status Closed -CloseReason FalsePositive -ClosedReasonText "Your input"
-    Close a Incidnet using status Closed, when status closed is selected then CloseReason and ClosedReasonText prperty are required to be filled in
+    Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Status Closed -CloseReason FalsePositive -ClosedReasonText "Your input"
+    Close the Incidnet using status Closed, when status closed is selected then CloseReason and ClosedReasonText prperty are required to be filled in
     #>
-
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -145,7 +146,7 @@ function Update-AzSentinelIncident {
                 }
             }
 
-            Write-Host "Found incident with case number: $($incident.caseNumber)"
+            Write-Output "Found incident with case number: $($incident.caseNumber)"
 
             try {
                 $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
@@ -154,7 +155,7 @@ function Update-AzSentinelIncident {
             catch {
                 Write-Verbose $_
                 Write-Error "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
-                throw "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
+                return "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
             }
         }
     }
