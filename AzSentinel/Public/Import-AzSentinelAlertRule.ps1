@@ -94,7 +94,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Host -Message "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Output -Message "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -142,8 +142,8 @@ function Import-AzSentinelAlertRule {
             if ($content) {
                 $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 if ($compareResult) {
-                    Write-Host "Found Differences for rule: $($item.displayName)" -ForegroundColor Yellow
-                    Write-Host ($compareResult | Format-Table | Out-String)
+                    Write-Output "Found Differences for rule: $($item.displayName)" -ForegroundColor Yellow
+                    Write-Output ($compareResult | Format-Table | Out-String)
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
@@ -159,7 +159,7 @@ function Import-AzSentinelAlertRule {
                                 # Nothing to do
                             }
 
-                            Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
@@ -168,12 +168,12 @@ function Import-AzSentinelAlertRule {
                         }
                     }
                     else {
-                        Write-Host "No change have been made for rule $($item.displayName), deployment aborted"
+                        Write-Output "No change have been made for rule $($item.displayName), deployment aborted"
                     }
                 }
                 else {
-                    Write-Host "Rule $($item.displayName) is compliance, nothing to do"
-                    Write-Host ($body.Properties | Format-List | Format-Table | Out-String)
+                    Write-Output "Rule $($item.displayName) is compliance, nothing to do"
+                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
             }
             else {
@@ -184,7 +184,7 @@ function Import-AzSentinelAlertRule {
                     if ($body.Properties.playbookName) {
                         New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
                     }
-                    Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {

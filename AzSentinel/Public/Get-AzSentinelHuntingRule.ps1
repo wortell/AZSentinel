@@ -13,6 +13,8 @@ function Get-AzSentinelHuntingRule {
     Enter the Workspace name
     .PARAMETER RuleName
     Enter the name of the Hunting rule name
+    .PARAMETER Filter
+    Select which type of Hunting rules you want to see. Option: HuntingQueries, GeneralExploration, LogManagement
     .EXAMPLE
     Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
     In this example you can get configuration of multiple Hunting rules
@@ -38,7 +40,7 @@ function Get-AzSentinelHuntingRule {
         [string[]]$RuleName,
 
         [Parameter(Mandatory = $false)]
-        [validateset("Hunting Queries", "GeneralExploration", "LogManagement")]
+        [validateset("HuntingQueries", "GeneralExploration", "LogManagement")]
         [string]$Filter
     )
 

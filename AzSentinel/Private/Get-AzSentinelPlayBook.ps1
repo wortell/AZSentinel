@@ -6,7 +6,7 @@ function Get-AzSentinelPlayBook {
       .SYNOPSIS
       Get Logic App Playbook
       .DESCRIPTION
-      This function is used by other function for resolving the Logic App thats compatible for use with Azure Sentinel
+      This function is used for resolving the Logic App and testing the compability with Azure Sentinel
       .PARAMETER SubscriptionId
       Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
       .PARAMETER Name
@@ -41,29 +41,32 @@ function Get-AzSentinelPlayBook {
             $uri = "https://management.azure.com/subscriptions/$($script:subscriptionId)/providers/Microsoft.Logic/workflows?api-version=2016-06-01"
         }
         else {
-            Write-Error "No SubscriptionID provided" -ErrorAction Stop
+            $return = "No SubscriptionID provided"
+            return $return
         }
 
-        $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object { $_.name -eq $Name }
+        $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object { $_.name -eq $Name } -ErrorAction SilentlyContinue
 
-        if ($playBook) {
+        if ($null -ne $playBook) {
             $uri1 = "https://management.azure.com$($playBook.id)/triggers/When_a_response_to_an_Azure_Sentinel_alert_is_triggered?api-version=2016-06-01"
             try {
                 $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Get -Headers $script:authHeader).properties
 
-                if ($playbookTrigger) {
+                if ($null -ne $playbookTrigger) {
                     return $playBook
                 }
                 else {
-                    Write-Error "Playbook doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step! " -ErrorAction Continue
+                   $return = "Playbook doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step!"
+                   return $return
                 }
             }
             catch {
-                Write-Error $_.Exception.Message
+                $return = $_.Exception.Message
+                return $return
             }
         }
         else {
-            Write-Error "Unable to find LogicApp $Name under Subscription Id: $($script:subscriptionId)" -ErrorAction Stop
+            Write-Error "Unable to find LogicApp $Name under Subscription Id: $($script:subscriptionId)"
         }
     }
 }

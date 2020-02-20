@@ -13,6 +13,8 @@ function Get-AzSentinelAlertRuleAction {
       Enter the Workspace name
       .PARAMETER RuleName
       Enter the name of the Alert rule
+      .PARAMETER RuleId
+      Enter the Rule Id
       .EXAMPLE
       Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
       This example will get the Workspace ands return the full data object
@@ -79,7 +81,8 @@ function Get-AzSentinelAlertRuleAction {
             }
         }
         else {
-            return "No Alert found with provided: $($alertId)"
+            $return = "No Alert found with provided: $($alertId)"
+            return $return
         }
     }
 }
