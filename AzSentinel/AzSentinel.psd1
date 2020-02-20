@@ -12,7 +12,7 @@
     RootModule           = 'AzSentinel.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '0.6.3'
+    ModuleVersion        = '0.6.2'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Core', 'Desktop'
@@ -90,6 +90,7 @@
         'Import-AzSentinelHuntingRule',
         'Remove-AzSentinelHuntingRule',
         'Get-AzSentinelIncident',
+        'Update-AzSentinelIncident',
         'Get-AzSentinelAlertRuleAction',
         'New-AzSentinelAlertRuleAction',
         'Remove-AzSentinelAlertRuleAction'
