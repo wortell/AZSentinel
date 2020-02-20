@@ -15,14 +15,11 @@ Update Azure Sentinel Incident
 ```
 Update-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> -CaseNumber <Int32>
  [-Severity <String>] [-Status <Status>] [-Comment <String>] [-Labels <String[]>] [-CloseReason <CloseReason>]
- [-ClosedReasonText <String>] [<CommonParameters>]
+ [-ClosedReasonText <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 With this function you can update existing Azure Sentinel Incident.
-With the Update function you can achieve the following:
--Close Incident
--Update Incident
 
 ## EXAMPLES
 
@@ -35,7 +32,7 @@ Get a list of all open Incidents
 
 ### EXAMPLE 2
 ```
-Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Labels "NewLabel"
+Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42291 -Labels "NewLabel"
 ```
 
 Add a new Label to list of Labels for a Incident
@@ -179,6 +176,37 @@ When Status is equil to Closed, ClosedReasonText is required to be filled in.
 Type: String
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
 
 Required: False
 Position: Named

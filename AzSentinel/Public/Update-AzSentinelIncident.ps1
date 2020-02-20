@@ -7,9 +7,6 @@ function Update-AzSentinelIncident {
     Update Azure Sentinel Incident
     .DESCRIPTION
     With this function you can update existing Azure Sentinel Incident.
-    With the Update function you can achieve the following:
-    -Close Incident
-    -Update Incident
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
@@ -32,12 +29,14 @@ function Update-AzSentinelIncident {
     Update-AzSentinelIncident -WorkspaceName ""
     Get a list of all open Incidents
     .EXAMPLE
-    Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Labels "NewLabel"
+    Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42291 -Labels "NewLabel"
     Add a new Label to list of Labels for a Incident
     .EXAMPLE
     Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Status Closed -CloseReason FalsePositive -ClosedReasonText "Your input"
     Close the Incidnet using status Closed, when status closed is selected then CloseReason and ClosedReasonText prperty are required to be filled in
     #>
+
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -98,7 +97,6 @@ function Update-AzSentinelIncident {
         }
         Write-Verbose -Message "Using URI: $($uri)"
 
-
         $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber
 
         if ($incident) {
@@ -148,14 +146,20 @@ function Update-AzSentinelIncident {
 
             Write-Output "Found incident with case number: $($incident.caseNumber)"
 
-            try {
-                $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
-                return "Successfully updated Incident $($incident.caseNumber) with status $($return.StatusDescription)"
+            if ($PSCmdlet.ShouldProcess("Do you want to update Incident: $($body.Properties.DisplayName)")) {
+                try {
+                    $return = Invoke-WebRequest -Uri $uri -Method Put -Body ($body | ConvertTo-Json -Depth 99 -EnumsAsStrings) -Headers $script:authHeader
+                    return ($return.Content | ConvertFrom-Json).properties
+                }
+                catch {
+                    $return = $_.Exception.Message
+                    Write-Verbose $_
+                    Write-Error "Unable to update Incident $($incident.caseNumber) with error message $return"
+                    return $return
+                }
             }
-            catch {
-                Write-Verbose $_
-                Write-Error "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
-                return "Unable to update Incident $($incident.caseNumber) with error message $($_.Exception.Message)"
+            else {
+                Write-Output "No change have been made for Incident $($incident.caseNumber), update aborted"
             }
         }
     }
