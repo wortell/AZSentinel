@@ -88,6 +88,8 @@ function Get-AzSentinelIncident {
                 foreach ($rule in $IncidentName) {
                     [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.title -eq $rule }
                     if ($null -ne $temp) {
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $return += $temp.properties
                     }
                     else {
@@ -100,6 +102,8 @@ function Get-AzSentinelIncident {
                 foreach ($rule in $CaseNumber) {
                     [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.caseNumber -eq $rule }
                     if ($null -ne $temp) {
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $return += $temp.properties
                     }
                     else {
@@ -110,6 +114,8 @@ function Get-AzSentinelIncident {
             }
             else {
                 ($incident.Content | ConvertFrom-Json).value | ForEach-Object {
+                    $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
+                    $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     return $_.properties
                 }
             }
