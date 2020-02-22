@@ -16,7 +16,7 @@ function Remove-AzSentinelAlertRuleAction {
       .PARAMETER RuleId
       Enter the Alert Rule ID that you want to configure
       .EXAMPLE
-      Remove-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+      Remove-AzSentinelAlertRuleAction -WorkspaceName "" -RuleName "AlertRule01"
       This example will get the Workspace ands return the full data object
       .NOTES
       NAME: Remove-AzSentinelAlertRuleAction

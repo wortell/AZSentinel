@@ -16,8 +16,30 @@ function Import-AzSentinelAlertRule {
     .PARAMETER SettingsFile
     Path to the JSON or YAML file for the AlertRules
     .EXAMPLE
-    Import-AzSentinelAlertRule -WorkspaceName "pkm02" -SettingsFile ".\examples\AlertRules.json"
+    Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\AlertRules.json"
     In this example all the rules configured in the JSON file will be created or updated
+
+    Performing the operation "Import-AzSentinelAlertRule" on target "Do you want to update profile: AlertRule01".
+    [Y] Yes [A] Yes to All [N] No [L] No to All [S] Suspend [?] Help (default is "Yes"):
+    Successfully created Action for Rule:  with Playbook pkmsentinel Status: Created
+    Created
+    Successfully updated rule: AlertRule01 with status: OK
+
+    Name                : b6103d42-xxx-4f35-xxx-c76a7f31ee4e
+    DisplayName         : AlertRule01
+    Description         :
+    Severity            : Medium
+    Enabled             : True
+    Query               : SecurityEvent | where EventID == "4688" | where CommandLine contains "-noni -ep bypass $"
+    QueryFrequency      : PT5H
+    QueryPeriod         : PT6H
+    TriggerOperator     : GreaterThan
+    TriggerThreshold    : 5
+    SuppressionDuration : PT6H
+    SuppressionEnabled  : False
+    Tactics             : {Persistence, LateralMovement, Collection}
+    PlaybookName        : Playbook01
+
     .EXAMPLE
     Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\SuspectApplicationConsent.yaml"
     In this example all the rules configured in the YAML file will be created or updated
@@ -130,17 +152,23 @@ function Import-AzSentinelAlertRule {
                     $item.triggerThreshold,
                     $item.suppressionDuration,
                     $item.suppressionEnabled,
-                    $item.tactics,
+                    $item.Tactics,
                     $item.playbookName
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Continue
             }
 
             if ($content) {
-                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+                if ($item.playbookName) {
+                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+                }
+                else {
+                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName)
+                }
                 if ($compareResult) {
                     Write-Output "Found Differences for rule: $($item.displayName)"
                     Write-Output ($compareResult | Format-Table | Out-String)
@@ -181,7 +209,7 @@ function Import-AzSentinelAlertRule {
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
                     if ($body.Properties.playbookName) {
-                        New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
+                        New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                     }
 
                     Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"

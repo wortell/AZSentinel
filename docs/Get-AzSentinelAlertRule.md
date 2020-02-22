@@ -25,7 +25,6 @@ With this function you can get the configuration of the Azure Sentinel Alert rul
 ### EXAMPLE 1
 ```
 Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-Get-AzSentinelAlertRule -WorkspaceName "pkm02" -RuleName "AlertRule01"
 In this example you can get configuration of multiple alert rules in once
 ```
 

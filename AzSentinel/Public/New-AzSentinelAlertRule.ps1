@@ -38,7 +38,7 @@ function New-AzSentinelAlertRule {
     .PARAMETER PlaybookName
     Enter the Logic App name that you want to configure as playbook trigger
     .EXAMPLE
-    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
+    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
@@ -179,8 +179,12 @@ function New-AzSentinelAlertRule {
         }
 
         if ($content) {
-            $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
-            if ($compareResult) {
+            if ($PlaybookName) {
+                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+            }
+            else {
+                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName)
+            }            if ($compareResult) {
                 Write-Output "Found Differences for rule: $($DisplayName)"
                 Write-Output ($compareResult | Format-Table | Out-String)
 
@@ -188,12 +192,14 @@ function New-AzSentinelAlertRule {
                     try {
                         $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
 
-                        if ($compareResult.PropertyName -contains "playbookName") {
-                            #New-AzSentinelAlertRuleAction @arguments -PlayBookName $(($body.Properties).playbookName) -RuleId $($body.Name) -Confirm:$false
-                            New-AzSentinelAlertRuleAction @arguments -PlayBookName 'pkmsentinel' -RuleId 'b6103d42-d2fb-4f35-bced-c76a7f31ee4e' -Confirm:$false
+                        if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
+                            New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
                         }
-                        elseif ($null -ne $content.playbookName -and $null -eq $body.Properties.playbookName) {
-                            Write-Output "Currently Playbook configured but will be removed now"
+                        elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
+                            Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        }
+                        else {
+                            #nothing
                         }
 
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"
@@ -219,8 +225,8 @@ function New-AzSentinelAlertRule {
             try {
                 $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
 
-                if ($body.Properties.playbookName) {
-                    New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
+                if ($null -ne $body.Properties.playbookName) {
+                    New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                 }
 
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
