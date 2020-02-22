@@ -25,24 +25,20 @@ With this function you can remove Azure Sentinal hunting rules from Powershell, 
 ### EXAMPLE 1
 ```
 Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName ""
-```
-
 In this example the defined hunting rule will be removed from Azure Sentinel
+```
 
 ### EXAMPLE 2
 ```
 Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName "","", ""
-```
-
 In this example you can define multiple hunting rules that will be removed
+```
 
 ### EXAMPLE 3
 ```
 Remove-AzSentinelHuntingRule -WorkspaceName ""
+In this example no hunting rule is specified, all hunting rules will be removed one by one. For each rule you need to confirm the action
 ```
-
-In this example no hunting rule is specified, all hunting rules will be removed one by one.
-For each rule you need to confirm the action
 
 ## PARAMETERS
 

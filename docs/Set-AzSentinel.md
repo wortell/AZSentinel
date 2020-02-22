@@ -24,9 +24,8 @@ This function enables Azure Sentinel on a existing Workspace
 ### EXAMPLE 1
 ```
 Set-AzSentinel -WorkspaceName ""
-```
-
 This example will enable Azure Sentinel for the provided workspace
+```
 
 ## PARAMETERS
 

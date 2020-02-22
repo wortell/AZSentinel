@@ -15,7 +15,7 @@ function Get-AzSentinelAlertRule {
       Enter the name of the Alert rule
       .EXAMPLE
       Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-      Get-AzSentinelAlertRule -WorkspaceName "pkm02" -RuleName "testrule01"
+      Get-AzSentinelAlertRule -WorkspaceName "pkm02" -RuleName "AlertRule01"
       In this example you can get configuration of multiple alert rules in once
     #>
 

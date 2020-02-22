@@ -35,6 +35,8 @@ function New-AzSentinelAlertRule {
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
     Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+    .PARAMETER PlaybookName
+    Enter the Logic App name that you want to configure as playbook trigger
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
     In this example you create a new Alert rule by defining the rule properties from CMDLET
@@ -191,7 +193,7 @@ function New-AzSentinelAlertRule {
                             New-AzSentinelAlertRuleAction @arguments -PlayBookName 'pkmsentinel' -RuleId 'b6103d42-d2fb-4f35-bced-c76a7f31ee4e' -Confirm:$false
                         }
                         elseif ($null -ne $content.playbookName -and $null -eq $body.Properties.playbookName) {
-                            Write-Host "Currently Playbook configured but will be removed now"
+                            Write-Output "Currently Playbook configured but will be removed now"
                         }
 
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"

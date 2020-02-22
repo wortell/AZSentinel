@@ -13,12 +13,16 @@ function Remove-AzSentinelAlertRuleAction {
       Enter the Workspace name
       .PARAMETER RuleName
       Enter the name of the Alert rule
+      .PARAMETER RuleId
+      Enter the Alert Rule ID that you want to configure
       .EXAMPLE
       Remove-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
       This example will get the Workspace ands return the full data object
       .NOTES
       NAME: Remove-AzSentinelAlertRuleAction
     #>
+
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -31,7 +35,11 @@ function Remove-AzSentinelAlertRuleAction {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$RuleName
+        [string]$RuleName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$RuleId
     )
 
     begin {
@@ -53,30 +61,35 @@ function Remove-AzSentinelAlertRuleAction {
             }
         }
 
-        $result = Get-AzSentinelAlertRuleAction @arguments -RuleName $RuleName
+        if ($RuleName) {
+            $result = Get-AzSentinelAlertRuleAction @arguments -RuleName $RuleName
+        }
+        elseif ($RuleId) {
+            $result = Get-AzSentinelAlertRuleAction @arguments -RuleId $RuleId
+        }
+        else {
+            Write-Error "No Alert Name or ID is provided"
+        }
 
         if ($result) {
-            Write-Host
             $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($result.id.split('asicustomalertsv3_')[-1])?api-version=2019-01-01-preview"
-            Write-Host $uri
-            try {
-                $return = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+            Write-Verbose $uri
 
-                if ($return.StatusCode -eq 200) {
-                    return "Rule action $($result.properties.logicAppResourceId.Split('/')[-1]) removed for rule $($RuleName) with status: $($return.StatusCode)"
+            if ($PSCmdlet.ShouldProcess("Do you want to remove Alert Rule action for rule: $($RuleName)")) {
+                try {
+                    $return = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+                    Write-Verbose $return
+                    Write-Output "Rule action $($result.properties.logicAppResourceId.Split('/')[-1]) removed for rule $($RuleName) with status: $($return.StatusCode)"
+                    return $return.StatusCode
                 }
-                else {
+                catch {
                     Write-Verbose $_
-                    return "Failed to remove rule action $($result.properties.logicAppResourceId.Split('/')[-1]) for rule $($RuleName) with errorcode: $($return.StatusCode)"
+                    return $_.Exception.Message
                 }
-            }
-            catch {
-                $return = $_.Exception.Message
-                return $return
             }
         }
         else {
-            return "No Alert Action found for Rule: $($RuleName)"
+            Write-Output "No Alert Action found for Rule: $($RuleName)"
         }
     }
 }

@@ -68,8 +68,9 @@ function New-AzSentinelAlertRuleAction {
             $alertId = $RuleId
         }
         else {
-            Write-Error "No Alert Name or ID is provided" -ErrorAction Continue
+            Write-Error "No Alert Name or ID is provided"
         }
+
         $action = $null
 
         $playBook = Get-AzSentinelPlayBook -Name $PlayBookName
@@ -93,23 +94,29 @@ function New-AzSentinelAlertRuleAction {
             $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions/$($guid)?api-version=2019-01-01-preview"
             try {
                 $return = Invoke-WebRequest -Method Put -Uri $uri -Headers $Script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
-                Write-Host "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
-                Write-Verbose $return
+                if ($return.StatusCode -eq 201 -and $result.StatusDescription -eq "Created"){
+                    Write-Output "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
+                    return $return.StatusDescription
+                }
+                else {
+                    Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
+                    return $return.StatusDescription
+                }
             }
             catch {
-                $return = $_.Exception.Message
-                return $return
+                Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Error: $($_.Exception.Message)"
+                return $_.Exception.Message
                 Write-Verbose $_.
             }
         }
-        elseif ($(($action.properties.logicAppResourceId).Split('/')[-1]) -eq $PlayBookName) {
-            Write-Host "Alert Rule: $($alertId) has already playbook assigned: $(($action.properties.logicAppResourceId).Split('/')[-1])"
+        elseif ((($action.properties.logicAppResourceId).Split('/')[-1]) -eq $PlayBookName) {
+            Write-Output "Alert Rule: $($alertId) has already playbook assigned: $(($action.properties.logicAppResourceId).Split('/')[-1])"
         }
-        elseif ($(($action.properties.logicAppResourceId).Split('/')[-1]) -ne $PlayBookName) {
-            Write-Host "Alert rule $($RuleName) assigned to a different playbook with name $(($action.properties.logicAppResourceId).Split('/')[-1])"
+        elseif ((($action.properties.logicAppResourceId).Split('/')[-1]) -ne $PlayBookName) {
+            Write-Output "Alert rule $($RuleName) assigned to a different playbook with name $(($action.properties.logicAppResourceId).Split('/')[-1])"
         }
         else {
-            Write-Error "BomBastic"
+            #nothing?
         }
     }
 }

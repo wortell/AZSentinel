@@ -2,7 +2,7 @@
   "analytics": [
     {
       "displayName": "AlertRule01",
-      "description": "",
+      "description": "test",
       "severity": "Medium",
       "enabled": true,
       "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
@@ -17,7 +17,7 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "pkmsentinel"
+      "playbookName": "aaaa"
     }
   ]
 }

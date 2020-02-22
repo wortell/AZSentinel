@@ -5,36 +5,28 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelHuntingRule
+# Remove-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Get Azure Sentinel Hunting rule
+Remove Azure Sentinel Alert rule Action
 
 ## SYNTAX
 
 ```
-Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String>]
+ [-RuleId <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
+This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
+Remove-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+This example will get the Workspace ands return the full data object
 ```
-
-In this example you can get configuration of multiple Hunting rules
-
-### EXAMPLE 2
-```
-Get-AzSentinelHuntingRule -WorkspaceName ""
-```
-
-In this example you can get a list of all the Hunting rules in once
 
 ## PARAMETERS
 
@@ -69,22 +61,22 @@ Accept wildcard characters: False
 ```
 
 ### -RuleName
-Enter the name of the Hunting rule name
+Enter the name of the Alert rule
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Filter
-{{ Fill Filter Description }}
+### -RuleId
+Enter the Alert Rule ID that you want to configure
 
 ```yaml
 Type: String
@@ -137,5 +129,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+NAME: Remove-AzSentinelAlertRuleAction
 
 ## RELATED LINKS

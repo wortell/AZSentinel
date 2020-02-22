@@ -5,39 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-AzSentinelHuntingRule
+# Get-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Remove Azure Sentinal Hunting Rules
+Get Azure Sentinel Alert rule Action
 
 ## SYNTAX
 
 ```
-Remove-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String>]
+ [-RuleId <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can remove Azure Sentinal hunting rules from Powershell, if you don't provide andy Hunting rule name all rules will be removed
+This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName ""
-In this example the defined hunting rule will be removed from Azure Sentinel
-```
-
-### EXAMPLE 2
-```
-Remove-AzSentinelHuntingRule -WorkspaceName "" -RuleName "","", ""
-In this example you can define multiple hunting rules that will be removed
-```
-
-### EXAMPLE 3
-```
-Remove-AzSentinelHuntingRule -WorkspaceName ""
-In this example no hunting rule is specified, all hunting rules will be removed one by one. For each rule you need to confirm the action
+Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+This example will get the Workspace ands return the full data object
 ```
 
 ## PARAMETERS
@@ -73,28 +61,12 @@ Accept wildcard characters: False
 ```
 
 ### -RuleName
-Enter the name of the rule that you wnat to remove
+Enter the name of the Alert rule
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
 
 Required: False
 Position: Named
@@ -103,13 +75,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
+### -RuleId
+Enter the Rule Id to skip Get-AzSentinelAlertRule step
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
-Aliases: cf
+Aliases:
 
 Required: False
 Position: Named
@@ -126,5 +98,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+NAME: Get-AzSentinelAlertRuleAction
 
 ## RELATED LINKS

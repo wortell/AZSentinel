@@ -14,7 +14,7 @@ function Get-AzSentinelAlertRuleAction {
       .PARAMETER RuleName
       Enter the name of the Alert rule
       .PARAMETER RuleId
-      Enter the Rule Id
+      Enter the Rule Id to skip Get-AzSentinelAlertRule step
       .EXAMPLE
       Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
       This example will get the Workspace ands return the full data object
@@ -66,7 +66,7 @@ function Get-AzSentinelAlertRuleAction {
             $alertId = $RuleId
         }
         else {
-            Write-Error "No Alert Name or ID is provided" -ErrorAction Continue
+            Write-Error "No Alert Name or ID is provided"
         }
 
         if ($alertId) {

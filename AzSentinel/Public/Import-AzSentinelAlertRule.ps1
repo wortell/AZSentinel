@@ -94,7 +94,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Output -Message "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Output "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -142,24 +142,23 @@ function Import-AzSentinelAlertRule {
             if ($content) {
                 $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 if ($compareResult) {
-                    Write-Output "Found Differences for rule: $($item.displayName)" -ForegroundColor Yellow
+                    Write-Output "Found Differences for rule: $($item.displayName)"
                     Write-Output ($compareResult | Format-Table | Out-String)
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
                             $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
 
-                            if ( $null -ne ($compareResult.PropertyName -eq "playbookName").RefValue) {
-                                New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Name)
+                            if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
+                                New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
                             }
-                            elseif ( $null -ne ($compareResult.PropertyName -eq "playbookName").DiffValue) {
-                                Remove-AzSentinelAlertRuleAction @arguments -PlayBookName $($content.playbookName) -RuleId -RuleId $($body.Name)
+                            elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
+                                Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
                             }
                             else {
-                                # Nothing to do
+                                #nothing
                             }
-
-                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
@@ -184,7 +183,8 @@ function Import-AzSentinelAlertRule {
                     if ($body.Properties.playbookName) {
                         New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
                     }
-                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+
+                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {
