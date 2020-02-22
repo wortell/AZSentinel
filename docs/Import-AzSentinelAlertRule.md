@@ -25,24 +25,21 @@ This way you can manage your Alert rules dynamic from JSON or multiple YAML file
 
 ### EXAMPLE 1
 ```
-Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\AlertRules.json"
-```
-
+Import-AzSentinelAlertRule -WorkspaceName "pkm02" -SettingsFile ".\examples\AlertRules.json"
 In this example all the rules configured in the JSON file will be created or updated
+```
 
 ### EXAMPLE 2
 ```
 Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\SuspectApplicationConsent.yaml"
-```
-
 In this example all the rules configured in the YAML file will be created or updated
+```
 
 ### EXAMPLE 3
 ```
 Get-Item .\examples\*.json | Import-AzSentinelAlertRule -WorkspaceName ""
-```
-
 In this example you can select multiple JSON files and Pipeline it to the SettingsFile parameter
+```
 
 ## PARAMETERS
 

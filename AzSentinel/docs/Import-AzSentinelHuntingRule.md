@@ -26,23 +26,20 @@ This way you can manage your Hunting rules dynamic from JSON or multiple YAML fi
 ### EXAMPLE 1
 ```
 Import-AzSentinelHuntingRule -WorkspaceName "infr-weu-oms-t-7qodryzoj6agu" -SettingsFile ".\examples\HuntingRules.json"
-```
-
 In this example all the rules configured in the JSON file will be created or updated
+```
 
 ### EXAMPLE 2
 ```
 Import-AzSentinelHuntingRule -WorkspaceName "" -SettingsFile ".\examples\HuntingRules.yaml"
-```
-
 In this example all the rules configured in the YAML file will be created or updated
+```
 
 ### EXAMPLE 3
 ```
 Get-Item .\examples\HuntingRules*.json | Import-AzSentinelHuntingRule -WorkspaceName ""
-```
-
 In this example you can select multiple JSON files and Pipeline it to the SettingsFile parameter
+```
 
 ## PARAMETERS
 

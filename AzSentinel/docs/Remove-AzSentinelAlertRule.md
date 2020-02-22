@@ -25,24 +25,20 @@ With this function you can remove Azure Sentinal Alert rules from Powershell, if
 ### EXAMPLE 1
 ```
 Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName ""
-```
-
 In this example the defined rule will be removed from Azure Sentinel
+```
 
 ### EXAMPLE 2
 ```
 Remove-AzSentinelAlertRule -WorkspaceName "" -RuleName "","", ""
-```
-
 In this example you can define multiple rules that will be removed
+```
 
 ### EXAMPLE 3
 ```
 Remove-AzSentinelAlertRule -WorkspaceName ""
+In this example no rule is specified, all rules will be removed one by one. For each rule you need to confirm the action
 ```
-
-In this example no rule is specified, all rules will be removed one by one.
-For each rule you need to confirm the action
 
 ## PARAMETERS
 

@@ -1,5 +1,10 @@
 # Azure Sentinel
 
+| branch      | status                                                                                         |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| master      | ![](https://github.com/wortell/AZSentinel/workflows/Build-Module/badge.svg?branch=master)      |
+| development | ![](https://github.com/wortell/AZSentinel/workflows/Build-Module/badge.svg?branch=development) |
+
 Azure Sentinel is a cloud-native SIEM that provides intelligent security analytics for your entire enterprise at cloud scale. Get limitless cloud speed and scale to help focus on what really matters. Easily collect data from all your cloud or on-premises assets, Office 365, Azure resources, and other clouds. Effectively detect threats with built-in machine learning from Microsoft’s security analytics experts. Automate threat response, using built-in orchestration and automation playbooks. [read more](https://docs.microsoft.com/en-us/azure/sentinel/overview)
 
 ## Why this PowerShell Module
@@ -53,7 +58,8 @@ To create a Azure Sentinel Rule, use the following JSON format.
         "Persistence",
         "LateralMovement",
         "Collection"
-      ]
+      ],
+      "playbookName": "string"
     }
   ]
 }
@@ -65,18 +71,19 @@ The following tables describe the values you need to set in the schema.
 
 | Name                | Type   | Required | Allowed Values                                                                                                                                                      | Example                                                                                           |
 | ------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| displayName         | string | yes      | *                                                                                                                                                                   | DisplayName                                                                                       |
-| description         | string | yes      | *                                                                                                                                                                   | Description                                                                                       |
-| severity            | string | yes      | Medium, High, Low, Informational                                                                                                                                    | Medium                                                                                            |
-| enabled             | bool   | yes      | true, false                                                                                                                                                         | true                                                                                              |
-| query               | string | yes      | special character need to be escaped by \                                                                                                                           | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
-| queryFrequency      | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 5H                                                                                                |
-| queryPeriod         | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 1440M                                                                                             |
-| triggerOperator     | string | yes      | GreaterThan, FewerThan, EqualTo, NotEqualTo                                                                                                                         | GreaterThan                                                                                       |
-| triggerThreshold    | int    | yes      | The value must be between 0 and 10000                                                                                                                               | 5                                                                                                 |
-| suppressionDuration | string | yes      | Value must be between 5 minutes and 24 hours                                                                                                                        | 11H                                                                                               |
-| suppressionEnabled  | bool   | yes      | true, false                                                                                                                                                         | true                                                                                              |
-| tactics             | array  | yes      | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
+| displayName         | string | true     | *                                                                                                                                                                   | DisplayName                                                                                       |
+| description         | string | true     | *                                                                                                                                                                   | Description                                                                                       |
+| severity            | string | true     | Medium, High, Low, Informational                                                                                                                                    | Medium                                                                                            |
+| enabled             | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
+| query               | string | true     | special character need to be escaped by \                                                                                                                           | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
+| queryFrequency      | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 5H                                                                                                |
+| queryPeriod         | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 1440M                                                                                             |
+| triggerOperator     | string | true     | GreaterThan, FewerThan, EqualTo, NotEqualTo                                                                                                                         | GreaterThan                                                                                       |
+| triggerThreshold    | int    | true     | The value must be between 0 and 10000                                                                                                                               | 5                                                                                                 |
+| suppressionDuration | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 11H                                                                                               |
+| suppressionEnabled  | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
+| tactics             | array  | true     | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
+| playbookName        | string | false    | Enter the Logic App name that you want to configure as playbook trigger                                                                                             | LogicApp01                                                                                        |
 
 ## Find us
 
@@ -88,13 +95,13 @@ The following tables describe the values you need to set in the schema.
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Thanks
+## Contributors
 
-* A big thank you goes out to [@bgelens](https://github.com/bgelens) and [@MauRiEEZZZ](https://github.com/MauRiEEZZZ) for their great contributions!
+* A big thank you goes out to [@bgelens](https://github.com/bgelens) and [@MauRiEEZZZ](https://github.com/MauRiEEZZZ) for their contributions!
 
 ## Authors
 
-* **Pouyan Khabazi** - *Initial work* - [GitHub](https://github.com/pkhabazi) / [Blog](https://pkm-technology.com)
+* **Pouyan Khabazi** - *Developer and Maintainer* - [GitHub](https://github.com/pkhabazi) / [Blog](https://pkm-technology.com)
 
 See also the list of [contributors](https://github.com/wortell/AzSentinel/contributors) who participated in this project.
 

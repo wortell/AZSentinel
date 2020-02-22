@@ -35,6 +35,8 @@ function New-AzSentinelAlertRule {
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
     Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+    .PARAMETER PlaybookName
+    Enter the Logic App name that you want to configure as playbook trigger
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
     In this example you create a new Alert rule by defining the rule properties from CMDLET
@@ -94,7 +96,11 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [Tactics[]] $Tactics
+        [Tactics[]] $Tactics,
+
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [string] $PlaybookName = $null
     )
 
     begin {
@@ -163,7 +169,8 @@ function New-AzSentinelAlertRule {
                 $TriggerThreshold,
                 $SuppressionDuration,
                 $SuppressionEnabled,
-                $Tactics
+                $Tactics,
+                $PlaybookName
             )
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
@@ -180,6 +187,15 @@ function New-AzSentinelAlertRule {
                 if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                     try {
                         $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+
+                        if ($compareResult.PropertyName -contains "playbookName") {
+                            #New-AzSentinelAlertRuleAction @arguments -PlayBookName $(($body.Properties).playbookName) -RuleId $($body.Name) -Confirm:$false
+                            New-AzSentinelAlertRuleAction @arguments -PlayBookName 'pkmsentinel' -RuleId 'b6103d42-d2fb-4f35-bced-c76a7f31ee4e' -Confirm:$false
+                        }
+                        elseif ($null -ne $content.playbookName -and $null -eq $body.Properties.playbookName) {
+                            Write-Output "Currently Playbook configured but will be removed now"
+                        }
+
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"
                         Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                     }
@@ -202,6 +218,11 @@ function New-AzSentinelAlertRule {
 
             try {
                 $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+
+                if ($body.Properties.playbookName) {
+                    New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
+                }
+
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
             }

@@ -16,7 +16,7 @@ function Import-AzSentinelAlertRule {
     .PARAMETER SettingsFile
     Path to the JSON or YAML file for the AlertRules
     .EXAMPLE
-    Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\AlertRules.json"
+    Import-AzSentinelAlertRule -WorkspaceName "pkm02" -SettingsFile ".\examples\AlertRules.json"
     In this example all the rules configured in the JSON file will be created or updated
     .EXAMPLE
     Import-AzSentinelAlertRule -WorkspaceName "" -SettingsFile ".\examples\SuspectApplicationConsent.yaml"
@@ -60,8 +60,7 @@ function Import-AzSentinelAlertRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
-
+        #Get-LogAnalyticWorkspace @arguments
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
@@ -95,7 +94,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Host -Message "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Output "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -131,7 +130,8 @@ function Import-AzSentinelAlertRule {
                     $item.triggerThreshold,
                     $item.suppressionDuration,
                     $item.suppressionEnabled,
-                    $item.tactics
+                    $item.tactics,
+                    $item.playbookName
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
@@ -142,13 +142,23 @@ function Import-AzSentinelAlertRule {
             if ($content) {
                 $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 if ($compareResult) {
-                    Write-Host "Found Differences for rule: $($item.displayName)" -ForegroundColor Yellow
-                    Write-Host ($compareResult | Format-Table | Out-String)
+                    Write-Output "Found Differences for rule: $($item.displayName)"
+                    Write-Output ($compareResult | Format-Table | Out-String)
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
-                            Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+
+                            if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
+                                New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                            }
+                            elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
+                                Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                            }
+                            else {
+                                #nothing
+                            }
+                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                         }
                         catch {
@@ -157,20 +167,24 @@ function Import-AzSentinelAlertRule {
                         }
                     }
                     else {
-                        Write-Host "No change have been made for rule $($item.displayName), deployment aborted"
+                        Write-Output "No change have been made for rule $($item.displayName), deployment aborted"
                     }
                 }
                 else {
-                    Write-Host "Rule $($item.displayName) is compliance, nothing to do"
-                    Write-Host ($body.Properties | Format-List | Format-Table | Out-String)
+                    Write-Output "Rule $($item.displayName) is compliance, nothing to do"
+                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
             }
             else {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
-                    Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)" -ForegroundColor Green
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+                    if ($body.Properties.playbookName) {
+                        New-AzSentinelAlertRuleAction -PlayBookName $($body.Properties.playbookName) -RuleName $($body.Properties.DisplayName) -confirm:$false
+                    }
+
+                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {

@@ -87,7 +87,7 @@ function Import-AzSentinelHuntingRule {
         }
 
         foreach ($item in $analytics) {
-            Write-Host -Message "Started with Hunting rule: $($item.displayName)"
+            Write-Output "Started with Hunting rule: $($item.displayName)"
 
             try {
                 Write-Verbose -Message "Get rule $($item.description)"

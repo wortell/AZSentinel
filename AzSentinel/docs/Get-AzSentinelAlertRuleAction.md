@@ -5,39 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelHuntingRule
+# Get-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Get Azure Sentinel Hunting rule
+Get Azure Sentinel Alert rule Action
 
 ## SYNTAX
 
 ```
-Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String>]
+ [-RuleId <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
+This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelIncident -WorkspaceName ""
-Get a list of all open Incidents
-```
-
-### EXAMPLE 2
-```
-Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
-Get information of a specifiek incident with providing the casenumber
-```
-
-### EXAMPLE 3
-```
-Get-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
-Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
+Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+This example will get the Workspace ands return the full data object
 ```
 
 ## PARAMETERS
@@ -73,22 +61,7 @@ Accept wildcard characters: False
 ```
 
 ### -RuleName
-Enter the name of the Hunting rule name
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -Filter
-{{ Fill Filter Description }}
+Enter the name of the Alert rule
 
 ```yaml
 Type: String
@@ -102,29 +75,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
+### -RuleId
+Enter the Rule Id to skip Get-AzSentinelAlertRule step
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
-Aliases: wi
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
+Aliases:
 
 Required: False
 Position: Named
@@ -141,5 +98,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+NAME: Get-AzSentinelAlertRuleAction
 
 ## RELATED LINKS
