@@ -5,21 +5,20 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelIncident
+# Get-AzSentinelHuntingRule
 
 ## SYNOPSIS
-Get Azure Sentinel Incident
+Get Azure Sentinel Hunting rule
 
 ## SYNTAX
 
 ```
-Get-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> [-IncidentName <String[]>]
- [-CaseNumber <Int32[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
+ [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get a list of open incidents from Azure Sentinel.
-You can can also filter to Incident with speciefiek case namber or Case name
+With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
 
 ## EXAMPLES
 
@@ -73,8 +72,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -IncidentName
-Enter incident name, this is the same name as the alert rule that triggered the incident
+### -RuleName
+Enter the name of the Hunting rule name
 
 ```yaml
 Type: String[]
@@ -88,18 +87,18 @@ Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
-### -CaseNumber
-Enter the case number to get specfiek details of a open case
+### -Filter
+{{ Fill Filter Description }}
 
 ```yaml
-Type: Int32[]
+Type: String
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: True (ByValue)
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
