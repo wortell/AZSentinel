@@ -2,6 +2,18 @@
 #requires -version 6.2
 
 function precheck {
+      <#
+    .SYNOPSIS
+    PreCheck
+    .DESCRIPTION
+    This function is used as a precheck step by all the functions to test all the required authentication and properties.
+    .EXAMPLE
+    precheck
+    Run the test
+    .NOTES
+    NAME: precheck
+    #>
+
     if ($null -eq $script:accessToken) {
         Get-AuthToken
     } elseif ([datetime]::UtcNow.AddMinutes(5) -lt $script:accessToken.ExpiresOn.DateTime ) {

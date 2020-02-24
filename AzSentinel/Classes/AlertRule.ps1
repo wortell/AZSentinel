@@ -1,84 +1,69 @@
 class AlertProp {
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [guid] $Name
 
-    [Parameter(Mandatory)]
     [string] $DisplayName
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [string] $Description
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [Severity] $Severity
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [bool] $Enabled
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [string] $Query
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [string] $QueryFrequency
 
-    [ValidateNotNullOrEmpty()]
     [string] $QueryPeriod
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
-    [TriggerOperator] $TriggerOperator
+    [TriggerOperator]$TriggerOperator
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [Int] $TriggerThreshold
 
-    [Parameter(Mandatory)]
-    [AllowEmptyString()]
     [string] $SuppressionDuration
 
-    [Parameter(Mandatory)]
     [bool] $SuppressionEnabled
 
-    [Parameter(Mandatory)]
-    [AllowEmptyCollection()]
     [Tactics[]] $Tactics
 
-    AlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics) {
+    [string] $PlaybookName
+
+    static [string] TriggerOperatorSwitch([string]$value) {
+        switch ($value) {
+            "gt" { $value = "GreaterThan" }
+            "lt" { $value = "LessThan" }
+            "eq" { $value = "Equal" }
+            "ne" { $value = "NotEqual" }
+            default { $value }
+        }
+        return $value
+    }
+
+    AlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName) {
         $this.name = $Name
         $this.DisplayName = $DisplayName
         $this.Description = $Description
         $this.Severity = $Severity
         $this.Enabled = $Enabled
         $this.Query = $Query
-        $this.QueryFrequency = ("PT" + $QueryFrequency).ToUpper()
-        $this.QueryPeriod = ("PT" + $QueryPeriod).ToUpper()
-        $this.TriggerOperator = $TriggerOperator
+        $this.QueryFrequency = if ($QueryFrequency -like "PT*") { $QueryFrequency.ToUpper() } else { ("PT" + $QueryFrequency).ToUpper() }
+        $this.QueryPeriod = if ($QueryPeriod -like "PT*") { $QueryPeriod.ToUpper() } else { ("PT" + $QueryPeriod).ToUpper() }
+        $this.TriggerOperator = [AlertProp]::TriggerOperatorSwitch($TriggerOperator)
         $this.TriggerThreshold = $TriggerThreshold
-        $this.SuppressionDuration = if (! ($null -eq $suppressionDuration) -or ! ($null -eq $suppressionEnabled)) { ("PT" + $suppressionDuration).ToUpper() } else { "PT1H" }
+        $this.SuppressionDuration = if ((! $null -eq $suppressionDuration) -or ( $false -eq $suppressionEnabled)) { if ($suppressionDuration -like "PT*") { $suppressionDuration.ToUpper() } else { ("PT" + $suppressionDuration).ToUpper() } } else { "PT1H" }
         $this.SuppressionEnabled = if ($suppressionEnabled) { $suppressionEnabled } else { $false }
         $this.Tactics = $Tactics
+        $this.PlaybookName = $PlaybookName
     }
 }
 
 class AlertRule {
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [guid] $Name
 
-    [Parameter(Mandatory)]
     [string] $Etag
 
-    [Parameter(Mandatory = $false)]
     [string]$type
 
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
     [AlertProp]$Properties
 
     [Parameter(Mandatory)]

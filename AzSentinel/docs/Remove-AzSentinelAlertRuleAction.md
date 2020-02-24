@@ -5,27 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# New-AzSentinelHuntingRule
+# Remove-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Create Azure Sentinal Hunting Rule
+Remove Azure Sentinel Alert rule Action
 
 ## SYNTAX
 
 ```
-New-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
- -Query <String> -Description <String> -Tactics <Tactics[]> [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String>]
+ [-RuleId <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Use this function to creates Azure Sentinal Hunting rule
+This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-AzSentinelHuntingRule -WorkspaceName "" -DisplayName "" -Description "" -Tactics "","" -Query ''
-In this example you create a new hunting rule by defining the rule properties from CMDLET
+Remove-AzSentinelAlertRuleAction -WorkspaceName "" -RuleName "AlertRule01"
+This example will get the Workspace ands return the full data object
 ```
 
 ## PARAMETERS
@@ -60,61 +60,30 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -DisplayName
-Enter the Display name for the hunting rule
+### -RuleName
+Enter the name of the Alert rule
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Query
-Enter the querry in KQL format
+### -RuleId
+Enter the Alert Rule ID that you want to configure
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Description
-Enter the Description for the hunting rule
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Tactics
-Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
-
-```yaml
-Type: Tactics[]
-Parameter Sets: (All)
-Aliases:
-Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
-
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -160,5 +129,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+NAME: Remove-AzSentinelAlertRuleAction
 
 ## RELATED LINKS

@@ -71,15 +71,25 @@ function Get-AzSentinelIncident {
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
         Write-Verbose -Message "Using URI: $($uri)"
-        $incident = Invoke-webrequest -Uri $uri -Method get -Headers $script:authHeader
-        Write-Verbose "Found $((($incident.Content | ConvertFrom-Json).value).count) incidents"
+
+        try {
+            $incident = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+        }
+        catch {
+            Write-Verbose $_
+            Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
+        }
+
         $return = @()
 
         if ($incident) {
+            Write-Verbose "Found $($incident.value.count) incidents"
             if ($IncidentName.Count -ge 1) {
                 foreach ($rule in $IncidentName) {
-                    [PSCustomObject]$temp = ($incident.Content | ConvertFrom-Json).value | Where-Object { $_.properties.title -eq $rule }
+                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.title -eq $rule }
                     if ($null -ne $temp) {
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $return += $temp.properties
                     }
                     else {
@@ -90,8 +100,10 @@ function Get-AzSentinelIncident {
             }
             elseif ($CaseNumber.Count -ge 1) {
                 foreach ($rule in $CaseNumber) {
-                    [PSCustomObject]$temp = ($incident.Content | ConvertFrom-Json).value | Where-Object { $_.properties.caseNumber -eq $rule }
+                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.caseNumber -eq $rule }
                     if ($null -ne $temp) {
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $return += $temp.properties
                     }
                     else {
@@ -102,6 +114,8 @@ function Get-AzSentinelIncident {
             }
             else {
                 ($incident.Content | ConvertFrom-Json).value | ForEach-Object {
+                    $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
+                    $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     return $_.properties
                 }
             }

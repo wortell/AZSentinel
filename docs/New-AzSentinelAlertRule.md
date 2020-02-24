@@ -16,8 +16,8 @@ Create Azure Sentinal Alert Rules
 New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
  -Description <String> -Severity <Severity> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
  [-QueryPeriod <String>] -TriggerOperator <TriggerOperator> -TriggerThreshold <Int32>
- -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <Tactics[]> [-WhatIf] [-Confirm]
- [<CommonParameters>]
+ -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <Tactics[]> [-PlaybookName <String>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -27,10 +27,9 @@ Use this function creates Azure Sentinal Alert rules from provided CMDLET
 
 ### EXAMPLE 1
 ```
-New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity "" -Enabled  -Query '' -QueryFrequency ""  -QueryPeriod "" -TriggerOperator "" -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
-```
-
+New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
 In this example you create a new Alert rule by defining the rule properties from CMDLET
+```
 
 ## PARAMETERS
 
@@ -177,7 +176,7 @@ Select the triggert Operator, valid values are: "GreaterThan", "FewerThan", "Equ
 Type: TriggerOperator
 Parameter Sets: (All)
 Aliases:
-Accepted values: GreaterThan, FewerThan, EqualTo, NotEqualTo
+Accepted values: GreaterThan, LessThan, Equal, NotEqual, gt, lt, eq, ne
 
 Required: True
 Position: Named
@@ -241,6 +240,21 @@ Aliases:
 Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PlaybookName
+Enter the Logic App name that you want to configure as playbook trigger
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

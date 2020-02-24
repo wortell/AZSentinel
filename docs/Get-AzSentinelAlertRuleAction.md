@@ -5,27 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelAlertRule
+# Get-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Get Azure Sentinel Alert Rules
+Get Azure Sentinel Alert rule Action
 
 ## SYNTAX
 
 ```
-Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String>]
+ [-RuleId <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Alert rule from Azure Sentinel
+This function can be used to see if an action is attached to the alert rule, if so then the configuration will be returned
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-In this example you can get configuration of multiple alert rules in once
+Get-AzSentinelAlertRuleAction -WorkspaceName "" -RuleName "testrule01"
+This example will get the Workspace ands return the full data object
 ```
 
 ## PARAMETERS
@@ -64,25 +64,9 @@ Accept wildcard characters: False
 Enter the name of the Alert rule
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
 Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
 
 Required: False
 Position: Named
@@ -91,13 +75,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
+### -RuleId
+Enter the Rule Id to skip Get-AzSentinelAlertRule step
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
-Aliases: cf
+Aliases:
 
 Required: False
 Position: Named
@@ -114,5 +98,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## OUTPUTS
 
 ## NOTES
+NAME: Get-AzSentinelAlertRuleAction
 
 ## RELATED LINKS
