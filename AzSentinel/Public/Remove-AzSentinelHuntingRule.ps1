@@ -64,14 +64,20 @@ function Remove-AzSentinelHuntingRule {
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule
+                $item = Get-AzSentinelHuntingRule @arguments -Filter 'HuntingQueries' -RuleName $rule
                 if ($item) {
                     $uri = "$script:baseUri/savedSearches/$($item.name)?api-version=2017-04-26-preview"
 
                     if ($PSCmdlet.ShouldProcess("Do you want to remove: $rule")) {
                         Write-Output $item
-                        $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                        Write-Output "Successfully removed hunting rule: $($rule) with status: $($result.StatusDescription)"
+                        try {
+                            $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+                            Write-Output "Successfully removed hunting rule: $($rule) with status: $($result.StatusDescription)"
+                        }
+                        catch {
+                            Write-Verbose $_
+                            Write-Error "Unable to remove rule: $($rule) with error message: $($_.Exception.Message)" -ErrorAction Continue
+                        }
                     }
                     else {
                         Write-Output "No change have been made for hunting rule: $rule"
@@ -84,11 +90,17 @@ function Remove-AzSentinelHuntingRule {
         }
         else {
             Write-Warning "No hunting rule selected, All hunting rules will be removed one by one!"
-            Get-AzSentinelHuntingRule @arguments | ForEach-Object {
+            Get-AzSentinelHuntingRule @arguments -Filter 'HuntingQueries' | ForEach-Object {
                 $uri = "$script:baseUri/savedSearches/$($_.name)?api-version=2017-04-26-preview"
                 if ($PSCmdlet.ShouldProcess("Do you want to remove: $($_.displayName)")) {
-                    $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                    Write-Output "Successfully removed hunting rule: $($_.displayName) with status: $($result.StatusDescription)"
+                    try {
+                        $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+                        Write-Output "Successfully removed hunting rule: $($_.displayName) with status: $($result.StatusDescription)"
+                    }
+                    catch {
+                        Write-Verbose $_
+                        Write-Error "Unable to remove rule: $($_.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+                    }
                 }
                 else {
                     Write-Output "No change have been made for hunting rule: $($_.displayName)"

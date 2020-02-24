@@ -35,8 +35,10 @@ function New-AzSentinelAlertRule {
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
     Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+    .PARAMETER PlaybookName
+    Enter the Logic App name that you want to configure as playbook trigger
     .EXAMPLE
-    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","")
+    New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
@@ -94,7 +96,11 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [Tactics[]] $Tactics
+        [Tactics[]] $Tactics,
+
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyString()]
+        [string] $PlaybookName = $null
     )
 
     begin {
@@ -116,7 +122,6 @@ function New-AzSentinelAlertRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $errorResult = ''
         $item = @{ }
 
         Write-Verbose -Message "Creating new rule: $($DisplayName)"
@@ -146,10 +151,8 @@ function New-AzSentinelAlertRule {
             }
         }
         catch {
-            $errorReturn = $_
-            $errorResult = ($errorReturn | ConvertFrom-Json ).error
             Write-Verbose $_
-            Write-Error "Unable to connect to APi to get Analytic rules with message: $($errorResult.message)" -ErrorAction Stop
+            Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
         }
 
         try {
@@ -166,7 +169,8 @@ function New-AzSentinelAlertRule {
                 $TriggerThreshold,
                 $SuppressionDuration,
                 $SuppressionEnabled,
-                $Tactics
+                $Tactics,
+                $PlaybookName
             )
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
@@ -175,22 +179,35 @@ function New-AzSentinelAlertRule {
         }
 
         if ($content) {
-            $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
-            if ($compareResult) {
+            if ($PlaybookName) {
+                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+            }
+            else {
+                $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName)
+            }            if ($compareResult) {
                 Write-Output "Found Differences for rule: $($DisplayName)"
                 Write-Output ($compareResult | Format-Table | Out-String)
 
                 if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                     try {
                         $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+
+                        if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
+                            New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                        }
+                        elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
+                            Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        }
+                        else {
+                            #nothing
+                        }
+
                         Write-Output "Successfully updated rule: $($DisplayName) with status: $($result.StatusDescription)"
                         Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                     }
                     catch {
-                        $errorReturn = $_
-                        $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                        Write-Verbose $_.Exception.Message
-                        Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                        Write-Verbose $_
+                        Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
                     }
                 }
                 else {
@@ -207,14 +224,17 @@ function New-AzSentinelAlertRule {
 
             try {
                 $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+
+                if ($null -ne $body.Properties.playbookName) {
+                    New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
+                }
+
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
                 Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
             }
             catch {
-                $errorReturn = $_
-                $errorResult = ($errorReturn | ConvertFrom-Json ).error
-                Write-Verbose $_.Exception.Message
-                Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                Write-Verbose $_
+                Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
             }
         }
     }

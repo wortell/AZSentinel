@@ -12,7 +12,7 @@
     RootModule           = 'AzSentinel.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '0.6.1'
+    ModuleVersion        = '0.6.2'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Core', 'Desktop'
@@ -89,7 +89,11 @@
         'New-AzSentinelHuntingRule',
         'Import-AzSentinelHuntingRule',
         'Remove-AzSentinelHuntingRule',
-        'Get-AzSentinelIncident'
+        'Get-AzSentinelIncident',
+        'Update-AzSentinelIncident',
+        'Get-AzSentinelAlertRuleAction',
+        'New-AzSentinelAlertRuleAction',
+        'Remove-AzSentinelAlertRuleAction'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

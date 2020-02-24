@@ -25,9 +25,8 @@ Use this function to creates Azure Sentinal Hunting rule
 ### EXAMPLE 1
 ```
 New-AzSentinelHuntingRule -WorkspaceName "" -DisplayName "" -Description "" -Tactics "","" -Query ''
-```
-
 In this example you create a new hunting rule by defining the rule properties from CMDLET
+```
 
 ## PARAMETERS
 

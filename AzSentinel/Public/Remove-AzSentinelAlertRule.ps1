@@ -70,8 +70,14 @@ function Remove-AzSentinelAlertRule {
 
                     if ($PSCmdlet.ShouldProcess("Do you want to remove: $rule")) {
                         Write-Output $item
-                        $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                        Write-Output "Successfully removed rule: $($rule) with status: $($result.StatusDescription)"
+                        try {
+                            $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+                            Write-Output "Successfully removed rule: $($rule) with status: $($result.StatusDescription)"
+                        }
+                        catch {
+                            Write-Verbose $_
+                            Write-Error "Unable to remove rule: $($rule) with error message: $($_.Exception.Message)" -ErrorAction Continue
+                        }
                     }
                     else {
                         Write-Output "No change have been made for rule: $rule"
@@ -88,8 +94,14 @@ function Remove-AzSentinelAlertRule {
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($_.name)?api-version=2019-01-01-preview"
 
                 if ($PSCmdlet.ShouldProcess("Do you want to remove: $($_.displayName)")) {
-                    $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                    Write-Output "Successfully removed rule: $($_.displayName) with status: $($result.StatusDescription)"
+                    try {
+                        $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
+                        Write-Output "Successfully removed rule: $($_.displayName) with status: $($result.StatusDescription)"
+                    }
+                    catch {
+                        Write-Verbose $_
+                        Write-Error "Unable to remove rule: $($_.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+                    }
                 }
                 else {
                     Write-Output "No change have been made for rule: $($_.displayName)"

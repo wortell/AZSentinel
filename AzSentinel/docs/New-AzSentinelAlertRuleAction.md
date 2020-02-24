@@ -5,27 +5,28 @@ online version:
 schema: 2.0.0
 ---
 
-# New-AzSentinelHuntingRule
+# New-AzSentinelAlertRuleAction
 
 ## SYNOPSIS
-Create Azure Sentinal Hunting Rule
+Create Azure Sentinal Alert Rule Action
 
 ## SYNTAX
 
 ```
-New-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
- -Query <String> -Description <String> -Tactics <Tactics[]> [-WhatIf] [-Confirm] [<CommonParameters>]
+New-AzSentinelAlertRuleAction [-SubscriptionId <String>] -WorkspaceName <String> -PlayBookName <String>
+ [-RuleName <String>] [-RuleId <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Use this function to creates Azure Sentinal Hunting rule
+Use this function to creates Azure Sentinal Alert rule action
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-New-AzSentinelHuntingRule -WorkspaceName "" -DisplayName "" -Description "" -Tactics "","" -Query ''
-In this example you create a new hunting rule by defining the rule properties from CMDLET
+New-AzSentinelAlertRuleAction -WorkspaceName "" -PlayBookName "Playbook01" -RuleName "AlertRule01"
+New-AzSentinelAlertRuleAction -WorkspaceName "" -PlayBookName "Playbook01" -RuleId 'b6103d42-d2fb-4f35-xxx-c76a7f31ee4e'
+In this example you you assign the playbook to the Alert rule
 ```
 
 ## PARAMETERS
@@ -60,8 +61,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -DisplayName
-Enter the Display name for the hunting rule
+### -PlayBookName
+Enter the Playbook name that you want to assign to the alert rule
 
 ```yaml
 Type: String
@@ -75,46 +76,30 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Query
-Enter the querry in KQL format
+### -RuleName
+Enter the Alert Rule name that you want to configure
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Description
-Enter the Description for the hunting rule
+### -RuleId
+Enter the Alert Rule ID that you want to configure
 
 ```yaml
 Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Tactics
-Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
-
-```yaml
-Type: Tactics[]
-Parameter Sets: (All)
-Aliases:
-Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
-
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

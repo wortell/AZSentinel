@@ -1,6 +1,10 @@
 enum TriggerOperator {
     GreaterThan
-    FewerThan
-    EqualTo
-    NotEqualTo
+    LessThan
+    Equal
+    NotEqual
+    gt
+    lt
+    eq
+    ne
 }
