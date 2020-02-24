@@ -19,6 +19,7 @@ tactics:
   - Persistence
   - LateralMovement
   - Collection
+playbookName: Playbook01
 query: |
 
   AzureActivity

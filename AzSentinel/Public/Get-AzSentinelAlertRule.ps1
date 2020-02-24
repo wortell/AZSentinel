@@ -15,7 +15,6 @@ function Get-AzSentinelAlertRule {
       Enter the name of the Alert rule
       .EXAMPLE
       Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-      Get-AzSentinelAlertRule -WorkspaceName "pkm02" -RuleName "AlertRule01"
       In this example you can get configuration of multiple alert rules in once
     #>
 
@@ -83,7 +82,7 @@ function Get-AzSentinelAlertRule {
                             $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
                         }
                         else {
-                            $playbookName = $null
+                            $playbookName = ""
                         }
 
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
@@ -107,7 +106,7 @@ function Get-AzSentinelAlertRule {
                         $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
                     }
                     else {
-                        $playbookName = $null
+                        $playbookName = ""
                     }
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force

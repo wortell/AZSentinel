@@ -26,23 +26,20 @@ With this function you can update existing Azure Sentinel Incident.
 ### EXAMPLE 1
 ```
 Update-AzSentinelIncident -WorkspaceName ""
-```
-
 Get a list of all open Incidents
+```
 
 ### EXAMPLE 2
 ```
 Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42291 -Labels "NewLabel"
-```
-
 Add a new Label to list of Labels for a Incident
+```
 
 ### EXAMPLE 3
 ```
 Update-AzSentinelIncident -WorkspaceName '' -CaseNumber 42293 -Status Closed -CloseReason FalsePositive -ClosedReasonText "Your input"
-```
-
 Close the Incidnet using status Closed, when status closed is selected then CloseReason and ClosedReasonText prperty are required to be filled in
+```
 
 ## PARAMETERS
 

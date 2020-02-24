@@ -16,7 +16,7 @@ function Get-AzSentinelAlertRuleAction {
       .PARAMETER RuleId
       Enter the Rule Id to skip Get-AzSentinelAlertRule step
       .EXAMPLE
-      Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+      Get-AzSentinelAlertRuleAction -WorkspaceName "" -RuleName "testrule01"
       This example will get the Workspace ands return the full data object
       .NOTES
       NAME: Get-AzSentinelAlertRuleAction

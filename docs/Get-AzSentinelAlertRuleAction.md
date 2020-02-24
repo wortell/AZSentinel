@@ -24,7 +24,7 @@ This function can be used to see if an action is attached to the alert rule, if 
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelAlertRuleAction -WorkspaceName "pkm02" -RuleName "testrule01"
+Get-AzSentinelAlertRuleAction -WorkspaceName "" -RuleName "testrule01"
 This example will get the Workspace ands return the full data object
 ```
 

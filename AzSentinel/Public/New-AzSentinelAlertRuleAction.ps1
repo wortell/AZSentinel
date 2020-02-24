@@ -18,8 +18,8 @@ function New-AzSentinelAlertRuleAction {
       .PARAMETER RuleId
       Enter the Alert Rule ID that you want to configure
       .EXAMPLE
-      New-AzSentinelAlertRuleAction -WorkspaceName pkm02 -PlayBookName "pkmsentinel" -RuleName "testrule01"
-      New-AzSentinelAlertRuleAction -WorkspaceName pkm02 -PlayBookName "pkmsentinel" -RuleId 'b6103d42-d2fb-4f35-bced-c76a7f31ee4e'
+      New-AzSentinelAlertRuleAction -WorkspaceName "" -PlayBookName "Playbook01" -RuleName "AlertRule01"
+      New-AzSentinelAlertRuleAction -WorkspaceName "" -PlayBookName "Playbook01" -RuleId 'b6103d42-d2fb-4f35-xxx-c76a7f31ee4e'
       In this example you you assign the playbook to the Alert rule
     #>
 
@@ -94,14 +94,8 @@ function New-AzSentinelAlertRuleAction {
             $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions/$($guid)?api-version=2019-01-01-preview"
             try {
                 $return = Invoke-WebRequest -Method Put -Uri $uri -Headers $Script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
-                if ($return.StatusCode -eq 201 -and $result.StatusDescription -eq "Created"){
-                    Write-Output "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
-                    return $return.StatusDescription
-                }
-                else {
-                    Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
-                    return $return.StatusDescription
-                }
+                Write-Output "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
+                return $return.StatusDescription
             }
             catch {
                 Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Error: $($_.Exception.Message)"
