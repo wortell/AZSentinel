@@ -156,22 +156,48 @@ function New-AzSentinelAlertRule {
         }
 
         try {
-            $bodyAlertProp = [AlertProp]::new(
-                $item.name,
-                $DisplayName,
-                $Description,
-                $Severity,
-                $Enabled,
-                $Query,
-                $QueryFrequency,
-                $QueryPeriod,
-                $TriggerOperator,
-                $TriggerThreshold,
-                $SuppressionDuration,
-                $SuppressionEnabled,
-                $Tactics,
-                $PlaybookName
-            )
+            if ($Kind -eq "Scheduled") {
+                $bodyAlertProp = [AlertProp]::new(
+                    $item.name,
+                    $DisplayName,
+                    $Description,
+                    $Severity,
+                    $Enabled,
+                    $Query,
+                    $QueryFrequency,
+                    $QueryPeriod,
+                    $TriggerOperator,
+                    $TriggerThreshold,
+                    $SuppressionDuration,
+                    $SuppressionEnabled,
+                    $Tactics,
+                    $PlaybookName
+                )
+            }
+            elseif ($Kind -eq "Fusion") {
+                $bodyAlertProp = @{
+                    enabled               = $Enabled
+                    alertRuleTemplateName = $AlertRuleTemplateName
+                }
+            }
+            elseif ($item.kind -eq "MicrosoftSecurityIncidentCreation") {
+                $bodyAlertProp = @{
+                    displayName           = $DisplayName
+                    description           = $Description
+                    enabled               = $Enabled
+                    productFilter         = $ProductFilter
+                    severitiesFilter      = $SeveritiesFilter
+                    displayNamesFilter    = $DisplayNamesFilter
+                    alertRuleTemplateName = $AlertRuleTemplateName
+                }
+            }
+            elseif ($item.kind -eq "MLBehaviorAnalytics") {
+                $bodyAlertProp = @{
+                    enabled = $Enabled
+                    alertRuleTemplateName = $AlertRuleTemplateName
+                }
+            }
+
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
         catch {
