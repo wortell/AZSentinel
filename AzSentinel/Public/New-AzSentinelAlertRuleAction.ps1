@@ -73,13 +73,7 @@ function New-AzSentinelAlertRuleAction {
 
         $action = $null
 
-        if ($SubscriptionId) {
-            $playBook = Get-AzSentinelPlayBook -SubscriptionId $SubscriptionId -Name $PlayBookName
-        }
-        else {
-            $playBook = Get-AzSentinelPlayBook -Name $PlayBookName
-        }
-
+        $playBook = Get-AzSentinelPlayBook -Name $PlayBookName
         $action = Get-AzSentinelAlertRuleAction @arguments -RuleId $alertId -ErrorAction SilentlyContinue
 
 
