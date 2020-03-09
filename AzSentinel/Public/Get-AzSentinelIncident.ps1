@@ -46,7 +46,9 @@ function Get-AzSentinelIncident {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$CaseNumber
+        [int[]]$CaseNumber,
+
+        [Switch]$All
     )
 
     begin {
@@ -73,7 +75,15 @@ function Get-AzSentinelIncident {
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
-            $incident = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+            $incident = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
+            if ($All){
+                while ($incident.nextLink) {
+                    $nextLink = $incident.nextLink
+                    $method = (Invoke-RestMethod -Uri $uriPage$nextLink -Headers $script:authHeader -Method Get)
+                    $incident += $method.value
+                }
+
+            }
         }
         catch {
             Write-Verbose $_
@@ -113,7 +123,7 @@ function Get-AzSentinelIncident {
                 return $return
             }
             else {
-                ($incident.Content | ConvertFrom-Json).value | ForEach-Object {
+                $incident.value | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     return $_.properties
