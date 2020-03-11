@@ -39,8 +39,9 @@ function Get-AzSentinelHuntingRule {
         [ValidateNotNullOrEmpty()]
         [string[]]$RuleName,
 
-        [Parameter(Mandatory = $false)]
-        [validateset("HuntingQueries", "GeneralExploration", "LogManagement")]
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [string]$Filter
     )
 
@@ -72,7 +73,6 @@ function Get-AzSentinelHuntingRule {
         try {
             if ($Filter) {
                 $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader) | Where-Object $_.Category -eq $Filter
-
             }
             else {
                 $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
