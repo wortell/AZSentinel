@@ -16,14 +16,19 @@ function Get-AzSentinelIncident {
     Enter incident name, this is the same name as the alert rule that triggered the incident
     .PARAMETER CaseNumber
     Enter the case number to get specfiek details of a open case
+    .PARAMETER All
+    Use -All switch to get a list of all the incidents
     .EXAMPLE
     Get-AzSentinelIncident -WorkspaceName ""
-    Get a list of all open Incidents
+    Get a list of the last 200 Incidents
+    .EXAMPLE
+    Get-AzSentinelIncident -WorkspaceName "" -All
+    Get a list of all Incidents
     .EXAMPLE
     Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
     Get information of a specifiek incident with providing the casenumber
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
+    Get-AzSentinelIncident -WorkspaceName "" -IncidentName "", ""
     Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
     #>
 
@@ -48,6 +53,8 @@ function Get-AzSentinelIncident {
         [ValidateNotNullOrEmpty()]
         [int[]]$CaseNumber,
 
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
         [Switch]$All
     )
 
@@ -75,14 +82,14 @@ function Get-AzSentinelIncident {
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
-            $incident = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
-            if ($All){
-                while ($incident.nextLink) {
-                    $nextLink = $incident.nextLink
-                    $method = (Invoke-RestMethod -Uri $uriPage$nextLink -Headers $script:authHeader -Method Get)
-                    $incident += $method.value
-                }
+            $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+            $incident += $incidentRaw.value
 
+            if ($All){
+                while ($incidentRaw.nextLink) {
+                    $incidentRaw = (Invoke-RestMethod -Uri $($incidentRaw.nextLink) -Headers $script:authHeader -Method Get)
+                    $incident += $incidentRaw.value
+                }
             }
         }
         catch {
@@ -93,10 +100,12 @@ function Get-AzSentinelIncident {
         $return = @()
 
         if ($incident) {
-            Write-Verbose "Found $($incident.value.count) incidents"
+            Write-Verbose "Found $($incident.count) incidents"
+
             if ($IncidentName.Count -ge 1) {
                 foreach ($rule in $IncidentName) {
-                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.title -eq $rule }
+                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.title -eq $rule }
+
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
@@ -110,7 +119,8 @@ function Get-AzSentinelIncident {
             }
             elseif ($CaseNumber.Count -ge 1) {
                 foreach ($rule in $CaseNumber) {
-                    [PSCustomObject]$temp = $incident.value | Where-Object { $_.properties.caseNumber -eq $rule }
+                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.caseNumber -eq $rule }
+
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
@@ -123,11 +133,11 @@ function Get-AzSentinelIncident {
                 return $return
             }
             else {
-                $incident.value | ForEach-Object {
+                $incident | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
-                    return $_.properties
                 }
+                return $incident.properties
             }
         }
         else {
