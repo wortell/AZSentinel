@@ -12,7 +12,7 @@ function Get-AzSentinelPlayBook {
       .PARAMETER Name
       Enter the Logic App name
       .EXAMPLE
-      Get-AzSentinelPlayBook -Name "pkmsentinel"
+      Get-AzSentinelPlayBook -Name ""
       This example will get search for the Logic app within the current subscripbtio and test to see if it's compatible for Sentinel
       .NOTES
       NAME: Get-AzSentinelPlayBook
@@ -32,6 +32,9 @@ function Get-AzSentinelPlayBook {
     }
 
     process {
+
+        $triggerName = 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered'
+
         if ($SubscriptionId) {
             Write-Verbose "Getting LogicApp from Subscription $($subscriptionId)"
             $uri = "https://management.azure.com/subscriptions/$($subscriptionId)/providers/Microsoft.Logic/workflows?api-version=2016-06-01"
@@ -45,28 +48,29 @@ function Get-AzSentinelPlayBook {
             return $return
         }
 
-        $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object { $_.name -eq $Name } -ErrorAction SilentlyContinue
+        try {
+            $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object { $_.name -eq $Name }
 
-        if ($null -ne $playBook) {
-            $uri1 = "https://management.azure.com$($playBook.id)/triggers/When_a_response_to_an_Azure_Sentinel_alert_is_triggered?api-version=2016-06-01"
-            try {
-                $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Get -Headers $script:authHeader).properties
+            if ($playBook){
+                $uri1 = "https://management.azure.com$($playBook.id)/triggers/$($triggerName)/listCallbackUrl?api-version=2016-06-01"
+                try {
+                    $playbookTrigger = (Invoke-RestMethod -Uri $uri1 -Method Post -Headers $script:authHeader)
+                    $playbookTrigger | Add-Member -NotePropertyName ResourceId -NotePropertyValue $playBook.id -Force
 
-                if ($null -ne $playbookTrigger) {
-                    return $playBook
+                    return $playbookTrigger
                 }
-                else {
-                   $return = "Playbook doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step!"
-                   return $return
+                catch {
+                    $return = "Playbook $($Name) doesn't start with 'When_a_response_to_an_Azure_Sentinel_alert_is_triggered' step! Error message: $($_.Exception.Message)"
+                    Write-Error $return
                 }
             }
-            catch {
-                $return = $_.Exception.Message
-                return $return
+            else {
+                Write-Warning "Unable to find LogicApp $Name under Subscription Id: $($script:subscriptionId)"
             }
         }
-        else {
-            Write-Error "Unable to find LogicApp $Name under Subscription Id: $($script:subscriptionId)"
+        catch {
+            $return = $_.Exception.Message
+            Write-Error $return
         }
     }
 }
