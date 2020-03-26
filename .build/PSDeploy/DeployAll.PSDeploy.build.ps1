@@ -32,6 +32,6 @@ task Deploy_with_PSDeploy {
         $null = $InvokePSDeployArgs.Add('Tags',$DeploymentTags)
     }
 
-    Import-Module PSDeploy -Force -ErrorAction SilentlyContinue
+    Import-Module PSDeploy -Force
     Invoke-PSDeploy @InvokePSDeployArgs
 }

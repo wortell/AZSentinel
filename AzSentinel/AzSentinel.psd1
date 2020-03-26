@@ -56,10 +56,6 @@
             ModuleName    = 'Az.Accounts'
             ModuleVersion = '1.5.2'
         }
-        @{
-            ModuleName    = 'powershell-yaml'
-            ModuleVersion = '0.4.0'
-        }
     )
 
     # Assemblies that must be loaded prior to importing this module

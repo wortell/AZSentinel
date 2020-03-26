@@ -13,6 +13,5 @@
     PSScriptAnalyzer  = 'latest'
     platyPS           = 'latest'
     PSDeploy          = 'latest'
-    'powershell-yaml' = '0.4.1'
     'Az.Accounts'     = '1.6.4'
 }
