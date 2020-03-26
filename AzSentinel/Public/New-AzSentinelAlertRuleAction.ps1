@@ -73,7 +73,13 @@ function New-AzSentinelAlertRuleAction {
 
         $action = $null
 
-        $playBook = Get-AzSentinelPlayBook -Name $PlayBookName
+        if ($SubscriptionId) {
+            $playBook = Get-AzSentinelPlayBook -SubscriptionId $SubscriptionId -Name $PlayBookName
+        }
+        else {
+            $playBook = Get-AzSentinelPlayBook -Name $PlayBookName
+        }
+
         $action = Get-AzSentinelAlertRuleAction @arguments -RuleId $alertId -ErrorAction SilentlyContinue
 
 
@@ -86,8 +92,8 @@ function New-AzSentinelAlertRuleAction {
                 "type"       = "Microsoft.SecurityInsights/alertRules/actions"
                 "properties" = @{
                     "ruleId"             = $alertId
-                    "triggerUri"         = "$($playBook.properties.accessEndpoint)/triggers/When_a_response_to_an_Azure_Sentinel_alert_is_triggered/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2FWhen_a_response_to_an_Azure_Sentinel_alert_is_triggered%2Frun&sv=1.0&sig=NMCSM7uOK4I42L2IPWdgL2eR3-VpoKLXpbTzI9_7wvI"
-                    "logicAppResourceId" = "$($playBook.id)"
+                    "triggerUri"         = $playBook.value
+                    "logicAppResourceId" = $playBook.ResourceId
                 }
             }
 

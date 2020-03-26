@@ -224,9 +224,8 @@ function New-AzSentinelAlertRule {
 
             try {
                 $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
-
-                if ($null -ne $body.Properties.playbookName) {
-                    New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
+                if (($body.Properties.PlaybookName)) {
+                    New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.PlaybookName) -RuleId $($body.Properties.Name) -confirm:$false
                 }
 
                 Write-Output "Successfully created rule: $($DisplayName) with status: $($result.StatusDescription)"
