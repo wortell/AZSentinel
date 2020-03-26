@@ -39,8 +39,9 @@ function Get-AzSentinelHuntingRule {
         [ValidateNotNullOrEmpty()]
         [string[]]$RuleName,
 
-        [Parameter(Mandatory = $false)]
-        [validateset("HuntingQueries", "GeneralExploration", "LogManagement")]
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [string]$Filter
     )
 
@@ -67,8 +68,16 @@ function Get-AzSentinelHuntingRule {
         $uri = "$script:baseUri/savedSearches?api-version=2017-04-26-preview"
 
         Write-Verbose -Message "Using URI: $($uri)"
+
+
         try {
-            $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader | Where-Object $_.Category -eq $Filter)
+            if ($Filter) {
+                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader) | Where-Object $_.Category -eq $Filter
+            }
+            else {
+                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+
+            }
         }
         catch {
             Write-Verbose $_
@@ -81,7 +90,7 @@ function Get-AzSentinelHuntingRule {
             Write-Verbose "Found $($huntingRules.value.count) hunting rules"
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = $huntingRules.value | Where-Object { $_.properties.displayName -eq $rule }
+                    [PSCustomObject]$temp = $huntingRules.value | Where-Object { $_.displayName -eq $rule }
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
