@@ -47,7 +47,12 @@ function Update-AzSentinelIncident {
         [ValidateNotNullOrEmpty()]
         [string]$WorkspaceName,
 
-        [Parameter(Mandatory,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [guid]$Name,
+
+        [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
         [int]$CaseNumber,
@@ -97,7 +102,12 @@ function Update-AzSentinelIncident {
         }
         Write-Verbose -Message "Using URI: $($uri)"
 
-        $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber
+        if ($CaseNumber) {
+            $incident = Get-AzSentinelIncident @arguments -CaseNumber $CaseNumber -All
+        }
+        elseif ($Name) {
+            $incident = Get-AzSentinelIncident @arguments -Name $Name
+        }
 
         if ($incident) {
             if ($Comment) {

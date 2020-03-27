@@ -46,6 +46,11 @@ function Get-AzSentinelIncident {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
+        [guid]$Name,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [string[]]$IncidentName,
 
         [Parameter(Mandatory = $false,
@@ -78,24 +83,39 @@ function Get-AzSentinelIncident {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
-        Write-Verbose -Message "Using URI: $($uri)"
-
-        try {
-            $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
-            $incident += $incidentRaw.value
-
-            if ($All){
-                while ($incidentRaw.nextLink) {
-                    $incidentRaw = (Invoke-RestMethod -Uri $($incidentRaw.nextLink) -Headers $script:authHeader -Method Get)
-                    $incident += $incidentRaw.value
-                }
+        if ($Name) {
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases/$($Name)?api-version=2019-01-01-preview"
+            try {
+                $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+                $incident += $incidentRaw
+            }
+            catch {
+                Write-Verbose $_
+                Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
             }
         }
-        catch {
-            Write-Verbose $_
-            Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
+        else {
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
+            Write-Verbose -Message "Using URI: $($uri)"
+
+            try {
+                $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+                $incident += $incidentRaw.value
+
+                if ($All) {
+                    while ($incidentRaw.nextLink) {
+                        $incidentRaw = (Invoke-RestMethod -Uri $($incidentRaw.nextLink) -Headers $script:authHeader -Method Get)
+                        $incident += $incidentRaw.value
+                    }
+                }
+            }
+            catch {
+                Write-Verbose $_
+                Write-Error "Unable to get incidents with error code: $($_.Exception.Message)" -ErrorAction Stop
+            }
         }
+
+
 
         $return = @()
 
