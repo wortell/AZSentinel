@@ -14,7 +14,7 @@ Get Azure Sentinel Incident
 
 ```
 Get-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> [-IncidentName <String[]>]
- [-CaseNumber <Int32[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-CaseNumber <Int32[]>] [-All] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -26,18 +26,24 @@ You can can also filter to Incident with speciefiek case namber or Case name
 ### EXAMPLE 1
 ```
 Get-AzSentinelIncident -WorkspaceName ""
-Get a list of all open Incidents
+Get a list of the last 200 Incidents
 ```
 
 ### EXAMPLE 2
+```
+Get-AzSentinelIncident -WorkspaceName "" -All
+Get a list of all Incidents
+```
+
+### EXAMPLE 3
 ```
 Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
 Get information of a specifiek incident with providing the casenumber
 ```
 
-### EXAMPLE 3
+### EXAMPLE 4
 ```
-Get-AzSentinelIncident -WorkspaceName "" -IncidentName "",""
+Get-AzSentinelIncident -WorkspaceName "" -IncidentName "", ""
 Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
 ```
 
@@ -99,6 +105,21 @@ Aliases:
 Required: False
 Position: Named
 Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -All
+Use -All switch to get a list of all the incidents
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
