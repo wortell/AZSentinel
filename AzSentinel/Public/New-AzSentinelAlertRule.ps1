@@ -42,65 +42,100 @@ function New-AzSentinelAlertRule {
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High', DefaultParameterSetName = 'Scheduled')]
     param (
-        [Parameter(Mandatory = $false,
-            ParameterSetName = "Sub")]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 0)]
+        [Parameter(ParameterSetName = 'Fusion', Position = 0)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 0)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string] $SubscriptionId,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 1)]
+        [Parameter(ParameterSetName = 'Fusion', Position = 1)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 1)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 1)]
         [ValidateNotNullOrEmpty()]
         [string] $WorkspaceName,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 2)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 2)]
         [string] $DisplayName,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 3)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 3)]
         [ValidateNotNullOrEmpty()]
         [string] $Description,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 4)]
         [ValidateNotNullOrEmpty()]
         [Severity] $Severity,
 
-        [Parameter(Mandatory)]
+
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 5)]
+        [Parameter(ParameterSetName = 'Fusion', Position = 2)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 4)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 2)]
         [ValidateNotNullOrEmpty()]
         [bool] $Enabled,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 6)]
         [ValidateNotNullOrEmpty()]
         [string] $Query,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 7)]
         [ValidateNotNullOrEmpty()]
         [string] $QueryFrequency,
 
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 8)]
         [ValidateNotNullOrEmpty()]
         [string] $QueryPeriod,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 9)]
         [ValidateNotNullOrEmpty()]
         [TriggerOperator] $TriggerOperator,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 10)]
         [ValidateNotNullOrEmpty()]
         [Int] $TriggerThreshold,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 11)]
         [AllowEmptyString()]
         [string] $SuppressionDuration,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 12)]
         [bool] $SuppressionEnabled,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 13)]
         [AllowEmptyCollection()]
         [Tactics[]] $Tactics,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 14)]
         [AllowEmptyString()]
-        [string] $PlaybookName = $null
+        [string] $PlaybookName = $null,
+
+
+        ### MicrosoftSecurityIncidentCreation
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 5)]
+        [AllowEmptyString()]
+        [string] $ProductFilter,
+
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 6)]
+        [AllowEmptyString()]
+        [string] $SeveritiesFilter,
+
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 7)]
+        [AllowEmptyString()]
+        [string] $DisplayNamesFilter,
+
+        ### Fusion
+        [Parameter(ParameterSetName = 'Fusion', Mandatory = $true, Position = 3)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 8)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 3)]
+        [ValidateNotNullOrEmpty()]
+        [string] $AlertRuleTemplateName
+
+
     )
 
     begin {
@@ -197,7 +232,6 @@ function New-AzSentinelAlertRule {
                     alertRuleTemplateName = $AlertRuleTemplateName
                 }
             }
-
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
         catch {
