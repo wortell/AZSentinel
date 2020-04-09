@@ -124,7 +124,7 @@ function Import-AzSentinelAlertRule {
                     $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
                 }
                 else {
-                    Write-Verbose -Message "Rule $($item.displayName) doesn't exists in Azure Sentinel"
+                    Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
