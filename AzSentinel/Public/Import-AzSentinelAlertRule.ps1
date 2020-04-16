@@ -93,7 +93,7 @@ function Import-AzSentinelAlertRule {
                 Write-Error -Message 'Unable to convert JSON file' -ErrorAction Stop
             }
         }
-        elseif ($SettingsFile.Extension -in '.yaml', 'yml') {
+        elseif ($SettingsFile.Extension -in '.yaml', '.yml') {
             try {
                 $analytics = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
                 $analytics | Add-Member -MemberType NoteProperty -Name DisplayName -Value $analytics.name
@@ -103,6 +103,8 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose $_
                 Write-Error -Message 'Unable to convert yaml file' -ErrorAction Stop
             }
+        } else {
+            Write-Error -Message 'Unsupported extension for SettingsFile' -ErrorAction Stop
         }
 
         foreach ($item in $analytics) {
