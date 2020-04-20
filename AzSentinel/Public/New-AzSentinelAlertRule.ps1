@@ -58,84 +58,87 @@ function New-AzSentinelAlertRule {
         [ValidateNotNullOrEmpty()]
         [string] $WorkspaceName,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 2)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 2)]
+        [Parameter(ParameterSetName = 'Fusion', Position = 2)]
         [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 2)]
-        [string] $DisplayName,
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 2)]
+        [ValidateNotNullOrEmpty()]
+        [Kind] $Kind = "Scheduled",
 
         [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 3)]
         [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 3)]
+        [string] $DisplayName,
+
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 4)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 4)]
         [ValidateNotNullOrEmpty()]
         [string] $Description,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 4)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 5)]
         [ValidateNotNullOrEmpty()]
         [Severity] $Severity,
 
-
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 5)]
-        [Parameter(ParameterSetName = 'Fusion', Position = 2)]
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 4)]
-        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 2)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 6)]
+        [Parameter(ParameterSetName = 'Fusion', Position = 3)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 5)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 3)]
         [ValidateNotNullOrEmpty()]
         [bool] $Enabled,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 6)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 7)]
         [ValidateNotNullOrEmpty()]
         [string] $Query,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 7)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 8)]
         [ValidateNotNullOrEmpty()]
         [string] $QueryFrequency,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 8)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 9)]
         [ValidateNotNullOrEmpty()]
         [string] $QueryPeriod,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 9)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 10)]
         [ValidateNotNullOrEmpty()]
         [TriggerOperator] $TriggerOperator,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 10)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 11)]
         [ValidateNotNullOrEmpty()]
         [Int] $TriggerThreshold,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 11)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 12)]
         [AllowEmptyString()]
         [string] $SuppressionDuration,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 12)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 13)]
         [bool] $SuppressionEnabled,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 13)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 14)]
         [AllowEmptyCollection()]
         [Tactics[]] $Tactics,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 14)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 15)]
         [AllowEmptyString()]
         [string] $PlaybookName = $null,
 
-
         ### MicrosoftSecurityIncidentCreation
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 5)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 6)]
         [AllowEmptyString()]
         [string] $ProductFilter,
 
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 6)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 7)]
         [AllowEmptyString()]
         [string] $SeveritiesFilter,
 
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 7)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Mandatory = $true, Position = 8)]
         [AllowEmptyString()]
         [string] $DisplayNamesFilter,
 
         ### Fusion
-        [Parameter(ParameterSetName = 'Fusion', Mandatory = $true, Position = 3)]
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 8)]
-        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 3)]
+        [Parameter(ParameterSetName = 'Fusion', Mandatory = $true, Position = 4)]
+        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 9)]
+        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 4)]
         [ValidateNotNullOrEmpty()]
         [string] $AlertRuleTemplateName
-
-
     )
 
     begin {
