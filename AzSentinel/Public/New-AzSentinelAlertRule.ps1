@@ -22,15 +22,15 @@ function New-AzSentinelAlertRule {
     .PARAMETER Query
     Enter the Query that you want to use
     .PARAMETER QueryFrequency
-    Enter the query frequency, example: 5H or 5M (H stands for Hour and M stands for Minute)
+    Enter the query frequency, example: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
     .PARAMETER QueryPeriod
-    Enter the quury period, exmaple: 5H or 5M (H stands for Hour and M stands for Minute)
+    Enter the query period, exmaple: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
     .PARAMETER TriggerOperator
     Select the triggert Operator, valid values are: "GreaterThan", "FewerThan", "EqualTo", "NotEqualTo"
     .PARAMETER TriggerThreshold
     Enter the trigger treshold
     .PARAMETER SuppressionDuration
-    Enter the suppression duration, example: 5H or 5M (H stands for Hour and M stands for Minute)
+    Enter the suppression duration, example: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
     .PARAMETER SuppressionEnabled
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
