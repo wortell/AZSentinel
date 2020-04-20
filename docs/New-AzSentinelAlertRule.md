@@ -140,7 +140,7 @@ Accept wildcard characters: False
 ```
 
 ### -QueryFrequency
-Enter the query frequency, example: 5H or 5M (H stands for Hour and M stands for Minute)
+Enter the query period, exmaple: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
 Type: String
@@ -155,7 +155,7 @@ Accept wildcard characters: False
 ```
 
 ### -QueryPeriod
-Enter the quury period, exmaple: 5H or 5M (H stands for Hour and M stands for Minute)
+Enter the query period, exmaple: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
 Type: String
@@ -201,7 +201,7 @@ Accept wildcard characters: False
 ```
 
 ### -SuppressionDuration
-Enter the suppression duration, example: 5H or 5M (H stands for Hour and M stands for Minute)
+Enter the query period, exmaple: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
 Type: String
