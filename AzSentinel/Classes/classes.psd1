@@ -1,8 +1,8 @@
 @{
     order = @(
-        ,'AlertRule'
-        ,'AlertProp'
         ,'groupingConfiguration'
         ,'IncidentConfiguration'
+        ,'ScheduledAlertProp'
+        ,'AlertRule'
     )
 }

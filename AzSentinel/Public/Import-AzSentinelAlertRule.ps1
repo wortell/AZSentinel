@@ -156,7 +156,7 @@ function Import-AzSentinelAlertRule {
                     )
                 }
 
-                $bodyAlertProp = [AlertProp]::new(
+                $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
                     $item.displayName,
                     $item.description,

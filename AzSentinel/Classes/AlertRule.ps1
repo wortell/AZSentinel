@@ -1,9 +1,3 @@
-
-
-
-
-
-
 class AlertRule {
     [guid] $Name
 
