@@ -103,7 +103,8 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose $_
                 Write-Error -Message 'Unable to convert yaml file' -ErrorAction Stop
             }
-        } else {
+        }
+        else {
             Write-Error -Message 'Unsupported extension for SettingsFile' -ErrorAction Stop
         }
 
@@ -140,6 +141,21 @@ function Import-AzSentinelAlertRule {
             }
 
             try {
+                if ($item.incidentConfiguration) {
+                    $groupingConfiguration = [groupingConfiguration]::new(
+                        $item.incidentConfiguration.groupingConfiguration.enabled,
+                        $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
+                        $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
+                        $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
+                        $item.incidentConfiguration.groupingConfiguration.groupByEntities
+                    )
+
+                    $IncidentConfiguration = [IncidentConfiguration]::new(
+                        $item.incidentConfiguration.createIncident,
+                        $groupingConfiguration
+                    )
+                }
+
                 $bodyAlertProp = [AlertProp]::new(
                     $item.name,
                     $item.displayName,
@@ -154,7 +170,9 @@ function Import-AzSentinelAlertRule {
                     $item.suppressionDuration,
                     $item.suppressionEnabled,
                     $item.Tactics,
-                    $item.playbookName
+                    $item.playbookName,
+                    $IncidentConfiguration
+
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
 
