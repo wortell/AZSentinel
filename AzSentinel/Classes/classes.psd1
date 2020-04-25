@@ -1,6 +1,7 @@
 @{
     order = @(
-        ,'AlertRule'
-        ,'ScheduledAlertProp'
+        , 'ScheduledAlertProp'
+        , 'AlertRule'
+        , 'FusionAlertProp'
     )
 }

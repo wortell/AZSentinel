@@ -39,6 +39,8 @@ function New-AzSentinelAlertRule {
     Enter the Logic App name that you want to configure as playbook trigger
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
+
+
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
@@ -58,15 +60,16 @@ function New-AzSentinelAlertRule {
         [ValidateNotNullOrEmpty()]
         [string] $WorkspaceName,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 2)]
-        [Parameter(ParameterSetName = 'Fusion', Position = 2)]
-        [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 2)]
-        [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 2)]
+        # [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 2)]
+        # [Parameter(ParameterSetName = 'Fusion', Position = 2)]
+        # [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 2)]
+        # [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 2)]
         [ValidateNotNullOrEmpty()]
         [Kind] $Kind = "Scheduled",
 
         [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 3)]
         [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 3)]
+        [Parameter(ParameterSetName = 'Fusion', Mandatory = $true, Position = 5)]
         [string] $DisplayName,
 
         [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 4)]
@@ -105,7 +108,7 @@ function New-AzSentinelAlertRule {
         [ValidateNotNullOrEmpty()]
         [Int] $TriggerThreshold,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 12)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 12)]
         [AllowEmptyString()]
         [string] $SuppressionDuration,
 
@@ -116,7 +119,7 @@ function New-AzSentinelAlertRule {
         [AllowEmptyCollection()]
         [Tactics[]] $Tactics,
 
-        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $true, Position = 15)]
+        [Parameter(ParameterSetName = 'Scheduled', Mandatory = $false, Position = 15)]
         [AllowEmptyString()]
         [string] $PlaybookName = $null,
 
@@ -135,10 +138,16 @@ function New-AzSentinelAlertRule {
 
         ### Fusion
         [Parameter(ParameterSetName = 'Fusion', Mandatory = $true, Position = 4)]
+        [ValidateNotNullOrEmpty()]
+        [string] $FusionAlertRuleTemplateName,
+
         [Parameter(ParameterSetName = 'MicrosoftSecurityIncidentCreation', Position = 9)]
+        [ValidateNotNullOrEmpty()]
+        [string] $MicrosoftSecurityIncidentCreationAlertRuleTemplateName,
+
         [Parameter(ParameterSetName = 'MLBehaviorAnalytics', Position = 4)]
         [ValidateNotNullOrEmpty()]
-        [string] $AlertRuleTemplateName
+        [string] $MLBehaviorAnalyticsAlertRuleTemplateName
     )
 
     begin {
@@ -195,7 +204,7 @@ function New-AzSentinelAlertRule {
 
         try {
             if ($Kind -eq "Scheduled") {
-                $bodyAlertProp = [AlertProp]::new(
+                $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
                     $DisplayName,
                     $Description,
@@ -213,10 +222,10 @@ function New-AzSentinelAlertRule {
                 )
             }
             elseif ($Kind -eq "Fusion") {
-                $bodyAlertProp = @{
-                    enabled               = $Enabled
-                    alertRuleTemplateName = $AlertRuleTemplateName
-                }
+                $bodyAlertProp = [FusionAlertProp]::new(
+                    $FusionAlertRuleTemplateName,
+                    $Enabled
+                )
             }
             elseif ($item.kind -eq "MicrosoftSecurityIncidentCreation") {
                 $bodyAlertProp = @{
@@ -235,13 +244,23 @@ function New-AzSentinelAlertRule {
                     alertRuleTemplateName = $AlertRuleTemplateName
                 }
             }
-            $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+            #return $bodyAlertProp
+
+
+            if ($bodyAlertProp) {
+                $body = [AlertRule]::new( $item.name, $Kind , $item.etag, $bodyAlertProp, $item.Id)
+            }
+            else {
+                Write-Error "Alert Properties is empty"
+            }
+            #return $body
         }
         catch {
             Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
         }
 
-        if ($content) {
+
+        if ($content -and $Kind -eq 'Scheduled') {
             if ($PlaybookName) {
                 $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
             }
@@ -296,7 +315,7 @@ function New-AzSentinelAlertRule {
             }
             catch {
                 Write-Verbose $_
-                Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Stop
+                Write-Error "Unable to invoke webrequest with error message: $($_.ErrorDetails)" -ErrorAction Stop
             }
         }
     }

@@ -1,5 +1,4 @@
 class ScheduledAlertProp {
-
     [guid] $Name
 
     [string] $DisplayName
@@ -39,19 +38,47 @@ class ScheduledAlertProp {
         return $value
     }
 
-    AlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName) {
+    # Convert string to ISO_8601 format PdDThHmMsS
+    static [string] TimeString([string]$value) {
+        $value = $value.ToUpper()
+        # Return values already in ISO 8601 format
+        if ($value -match "PT.*|P.*D") {
+            return $value
+        }
+        # Format day time periods
+        if ($value -like "*D") {
+            return "P$value"
+        }
+        # Format hour and minute time periods
+        if ($value -match ".*[HM]") {
+            return "PT$value"
+        }
+        return $value
+    }
+
+    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName) {
         $this.name = $Name
         $this.DisplayName = $DisplayName
         $this.Description = $Description
         $this.Severity = $Severity
         $this.Enabled = $Enabled
         $this.Query = $Query
-        $this.QueryFrequency = if ($QueryFrequency -like "PT*") { $QueryFrequency.ToUpper() } else { ("PT" + $QueryFrequency).ToUpper() }
-        $this.QueryPeriod = if ($QueryPeriod -like "PT*") { $QueryPeriod.ToUpper() } else { ("PT" + $QueryPeriod).ToUpper() }
+        $this.QueryFrequency = [ScheduledAlertProp]::TimeString($QueryFrequency)
+        $this.QueryPeriod = [ScheduledAlertProp]::TimeString($QueryPeriod)
         $this.TriggerOperator = [ScheduledAlertProp]::TriggerOperatorSwitch($TriggerOperator)
         $this.TriggerThreshold = $TriggerThreshold
-        $this.SuppressionDuration = if ((! $null -eq $suppressionDuration) -or ( $false -eq $suppressionEnabled)) { if ($suppressionDuration -like "PT*") { $suppressionDuration.ToUpper() } else { ("PT" + $suppressionDuration).ToUpper() } } else { "PT1H" }
-        $this.SuppressionEnabled = if ($suppressionEnabled) { $suppressionEnabled } else { $false }
+        $this.SuppressionDuration = if (($null -eq $suppressionDuration) -or ( $false -eq $suppressionEnabled)) {
+            "PT1H"
+        }
+        else {
+            if ( [ScheduledAlertProp]::TimeString($suppressionDuration) -ge [ScheduledAlertProp]::TimeString($QueryFrequency) ) {
+                [ScheduledAlertProp]::TimeString($suppressionDuration)
+            }
+            else {
+                Write-Error "Invalid Properties for Scheduled alert rule: 'suppressionDuration' should be greater than or equal to 'queryFrequency'" -ErrorAction Stop
+            }
+        }
+        $this.SuppressionEnabled = $suppressionEnabled
         $this.Tactics = $Tactics
         $this.PlaybookName = $PlaybookName
     }
