@@ -3,7 +3,7 @@ class IncidentConfiguration {
 
     $GroupingConfiguration
 
-    IncidentConfiguration ($CreateIncident, $GroupingConfiguration){
+    IncidentConfiguration ($CreateIncident, $GroupingConfiguration) {
         $this.createIncident = $CreateIncident
         $this.groupingConfiguration = $GroupingConfiguration
     }

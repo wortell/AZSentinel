@@ -30,6 +30,9 @@ class ScheduledAlertProp {
 
     $IncidentConfiguration
 
+    $queryResultsAggregationSettings
+    $aggregationKind
+
     static [string] TriggerOperatorSwitch([string]$value) {
         switch ($value) {
             "gt" { $value = "GreaterThan" }
@@ -85,5 +88,8 @@ class ScheduledAlertProp {
         $this.Tactics = $Tactics
         $this.PlaybookName = $PlaybookName
         $this.incidentConfiguration = if ($IncidentConfiguration) { $IncidentConfiguration } else { $null }
+        $this.queryResultsAggregationSettings = @(
+            $this.aggregationKind = "SingleAlert"
+        )
     }
 }

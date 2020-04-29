@@ -17,7 +17,21 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "Playbook01"
+      "playbookName": "Playbook01",
+
+      "createIncident": true,
+      "groupingConfiguration": {
+        "enabled": false,
+        "reopenClosedIncident": false,
+        "lookbackDuration": "PT5H",
+        "entitiesMatchingMethod": "All",
+        "groupByEntities": [
+          "Account",
+          "Ip",
+          "Host",
+          "Url"
+        ]
+      }
     }
   ]
 }

@@ -139,22 +139,27 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose $_
                 Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
             }
-
             try {
-                if ($item.incidentConfiguration) {
+                if ($item.groupingConfiguration) {
                     $groupingConfiguration = [groupingConfiguration]::new(
-                        $item.incidentConfiguration.groupingConfiguration.enabled,
-                        $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
-                        $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
-                        $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
-                        $item.incidentConfiguration.groupingConfiguration.groupByEntities
-                    )
-
-                    $IncidentConfiguration = [IncidentConfiguration]::new(
-                        $item.incidentConfiguration.createIncident,
-                        $groupingConfiguration
+                        $item.groupingConfiguration.enabled,
+                        $item.groupingConfiguration.reopenClosedIncident,
+                        $item.groupingConfiguration.lookbackDuration,
+                        $item.groupingConfiguration.entitiesMatchingMethod,
+                        $item.groupingConfiguration.groupByEntities
                     )
                 }
+                else {
+                    $groupingConfiguration = [groupingConfiguration]::new()
+                }
+
+                $IncidentConfiguration = [IncidentConfiguration]::new(
+                    $item.createIncident,
+                    $groupingConfiguration
+                )
+                # $queryResultsAggregationSettings = [queryResultsAggregationSettings]::new(
+                #     "SingleAlert"
+                # )
 
                 $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
@@ -172,13 +177,12 @@ function Import-AzSentinelAlertRule {
                     $item.Tactics,
                     $item.playbookName,
                     $IncidentConfiguration
-
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
-
+                #return $body
             }
             catch {
-                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Continue
+                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
             }
 
             if ($content) {
@@ -194,7 +198,7 @@ function Import-AzSentinelAlertRule {
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                             if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
                                 New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
@@ -206,7 +210,7 @@ function Import-AzSentinelAlertRule {
                                 #nothing
                             }
                             Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
-                            Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
+                            Write-Output ($body.Properties | Format-List | Format-Table | Out-String )
                         }
                         catch {
                             Write-Verbose $_
@@ -226,7 +230,7 @@ function Import-AzSentinelAlertRule {
                 Write-Verbose "Creating new rule: $($item.displayName)"
 
                 try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -EnumsAsStrings)
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                     if ($body.Properties.playbookName) {
                         New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                     }
