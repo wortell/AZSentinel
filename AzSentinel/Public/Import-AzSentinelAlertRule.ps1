@@ -118,7 +118,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Output "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Host "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -150,17 +150,39 @@ function Import-AzSentinelAlertRule {
                     )
                 }
                 else {
-                    $groupingConfiguration = [groupingConfiguration]::new()
+                    $groupingConfiguration = [groupingConfiguration]::new(
+                        $true,
+                        $false,
+                        "PT5H",
+                        "All",
+                        @(
+                            "Account",
+                            "Ip",
+                            "Host",
+                            "Url"
+                        )
+                    )
                 }
 
-                $IncidentConfiguration = [IncidentConfiguration]::new(
-                    $item.createIncident,
-                    $groupingConfiguration
-                )
-                # $queryResultsAggregationSettings = [queryResultsAggregationSettings]::new(
-                #     "SingleAlert"
-                # )
+                if ($item.createIncident) {
+                    $IncidentConfiguration = [IncidentConfiguration]::new(
+                        $item.createIncident,
+                        $groupingConfiguration
+                    )
+                }
+                else {
+                    $IncidentConfiguration = [IncidentConfiguration]::new(
+                        $true,
+                        $groupingConfiguration
+                    )
+                }
 
+                if ($item.aggregationKind) {
+                    #no aggregation field configured
+                }
+                else {
+                    $item | Add-Member -NotePropertyName aggregationKind -NotePropertyValue 'SingleAlert' -Force
+                }
                 $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
                     $item.displayName,
@@ -176,16 +198,20 @@ function Import-AzSentinelAlertRule {
                     $item.suppressionEnabled,
                     $item.Tactics,
                     $item.playbookName,
-                    $IncidentConfiguration
+                    $IncidentConfiguration,
+                    $item.aggregationKind
                 )
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
-                #return $body
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
             }
 
             if ($content) {
+                # $return=  ($content | Select-Object severity, query, queryFrequency, queryPeriod,triggerOperator, triggerThreshold,suppressionDuration,suppressionEnabled,incidentConfiguration.createIncident,incidentConfiguration -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
+                #return ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
+                return $body.Properties
+
                 if ($item.playbookName) {
                     $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 }
@@ -193,8 +219,8 @@ function Import-AzSentinelAlertRule {
                     $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName)
                 }
                 if ($compareResult) {
-                    Write-Output "Found Differences for rule: $($item.displayName)"
-                    Write-Output ($compareResult | Format-Table | Out-String)
+                    Write-Host "Found Differences for rule: $($item.displayName)"
+                    Write-Host ($compareResult | Format-Table | Out-String)
 
                     if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
                         try {
@@ -209,7 +235,8 @@ function Import-AzSentinelAlertRule {
                             else {
                                 #nothing
                             }
-                            Write-Output "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
+                            Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
+                            #return $body.Properties
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String )
                         }
                         catch {
@@ -218,12 +245,12 @@ function Import-AzSentinelAlertRule {
                         }
                     }
                     else {
-                        Write-Output "No change have been made for rule $($item.displayName), deployment aborted"
+                        Write-Host "No change have been made for rule $($item.displayName), deployment aborted"
                     }
                 }
                 else {
-                    Write-Output "Rule $($item.displayName) is compliance, nothing to do"
-                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
+                    Write-Host "Rule $($item.displayName) is compliance, nothing to do"
+                    Write-Host ($body.Properties | Format-List | Format-Table | Out-String)
                 }
             }
             else {
@@ -235,7 +262,7 @@ function Import-AzSentinelAlertRule {
                         New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                     }
 
-                    Write-Output "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
+                    Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
                     Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
                 }
                 catch {

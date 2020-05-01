@@ -1,5 +1,5 @@
 class IncidentConfiguration {
-    [bool] $CreateIncident
+    [bool] $CreateIncident = $true
 
     $GroupingConfiguration
 

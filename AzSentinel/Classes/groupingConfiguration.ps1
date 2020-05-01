@@ -5,7 +5,7 @@ class groupingConfiguration {
 
     [string]$lookbackDuration
 
-    $entitiesMatchingMethod
+    [MatchingMethod]$entitiesMatchingMethod
 
     [GroupByEntities[]]$groupByEntities
 
@@ -27,18 +27,18 @@ class groupingConfiguration {
         return $value
     }
 
-    groupingConfiguration () {
-        $this.enabled = $true,
-        $this.reopenClosedIncident = $false
-        $this.lookbackDuration = "PT5H"
-        $this.entitiesMatchingMethod = "All"
-        $this.groupByEntities = @(
-            "Account",
-            "Ip",
-            "Host",
-            "Url"
-        )
-    }
+    # groupingConfiguration () {
+    #     enabled = $true,
+    #     reopenClosedIncident = $false
+    #     lookbackDuration = "PT5H"
+    #     entitiesMatchingMethod = "All"
+    #     groupByEntities = @(
+    #         "Account",
+    #         "Ip",
+    #         "Host",
+    #         "Url"
+    #     )
+    # }
 
     groupingConfiguration ($Enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, [GroupByEntities[]]$groupByEntities) {
         $this.enabled = $Enabled
@@ -47,7 +47,4 @@ class groupingConfiguration {
         $this.entitiesMatchingMethod = $entitiesMatchingMethod
         $this.groupByEntities = $groupByEntities
     }
-
-
-
 }

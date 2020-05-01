@@ -31,7 +31,8 @@ class ScheduledAlertProp {
     $IncidentConfiguration
 
     $queryResultsAggregationSettings
-    $aggregationKind
+
+    hidden [string]$aggregationKind
 
     static [string] TriggerOperatorSwitch([string]$value) {
         switch ($value) {
@@ -62,7 +63,7 @@ class ScheduledAlertProp {
         return $value
     }
 
-    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName, $IncidentConfiguration) {
+    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName, $IncidentConfiguration, $aggregationKind) {
         $this.name = $Name
         $this.DisplayName = $DisplayName
         $this.Description = $Description
@@ -88,8 +89,8 @@ class ScheduledAlertProp {
         $this.Tactics = $Tactics
         $this.PlaybookName = $PlaybookName
         $this.incidentConfiguration = if ($IncidentConfiguration) { $IncidentConfiguration } else { $null }
-        $this.queryResultsAggregationSettings = @(
-            $this.aggregationKind = "SingleAlert"
-        )
+        $this.queryResultsAggregationSettings = @{
+            aggregationKind = $aggregationKind
+        }
     }
 }

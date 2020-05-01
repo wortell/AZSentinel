@@ -1,6 +1,5 @@
 @{
     order = @(
-        ,'queryResultsAggregationSettings'
         ,'groupingConfiguration'
         ,'IncidentConfiguration'
         ,'ScheduledAlertProp'
