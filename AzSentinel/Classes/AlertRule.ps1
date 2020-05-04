@@ -28,6 +28,8 @@ class AlertProp {
 
     [string] $PlaybookName
 
+    hidden $properties
+
     static [string] TriggerOperatorSwitch([string]$value) {
         switch ($value) {
             "gt" { $value = "GreaterThan" }
@@ -55,6 +57,22 @@ class AlertProp {
             return "PT$value"
         }
         return $value
+    }
+    AlertProp ($properties) {
+        $this.name = $properties.Name
+        $this.DisplayName = $properties.DisplayName
+        $this.Description = $properties.Description
+        $this.Severity = $properties.Severity
+        $this.Enabled = $properties.Enabled
+        $this.Query = $properties.Query
+        $this.QueryFrequency = $properties.QueryFrequency
+        $this.QueryPeriod = $properties.QueryPeriod
+        $this.TriggerOperator = $properties.TriggerOperator
+        $this.TriggerThreshold = $properties.TriggerThreshold
+        $this.SuppressionDuration = $properties.SuppressionDuration
+        $this.SuppressionEnabled = $properties.SuppressionEnabled
+        $this.Tactics = $properties.Tactics
+        $this.PlaybookName = $properties.PlaybookName
     }
 
     AlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName) {
@@ -84,8 +102,17 @@ class AlertRule {
 
     [AlertProp]$Properties
 
-    [Parameter(Mandatory)]
     [string]$Id
+
+    $header
+
+    AlertRule($header, $properties) {
+        $this.id = $header.Id
+        $this.type = 'Microsoft.SecurityInsights/alertRules'
+        $this.Name = $header.Name
+        $this.Etag = $header.Etag
+        $this.Properties = $properties
+    }
 
     AlertRule ([guid]$Name, [string]$Etag, [AlertProp]$Properties, $Id) {
 
