@@ -71,6 +71,8 @@ function Disable-AzSentinelAlertRule {
 
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                    Write-Host "Status of '$($rule.DisplayName)' changed to '$($rule.enabled)'"
+
                 }
                 catch {
                     Write-Error $_.Exception.Message
