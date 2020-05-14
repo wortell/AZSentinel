@@ -28,7 +28,7 @@ class ScheduledAlertProp {
 
     [string] $PlaybookName
 
-    $IncidentConfiguration
+    [psobject]$IncidentConfiguration
 
     $queryResultsAggregationSettings
 
@@ -63,7 +63,7 @@ class ScheduledAlertProp {
         return $value
     }
 
-    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName, $IncidentConfiguration, $aggregationKind) {
+    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, $suppressionEnabled, $Tactics, $PlaybookName, [psobject]$IncidentConfiguration, $aggregationKind) {
         $this.name = $Name
         $this.DisplayName = $DisplayName
         $this.Description = $Description

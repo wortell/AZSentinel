@@ -183,6 +183,7 @@ function Import-AzSentinelAlertRule {
                 else {
                     $item | Add-Member -NotePropertyName aggregationKind -NotePropertyValue 'SingleAlert' -Force
                 }
+
                 $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
                     $item.displayName,
@@ -201,6 +202,7 @@ function Import-AzSentinelAlertRule {
                     $IncidentConfiguration,
                     $item.aggregationKind
                 )
+
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
             catch {
@@ -211,7 +213,7 @@ function Import-AzSentinelAlertRule {
                 # $return=  ($content | Select-Object severity, query, queryFrequency, queryPeriod,triggerOperator, triggerThreshold,suppressionDuration,suppressionEnabled,incidentConfiguration.createIncident,incidentConfiguration -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
                 #return ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
                 return $body.Properties
-
+                #return $content
                 if ($item.playbookName) {
                     $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
                 }
@@ -235,6 +237,7 @@ function Import-AzSentinelAlertRule {
                             else {
                                 #nothing
                             }
+
                             Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
                             #return $body.Properties
                             Write-Output ($body.Properties | Format-List | Format-Table | Out-String )
