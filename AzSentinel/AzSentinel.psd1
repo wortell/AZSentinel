@@ -79,6 +79,8 @@
         'New-AzSentinelAlertRule',
         'Get-AzSentinelAlertRule',
         'Rename-AzSentinelAlertRule',
+        'Enable-AzSentinelAlertRule',
+        'Disable-AzSentinelAlertRule',
         'Import-AzSentinelAlertRule',
         'Remove-AzSentinelAlertRule',
         'Import-AzSentinelAlertRule',
