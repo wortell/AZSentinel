@@ -62,27 +62,20 @@ function Rename-AzSentinelAlertRule {
         }
 
         try {
-            $currentRule = Get-AzSentinelAlertRule @arguments -RuleName $CurrentRuleName -ErrorAction Stop
+            $rule = Get-AzSentinelAlertRule @arguments -RuleName $CurrentRuleName -ErrorAction Stop
 
             $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($currentRule.name)?api-version=2019-01-01-preview"
 
+            $rule.displayName = $NewRuleName
+
             $bodyAlertProp = [AlertProp]::new(
-                $currentRule.name,
-                $NewRuleName,
-                $currentRule.Description,
-                $currentRule.Severity,
-                $currentRule.Enabled,
-                $currentRule.Query,
-                $currentRule.QueryFrequency,
-                $currentRule.QueryPeriod,
-                $currentRule.TriggerOperator,
-                $currentRule.TriggerThreshold,
-                $currentRule.SuppressionDuration,
-                $currentRule.SuppressionEnabled,
-                $currentRule.Tactics,
-                $currentRule.playbookName
+                ($rule | Select-Object * -ExcludeProperty lastModifiedUtc, etag, id)
             )
-            $body = [AlertRule]::new( $currentRule.name, $currentRule.etag, $bodyAlertProp, $currentRule.Id)
+
+            $body = [AlertRule]::new(
+                ($rule | Select-Object lastModifiedUtc, etag, id, name),
+                $bodyAlertProp
+            )
 
             try {
                 $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
