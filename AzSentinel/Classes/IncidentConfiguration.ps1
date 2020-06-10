@@ -1,10 +1,10 @@
 class IncidentConfiguration {
-    [bool] $CreateIncident = $true
+    [bool] $CreateIncident
 
     $GroupingConfiguration
 
-    IncidentConfiguration ($CreateIncident, $GroupingConfiguration) {
-        $this.createIncident = $CreateIncident
-        $this.groupingConfiguration = $GroupingConfiguration
+    IncidentConfiguration ($CreateIncident, [PSCustomObject]$GroupingConfiguration) {
+        $this.createIncident = if ($createIncident) { $createIncident } else { $true }
+        $this.groupingConfiguration = [PSCustomObject]$GroupingConfiguration
     }
 }

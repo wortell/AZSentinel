@@ -27,24 +27,26 @@ class groupingConfiguration {
         return $value
     }
 
-    # groupingConfiguration () {
-    #     enabled = $true,
-    #     reopenClosedIncident = $false
-    #     lookbackDuration = "PT5H"
-    #     entitiesMatchingMethod = "All"
-    #     groupByEntities = @(
-    #         "Account",
-    #         "Ip",
-    #         "Host",
-    #         "Url"
-    #     )
-    # }
+    groupingConfiguration ($properties) {
+        $this.enabled = $properties.enabled
+        $this.reopenClosedIncident = $properties.reopenClosedIncident
+        $this.lookbackDuration = $properties.lookbackDuration
+        $this.entitiesMatchingMethod = $properties.entitiesMatchingMethod
+        $this.groupByEntities = $properties.groupByEntities
+    }
 
     groupingConfiguration ($Enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, [GroupByEntities[]]$groupByEntities) {
-        $this.enabled = $Enabled
-        $this.reopenClosedIncident = $reopenClosedIncident
-        $this.lookbackDuration = [groupingConfiguration]::TimeString($lookbackDuration)
-        $this.entitiesMatchingMethod = $entitiesMatchingMethod
-        $this.groupByEntities = $groupByEntities
+        $this.enabled = if ($Enabled) { $Enabled } else { $true }
+        $this.reopenClosedIncident = if ($reopenClosedIncident) { $reopenClosedIncident } else { $false }
+        $this.lookbackDuration = if ($lookbackDuration) { [groupingConfiguration]::TimeString($lookbackDuration) } else { "PT5H" }
+        $this.entitiesMatchingMethod = if ($entitiesMatchingMethod) { $entitiesMatchingMethod } else { "All" }
+        $this.groupByEntities = if ($groupByEntities) { $groupByEntities } else {
+            @(
+                "Account",
+                "Ip",
+                "Host",
+                "Url"
+            )
+        }
     }
 }

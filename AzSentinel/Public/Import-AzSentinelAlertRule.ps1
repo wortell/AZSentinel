@@ -81,7 +81,6 @@ function Import-AzSentinelAlertRule {
                 }
             }
         }
-        #Get-LogAnalyticWorkspace @arguments
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
@@ -108,6 +107,8 @@ function Import-AzSentinelAlertRule {
             Write-Error -Message 'Unsupported extension for SettingsFile' -ErrorAction Stop
         }
 
+        $return = @()
+
         foreach ($item in $analytics) {
             Write-Verbose -Message "Started with rule: $($item.displayName)"
 
@@ -118,7 +119,7 @@ function Import-AzSentinelAlertRule {
                 $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
 
                 if ($content) {
-                    Write-Host "Rule $($item.displayName) exists in Azure Sentinel"
+                    Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
 
                     $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
                     $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
@@ -140,50 +141,18 @@ function Import-AzSentinelAlertRule {
                 Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
             }
             try {
-                if ($item.groupingConfiguration) {
-                    $groupingConfiguration = [groupingConfiguration]::new(
-                        $item.groupingConfiguration.enabled,
-                        $item.groupingConfiguration.reopenClosedIncident,
-                        $item.groupingConfiguration.lookbackDuration,
-                        $item.groupingConfiguration.entitiesMatchingMethod,
-                        $item.groupingConfiguration.groupByEntities
-                    )
-                }
-                else {
-                    $groupingConfiguration = [groupingConfiguration]::new(
-                        $true,
-                        $false,
-                        "PT5H",
-                        "All",
-                        @(
-                            "Account",
-                            "Ip",
-                            "Host",
-                            "Url"
-                        )
-                    )
-                }
 
-                if ($item.createIncident) {
-                    $IncidentConfiguration = [IncidentConfiguration]::new(
-                        $item.createIncident,
-                        $groupingConfiguration
-                    )
-                }
-                else {
-                    $IncidentConfiguration = [IncidentConfiguration]::new(
-                        $true,
-                        $groupingConfiguration
-                    )
-                }
-
-                if ($item.aggregationKind) {
-                    #no aggregation field configured
-                }
-                else {
-                    $item | Add-Member -NotePropertyName aggregationKind -NotePropertyValue 'SingleAlert' -Force
-                }
-
+                $groupingConfiguration = [groupingConfiguration]::new(
+                    $item.groupingConfiguration.enabled,
+                    $item.groupingConfiguration.reopenClosedIncident,
+                    $item.groupingConfiguration.lookbackDuration,
+                    $item.groupingConfiguration.entitiesMatchingMethod,
+                    $item.groupingConfiguration.groupByEntities
+                )
+                $IncidentConfiguration = [IncidentConfiguration]::new(
+                    $item.createIncident,
+                    $groupingConfiguration
+                )
                 $bodyAlertProp = [ScheduledAlertProp]::new(
                     $item.name,
                     $item.displayName,
@@ -202,58 +171,42 @@ function Import-AzSentinelAlertRule {
                     $IncidentConfiguration,
                     $item.aggregationKind
                 )
-
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
             }
 
+
             if ($content) {
-                # $return=  ($content | Select-Object severity, query, queryFrequency, queryPeriod,triggerOperator, triggerThreshold,suppressionDuration,suppressionEnabled,incidentConfiguration.createIncident,incidentConfiguration -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
-                #return ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id)
-                return $body.Properties
-                #return $content
-                if ($item.playbookName) {
-                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name)
+
+                if ($item.playbookName -or $content.playbookName) {
+                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id,incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id,incidentConfiguration, queryResultsAggregationSettings)
                 }
                 else {
-                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName)
+                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName, incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName, incidentConfiguration, queryResultsAggregationSettings)
                 }
-                if ($compareResult) {
-                    Write-Host "Found Differences for rule: $($item.displayName)"
-                    Write-Host ($compareResult | Format-Table | Out-String)
+                try {
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
-                    if ($PSCmdlet.ShouldProcess("Do you want to update profile: $($body.Properties.DisplayName)")) {
-                        try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
-
-                            if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
-                                New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
-                            }
-                            elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
-                                Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
-                            }
-                            else {
-                                #nothing
-                            }
-
-                            Write-Host "Successfully updated rule: $($item.displayName) with status: $($result.StatusDescription)"
-                            #return $body.Properties
-                            Write-Output ($body.Properties | Format-List | Format-Table | Out-String )
-                        }
-                        catch {
-                            Write-Verbose $_
-                            Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
-                        }
+                    if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
+                        New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                    }
+                    elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
+                        Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
                     }
                     else {
-                        Write-Host "No change have been made for rule $($item.displayName), deployment aborted"
+                        #nothing
                     }
+                    $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                    $return += $body.Properties
                 }
-                else {
-                    Write-Host "Rule $($item.displayName) is compliance, nothing to do"
-                    Write-Host ($body.Properties | Format-List | Format-Table | Out-String)
+                catch {
+                    $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                    $return += $body.Properties
+
+                    Write-Verbose $_
+                    Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
                 }
             }
             else {
@@ -264,15 +217,18 @@ function Import-AzSentinelAlertRule {
                     if ($body.Properties.playbookName) {
                         New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
                     }
-
-                    Write-Host "Successfully created rule: $($item.displayName) with status: $($result.StatusDescription)"
-                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
+                    $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                    $return += $body.Properties
                 }
                 catch {
+                    $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                    $return += $body.Properties
+
                     Write-Verbose $_
-                    Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
+                    Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
                 }
             }
         }
+        return $return
     }
 }
