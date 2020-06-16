@@ -7,12 +7,11 @@ class AlertRule {
 
     [string]$kind
 
-    [ScheduledAlertProp]$Properties
+    [pscustomobject]$Properties
 
-    [Parameter(Mandatory)]
     [string]$Id
 
-    AlertRule ([guid]$Name, [string]$Etag, [ScheduledAlertProp]$Properties, $Id) {
+    AlertRule ($Name, $Etag, $Properties, $Id) {
 
         $this.id = $Id
         $this.type = 'Microsoft.SecurityInsights/alertRules'

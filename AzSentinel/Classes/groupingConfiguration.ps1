@@ -35,7 +35,7 @@ class groupingConfiguration {
         $this.groupByEntities = $properties.groupByEntities
     }
 
-    groupingConfiguration ($Enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, [GroupByEntities[]]$groupByEntities) {
+    groupingConfiguration ($Enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, $groupByEntities) {
         $this.enabled = if ($Enabled) { $Enabled } else { $true }
         $this.reopenClosedIncident = if ($reopenClosedIncident) { $reopenClosedIncident } else { $false }
         $this.lookbackDuration = if ($lookbackDuration) { [groupingConfiguration]::TimeString($lookbackDuration) } else { "PT5H" }

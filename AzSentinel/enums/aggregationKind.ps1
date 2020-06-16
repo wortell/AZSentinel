@@ -1,3 +1,3 @@
-enum aggregationKind {
+enum AggregationKind {
     SingleAlert
 }

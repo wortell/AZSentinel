@@ -28,11 +28,11 @@ class ScheduledAlertProp {
 
     [string] $PlaybookName
 
-    $IncidentConfiguration
+    [IncidentConfiguration]$IncidentConfiguration
 
     $queryResultsAggregationSettings
 
-    hidden [aggregationKind]$aggregationKind
+    hidden [AggregationKind]$aggregationKind
 
     static [string] TriggerOperatorSwitch([string]$value) {
         switch ($value) {
@@ -62,6 +62,39 @@ class ScheduledAlertProp {
         }
         return $value
     }
+    ScheduledAlertProp (){
+
+    }
+
+    ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, `
+            $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, `
+            $suppressionEnabled, $Tactics, $IncidentConfiguration) {
+        $this.name = $Name
+        $this.DisplayName = $DisplayName
+        $this.Description = $Description
+        $this.Severity = $Severity
+        $this.Enabled = $Enabled
+        $this.Query = $Query
+        $this.QueryFrequency = [ScheduledAlertProp]::TimeString($QueryFrequency)
+        $this.QueryPeriod = [ScheduledAlertProp]::TimeString($QueryPeriod)
+        $this.TriggerOperator = [ScheduledAlertProp]::TriggerOperatorSwitch($TriggerOperator)
+        $this.TriggerThreshold = $TriggerThreshold
+        $this.SuppressionDuration = if (($null -eq $suppressionDuration) -or ( $false -eq $suppressionEnabled)) {
+            "PT1H"
+        }
+        else {
+            if ( [ScheduledAlertProp]::TimeString($suppressionDuration) -ge [ScheduledAlertProp]::TimeString($QueryFrequency) ) {
+                [ScheduledAlertProp]::TimeString($suppressionDuration)
+            }
+            else {
+                Write-Error "Invalid Properties for Scheduled alert rule: 'suppressionDuration' should be greater than or equal to 'queryFrequency'" -ErrorAction Stop
+            }
+        }
+        $this.SuppressionEnabled = if ($suppressionEnabled) { $suppressionEnabled } else { $false }
+        $this.Tactics = $Tactics
+        $this.IncidentConfiguration = $IncidentConfiguration
+
+    }
 
     ScheduledAlertProp ($Name, $DisplayName, $Description, $Severity, $Enabled, $Query, $QueryFrequency, `
             $QueryPeriod, $TriggerOperator, $TriggerThreshold, $suppressionDuration, `
@@ -90,7 +123,7 @@ class ScheduledAlertProp {
         $this.SuppressionEnabled = if ($suppressionEnabled) { $suppressionEnabled } else { $false }
         $this.Tactics = $Tactics
         $this.PlaybookName = $PlaybookName
-        $this.incidentConfiguration = $IncidentConfiguration
+        $this.IncidentConfiguration = $IncidentConfiguration
         $this.queryResultsAggregationSettings = @{
             aggregationKind = if ($aggregationKind) { $aggregationKind } else { "SingleAlert" }
         }
