@@ -37,6 +37,20 @@ function New-AzSentinelAlertRule {
     Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
     .PARAMETER PlaybookName
     Enter the Logic App name that you want to configure as playbook trigger
+    .PARAMETER CreateIncident
+    Create incidents from alerts triggered by this analytics rule
+    .PARAMETER GroupingConfigurationEnabled
+    Group related alerts, triggered by this analytics rule, into incidents
+    .PARAMETER ReopenClosedIncident
+    Re-open closed matching incidents
+    .PARAMETER LookbackDuration
+    Limit the group to alerts created within the selected time frame
+    .PARAMETER EntitiesMatchingMethod
+    Group alerts triggered by this analytics rule into a single incident by
+    .PARAMETER GroupByEntities
+    Grouping alerts into a single incident if the selected entities match:
+    .PARAMETER AggregationKind
+    Configure how rule query results are grouped into alerts
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
     In this example you create a new Alert rule by defining the rule properties from CMDLET
@@ -121,7 +135,7 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
-        [string]$EntitiesMatchingMethod,
+        [MatchingMethod]$EntitiesMatchingMethod,
 
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
