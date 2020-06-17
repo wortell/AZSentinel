@@ -42,7 +42,7 @@ function New-AzSentinelAlertRule {
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
-    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    #[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -96,7 +96,8 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [Tactics[]] $Tactics,
+        #[Tactics[]] $Tactics,
+        [string[]] $Tactics,
 
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
@@ -124,7 +125,8 @@ function New-AzSentinelAlertRule {
 
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
-        [groupByEntities[]]$GroupByEntities,
+        #[groupByEntities[]]$GroupByEntities,
+        [string[]]$GroupByEntities,
 
         [Parameter(Mandatory = $false)]
         [AllowEmptyString()]
@@ -185,7 +187,7 @@ function New-AzSentinelAlertRule {
 
         try {
 
-            $groupingConfiguration = [groupingConfiguration]::new(
+            $groupingConfiguration = [GroupingConfiguration]::new(
                 $GroupingConfigurationEnabled,
                 $ReopenClosedIncident,
                 $LookbackDuration,
@@ -196,7 +198,7 @@ function New-AzSentinelAlertRule {
                 $CreateIncident,
                 $groupingConfiguration
             )
-            #return $incidentConfigurationn
+            #return $incidentConfiguration
             $bodyAlertProp = [ScheduledAlertProp]::new(
                 $item.name,
                 $DisplayName,
@@ -211,11 +213,11 @@ function New-AzSentinelAlertRule {
                 $SuppressionDuration,
                 $SuppressionEnabled,
                 $Tactics,
-                $playbookName,
+                $PlaybookName,
                 $incidentConfiguration,
                 $AggregationKind
             )
-            return $bodyAlertProp
+            #return $bodyAlertProp
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
         catch {
@@ -231,7 +233,7 @@ function New-AzSentinelAlertRule {
             }
 
             try {
-                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                 if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
                     New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
@@ -245,10 +247,12 @@ function New-AzSentinelAlertRule {
 
                 $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
                 $return += $body.Properties
+                return $return
             }
             catch {
                 $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
                 $return += $body.Properties
+                return $return
 
                 Write-Verbose $_
                 Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
@@ -258,17 +262,19 @@ function New-AzSentinelAlertRule {
             Write-Verbose "Creating new rule: $($DisplayName)"
 
             try {
-                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -EnumsAsStrings)
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                 if (($body.Properties.PlaybookName)) {
                     New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.PlaybookName) -RuleId $($body.Properties.Name) -confirm:$false
                 }
 
                 $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
                 $return += $body.Properties
+                return $return
             }
             catch {
                 $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
                 $return += $body.Properties
+                return $return
 
                 Write-Verbose $_
                 Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue

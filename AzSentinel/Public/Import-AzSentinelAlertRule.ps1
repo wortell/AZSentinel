@@ -142,7 +142,7 @@ function Import-AzSentinelAlertRule {
             }
             try {
 
-                $groupingConfiguration = [groupingConfiguration]::new(
+                $groupingConfiguration = [GroupingConfiguration]::new(
                     $item.groupingConfiguration.enabled,
                     $item.groupingConfiguration.reopenClosedIncident,
                     $item.groupingConfiguration.lookbackDuration,

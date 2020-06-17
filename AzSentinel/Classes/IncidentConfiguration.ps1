@@ -4,7 +4,7 @@ class IncidentConfiguration {
     [GroupingConfiguration]$GroupingConfiguration
 
     IncidentConfiguration ($CreateIncident, $GroupingConfiguration) {
-        $this.createIncident = if ($createIncident) { $createIncident } else { $true }
+        $this.createIncident = if ($null -ne $createIncident) { $createIncident } else { $true }
         $this.groupingConfiguration = $GroupingConfiguration
     }
 }

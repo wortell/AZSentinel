@@ -1,4 +1,4 @@
-class groupingConfiguration {
+class GroupingConfiguration {
     [bool]$Enabled
 
     [bool]$reopenClosedIncident
@@ -36,8 +36,8 @@ class groupingConfiguration {
     }
 
     groupingConfiguration ($Enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, $groupByEntities) {
-        $this.enabled = if ($Enabled) { $Enabled } else { $true }
-        $this.reopenClosedIncident = if ($reopenClosedIncident) { $reopenClosedIncident } else { $false }
+        $this.enabled = if ($Enabled) { $null -ne $Enabled } else { $true }
+        $this.reopenClosedIncident = if ($null -ne $reopenClosedIncident) { $reopenClosedIncident } else { $false }
         $this.lookbackDuration = if ($lookbackDuration) { [groupingConfiguration]::TimeString($lookbackDuration) } else { "PT5H" }
         $this.entitiesMatchingMethod = if ($entitiesMatchingMethod) { $entitiesMatchingMethod } else { "All" }
         $this.groupByEntities = if ($groupByEntities) { $groupByEntities } else {
