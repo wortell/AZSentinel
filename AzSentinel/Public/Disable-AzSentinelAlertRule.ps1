@@ -54,7 +54,7 @@ function Disable-AzSentinelAlertRule {
 
         foreach ($rule in $rules) {
             if ($rule.enabled -eq $false) {
-                Write-Host "'$($rule.DisplayName)' already has status '$($rule.enabled)'"
+                Write-Output "'$($rule.DisplayName)' already has status '$($rule.enabled)'"
             }
             else {
                 $rule.enabled = $false
@@ -71,7 +71,8 @@ function Disable-AzSentinelAlertRule {
 
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
-                    Write-Host "Status of '$($rule.DisplayName)' changed to '$($rule.enabled)'"
+                    Write-Verbose $result
+                    Write-Output "Status of '$($rule.DisplayName)' changed to '$($rule.enabled)'"
 
                 }
                 catch {

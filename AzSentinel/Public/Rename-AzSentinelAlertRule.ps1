@@ -21,6 +21,7 @@ function Rename-AzSentinelAlertRule {
     #>
 
     [cmdletbinding(SupportsShouldProcess)]
+    [OutputType([String])]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
