@@ -18,7 +18,6 @@
         "Collection"
       ],
       "playbookName": "Playbook01",
-
       "aggregationKind": "SingleAlert",
       "createIncident": true,
       "groupingConfiguration": {

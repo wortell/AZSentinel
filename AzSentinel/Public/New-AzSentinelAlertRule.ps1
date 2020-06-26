@@ -56,10 +56,9 @@ function New-AzSentinelAlertRule {
     In this example you create a new Alert rule by defining the rule properties from CMDLET
     #>
 
-    #[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param (
-        [Parameter(Mandatory = $false,
-            ParameterSetName = "Sub")]
+        [Parameter(Mandatory = $false, ParameterSetName = "Sub")]
         [ValidateNotNullOrEmpty()]
         [string] $SubscriptionId,
 
@@ -200,7 +199,6 @@ function New-AzSentinelAlertRule {
         }
 
         try {
-
             $groupingConfiguration = [GroupingConfiguration]::new(
                 $GroupingConfigurationEnabled,
                 $ReopenClosedIncident,
@@ -208,11 +206,12 @@ function New-AzSentinelAlertRule {
                 $EntitiesMatchingMethod,
                 $GroupByEntities
             )
+
             $incidentConfiguration = [IncidentConfiguration]::new(
                 $CreateIncident,
                 $groupingConfiguration
             )
-            #return $incidentConfiguration
+
             $bodyAlertProp = [ScheduledAlertProp]::new(
                 $item.name,
                 $DisplayName,
@@ -231,7 +230,7 @@ function New-AzSentinelAlertRule {
                 $incidentConfiguration,
                 $AggregationKind
             )
-            #return $bodyAlertProp
+
             $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
         }
         catch {

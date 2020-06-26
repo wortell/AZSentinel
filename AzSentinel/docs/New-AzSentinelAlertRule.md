@@ -16,8 +16,10 @@ Create Azure Sentinal Alert Rules
 New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
  -Description <String> -Severity <Severity> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
  [-QueryPeriod <String>] -TriggerOperator <TriggerOperator> -TriggerThreshold <Int32>
- -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <Tactics[]> [-PlaybookName <String>]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <String[]> [-PlaybookName <String>]
+ [-CreateIncident <Boolean>] [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>]
+ [-LookbackDuration <String>] [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>]
+ [-AggregationKind <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -234,10 +236,9 @@ Accept wildcard characters: False
 Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
 
 ```yaml
-Type: Tactics[]
+Type: String[]
 Parameter Sets: (All)
 Aliases:
-Accepted values: InitialAccess, Persistence, Execution, PrivilegeEscalation, DefenseEvasion, CredentialAccess, LateralMovement, Discovery, Collection, Exfiltration, CommandAndControl, Impact
 
 Required: True
 Position: Named
@@ -248,6 +249,112 @@ Accept wildcard characters: False
 
 ### -PlaybookName
 Enter the Logic App name that you want to configure as playbook trigger
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CreateIncident
+Create incidents from alerts triggered by this analytics rule
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GroupingConfigurationEnabled
+Group related alerts, triggered by this analytics rule, into incidents
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ReopenClosedIncident
+Re-open closed matching incidents
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LookbackDuration
+Limit the group to alerts created within the selected time frame
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -EntitiesMatchingMethod
+Group alerts triggered by this analytics rule into a single incident by
+
+```yaml
+Type: MatchingMethod
+Parameter Sets: (All)
+Aliases:
+Accepted values: All, None, Custom
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GroupByEntities
+Grouping alerts into a single incident if the selected entities match:
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AggregationKind
+Configure how rule query results are grouped into alerts
 
 ```yaml
 Type: String
