@@ -1,6 +1,7 @@
 #requires -module @{ModuleName = 'Az.Accounts'; ModuleVersion = '1.5.2'}
 #requires -version 6.2
 
+
 function Set-AzSentinelResourceProvider {
     <#
     .SYNOPSIS
@@ -12,6 +13,8 @@ function Set-AzSentinelResourceProvider {
     .EXAMPLE
     Set-AzSentinelResourceProvider -NameSpace 'OperationsManagementOperationsManagement'
     #>
+
+    [OutputType([String])]
     param (
         [string]$NameSpace
     )
@@ -20,6 +23,7 @@ function Set-AzSentinelResourceProvider {
 
     try {
         $invokeReturn = Invoke-RestMethod -Method Post -Uri $uri -Headers $script:authHeader
+        Write-Verbose $invokeReturn
         do {
             $resourceProviderStatus = Get-AzSentinelResourceProvider -NameSpace $NameSpace
         }
