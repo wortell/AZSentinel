@@ -9,7 +9,7 @@
 
     BuildHelpers      = 'latest'
     InvokeBuild       = 'latest'
-    Pester            = '3.4.0'
+    Pester            = '4.10.1'
     PSScriptAnalyzer  = 'latest'
     platyPS           = 'latest'
     PSDeploy          = 'latest'
