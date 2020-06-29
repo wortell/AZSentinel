@@ -5,33 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelHuntingRule
+# Disable-AzSentinelAlertRule
 
 ## SYNOPSIS
-Get Azure Sentinel Hunting rule
+Disable Azure Sentinel Alert Rules
 
 ## SYNTAX
 
 ```
-Get-AzSentinelHuntingRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Filter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Disable-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Hunting rule from Azure Sentinel
+With this function you can disbale Azure Sentinel Alert rule
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelHuntingRule -WorkspaceName "" -RuleName "",""
-In this example you can get configuration of multiple Hunting rules
-```
-
-### EXAMPLE 2
-```
-Get-AzSentinelHuntingRule -WorkspaceName ""
-In this example you can get a list of all the Hunting rules in once
+Disable-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
+In this example you can get configuration of multiple alert rules in once
 ```
 
 ## PARAMETERS
@@ -67,26 +61,10 @@ Accept wildcard characters: False
 ```
 
 ### -RuleName
-Enter the name of the Hunting rule name
+Enter the name of the Alert rule
 
 ```yaml
 Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -Filter
-Select which type of Hunting rules you want to see.
-Option: HuntingQueries, GeneralExploration, LogManagement
-
-```yaml
-Type: String
 Parameter Sets: (All)
 Aliases:
 

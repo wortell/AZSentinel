@@ -52,6 +52,39 @@ function Set-AzSentinel {
         $errorResult = ''
 
         if ($workspaceResult.properties.provisioningState -eq 'Succeeded') {
+
+            <#
+            Testing to see if OperationsManagement resource provider is enabled on subscription
+            #>
+            $operationsManagementProvider = Get-AzSentinelResourceProvider -NameSpace "OperationsManagement"
+            if ($operationsManagementProvider.registrationState -ne 'Registered') {
+                Write-Warning "Resource provider 'Microsoft.OperationsManagement' is not registered"
+
+                if ($PSCmdlet.ShouldProcess("Do you want to enable 'Microsoft.OperationsManagement' on subscription $($script:subscriptionId)")) {
+                    Set-AzSentinelResourceProvider -NameSpace 'OperationsManagement'
+                }
+                else {
+                    Write-Output "No change have been."
+                    break
+                }
+            }
+
+            <#
+            Testing to see if SecurityInsights resource provider is enabled on subscription
+            #>
+            $securityInsightsProvider = Get-AzSentinelResourceProvider -NameSpace 'SecurityInsights'
+            if ($securityInsightsProvider.registrationState -ne 'Registered') {
+                Write-Warning "Resource provider 'Microsoft.SecurityInsights' is not registered"
+
+                if ($PSCmdlet.ShouldProcess("Do you want to enable 'Microsoft.SecurityInsights' on subscription $($script:subscriptionId)")) {
+                    Set-AzSentinelResourceProvider -NameSpace 'SecurityInsights'
+                }
+                else {
+                    Write-Output "No change have been."
+                    break
+                }
+            }
+
             $body = @{
                 'id'         = ''
                 'etag'       = ''
@@ -85,21 +118,20 @@ function Set-AzSentinel {
                             Write-Output "Successfully enabled Sentinel on workspae: $WorkspaceName with result code $($result.StatusDescription)"
                         }
                         else {
-                            Write-Output "No change have been made for rule $WorkspaceName, deployment aborted"
+                            Write-Output "No change have been made for $WorkspaceName, deployment aborted"
+                            break
                         }
                     }
                     catch {
                         Write-Verbose $_
                         Write-Error "Unable to enable Sentinel on $WorkspaceName with error message: $($_.Exception.Message)"
                     }
-
                 }
                 else {
                     Write-Verbose $_
                     Write-Error "Unable to Azure Sentinel with error message: $($_.Exception.Message)" -ErrorAction Stop
                 }
             }
-
         }
         else {
             Write-Error "Workspace $WorkspaceName is currently in $($workspaceResult.properties.provisioningState) status, setup canceled"
