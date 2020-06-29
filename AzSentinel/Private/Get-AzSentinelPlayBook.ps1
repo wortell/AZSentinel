@@ -49,8 +49,13 @@ function Get-AzSentinelPlayBook {
         }
 
         try {
-            $playBook = (Invoke-RestMethod -Uri $uri -Method get -Headers $script:authHeader).value | Where-Object { $_.name -eq $Name }
-
+            $logicappRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+            $logicapp = $logicappRaw.value
+            while ($logicappRaw.nextLink) {
+                $logicappRaw = (Invoke-RestMethod -Uri $($logicappRaw.nextLink) -Headers $script:authHeader -Method Get)
+                $logicapp += $logicappRaw.value
+            }
+            $playBook = $logicapp | Where-Object { $_.name -eq $Name }
             if ($playBook){
                 $uri1 = "https://management.azure.com$($playBook.id)/triggers/$($triggerName)/listCallbackUrl?api-version=2016-06-01"
                 try {

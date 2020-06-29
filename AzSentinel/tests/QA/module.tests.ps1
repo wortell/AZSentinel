@@ -46,7 +46,7 @@ foreach ($function in $allModuleFunctions) {
             It "Script Analyzer for $($function.BaseName)" {
                 forEach ($scriptAnalyzerRule in $scriptAnalyzerRules) {
                     $PSSAResult = (Invoke-ScriptAnalyzer -Path $function.FullName -IncludeRule $scriptAnalyzerRule)
-                    ($PSSAResult | Select-Object Message,Line | Out-String) | Should -BeNullOrEmpty
+                    ($PSSAResult | Select-Object Message,Line | Out-String) | Should BeNullOrEmpty
                 }
             }
         }
