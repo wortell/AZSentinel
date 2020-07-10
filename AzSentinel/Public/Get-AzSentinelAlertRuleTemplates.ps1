@@ -65,11 +65,12 @@ function Get-AzSentinelAlertRuleTemplates {
         if ($alertRulesTemplates.value) {
             Write-Verbose "Found $($alertRulesTemplates.value.count) Alert rules templates"
 
-            $alertRulesTemplates.value | ForEach-Object {
-                    $return += $_.properties.displayName
-            }
-            $return = $return | Sort-Object
-            return $return
+            # This returns the objects for the alert rule templates which contains id, name, type, kind and properties[severity, query, ...]
+            # $alertRulesTemplates.Value | ForEach-Object {
+            #     $return += $_.properties
+            # }
+            $return =  $alertRulesTemplates.value
+            return  $return
         }
         else {
             Write-Warning "No rules templates found on $($WorkspaceName)"
