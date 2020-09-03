@@ -13,8 +13,8 @@ Get Azure Sentinel Alert Rules
 ## SYNTAX
 
 ```
-Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>] [-WhatIf]
- [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
+ [-Kind <Kind[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -67,6 +67,22 @@ Enter the name of the Alert rule
 Type: String[]
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Kind
+{{ Fill Kind Description }}
+
+```yaml
+Type: Kind[]
+Parameter Sets: (All)
+Aliases:
+Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
 
 Required: False
 Position: Named

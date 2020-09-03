@@ -13,13 +13,15 @@ Create Azure Sentinal Alert Rules
 ## SYNTAX
 
 ```
-New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> -DisplayName <String>
- -Description <String> -Severity <Severity> -Enabled <Boolean> -Query <String> -QueryFrequency <String>
- [-QueryPeriod <String>] -TriggerOperator <TriggerOperator> -TriggerThreshold <Int32>
- -SuppressionDuration <String> -SuppressionEnabled <Boolean> -Tactics <String[]> [-PlaybookName <String>]
- [-CreateIncident <Boolean>] [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>]
- [-LookbackDuration <String>] [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>]
- [-AggregationKind <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-Kind <Kind>]
+ [-DisplayName <String>] [-Description <String>] [-Severity <Severity>] [-Enabled <Boolean>] [-Query <String>]
+ [-QueryFrequency <String>] [-QueryPeriod <String>] [-TriggerOperator <TriggerOperator>]
+ [-TriggerThreshold <Int32>] [-SuppressionDuration <String>] [-SuppressionEnabled <Boolean>]
+ [-Tactics <String[]>] [-PlaybookName <String[]>] [-CreateIncident <Boolean>]
+ [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>] [-LookbackDuration <String>]
+ [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>] [-AggregationKind <String>]
+ [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <String>]
+ [-DisplayNamesFilter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -30,7 +32,25 @@ Use this function creates Azure Sentinal Alert rules from provided CMDLET
 ### EXAMPLE 1
 ```
 New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
-In this example you create a new Alert rule by defining the rule properties from CMDLET
+Example on how to create a scheduled rule
+```
+
+### EXAMPLE 2
+```
+New-AzSentinelAlertRule -WorkspaceName "" -Kind Fusion -DisplayName "Advanced Multistage Attack Detection" -Enabled $true -AlertRuleTemplateName "f71aba3d-28fb-450b-b192-4e76a83015c8"
+Example on how to create a Fusion rule
+```
+
+### EXAMPLE 3
+```
+New-AzSentinelAlertRule -WorkspaceName "" -Kind MLBehaviorAnalytics -DisplayName "(Preview) Anomalous SSH Login Detection" -Enabled $true -AlertRuleTemplateName "fa118b98-de46-4e94-87f9-8e6d5060b60b"
+Example on how to create a MLBehaviorAnalytics rule
+```
+
+### EXAMPLE 4
+```
+New-AzSentinelAlertRule -WorkspaceName "" -Kind MicrosoftSecurityIncidentCreation -DisplayName "" -Description "" -Enabled $true -ProductFilter "" -SeveritiesFilter "","" -DisplayNamesFilter ""
+Example on how to create a MicrosoftSecurityIncidentCreation rule
 ```
 
 ## PARAMETERS
@@ -65,6 +85,22 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Kind
+{{ Fill Kind Description }}
+
+```yaml
+Type: Kind
+Parameter Sets: (All)
+Aliases:
+Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
+
+Required: False
+Position: Named
+Default value: Scheduled
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -DisplayName
 Enter the Display name for the Alert rule
 
@@ -73,7 +109,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -88,7 +124,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -104,7 +140,7 @@ Parameter Sets: (All)
 Aliases:
 Accepted values: Medium, High, Low, Informational
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -119,7 +155,7 @@ Type: Boolean
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: False
 Accept pipeline input: False
@@ -134,7 +170,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -149,7 +185,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -180,7 +216,7 @@ Parameter Sets: (All)
 Aliases:
 Accepted values: GreaterThan, LessThan, Equal, NotEqual, gt, lt, eq, ne
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -195,7 +231,7 @@ Type: Int32
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: 0
 Accept pipeline input: False
@@ -210,7 +246,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -225,7 +261,7 @@ Type: Boolean
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: False
 Accept pipeline input: False
@@ -240,7 +276,7 @@ Type: String[]
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -251,7 +287,7 @@ Accept wildcard characters: False
 Enter the Logic App name that you want to configure as playbook trigger
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -355,6 +391,66 @@ Accept wildcard characters: False
 
 ### -AggregationKind
 Configure how rule query results are grouped into alerts
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AlertRuleTemplateName
+Fusion & MLBehaviorAnalytics
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProductFilter
+MicrosoftSecurityIncidentCreation
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SeveritiesFilter
+{{ Fill SeveritiesFilter Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DisplayNamesFilter
+{{ Fill DisplayNamesFilter Description }}
 
 ```yaml
 Type: String

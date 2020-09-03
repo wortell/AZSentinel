@@ -32,7 +32,12 @@ function Get-AzSentinelAlertRule {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$RuleName
+        [string[]]$RuleName,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [Kind[]]$Kind
     )
 
     begin {
@@ -67,7 +72,6 @@ function Get-AzSentinelAlertRule {
         }
 
         $return = @()
-
         if ($alertRules.value) {
             Write-Verbose "Found $($alertRules.value.count) Alert rules"
 
@@ -88,12 +92,45 @@ function Get-AzSentinelAlertRule {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
-                        $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                        $temp.properties | Add-Member -NotePropertyName kind -NotePropertyValue $temp.kind -Force
+                        if ($temp.kind -eq "Scheduled") {
+                            $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                        }
 
                         $return += $temp.properties
                     }
                     else {
-                        Write-Error "Unable to find Rule: $rule"
+                        Write-Verbose "Unable to find Rule: $rule"
+                    }
+                }
+                return $return
+            }
+            elseif ($Kind.Count -ge 1) {
+                foreach ($rule in $Kind) {
+                    [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.Kind -eq $rule }
+                    if ($null -ne $temp) {
+
+                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)
+
+                        if ($playbook) {
+                            $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
+                        }
+                        else {
+                            $playbookName = ""
+                        }
+
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
+                        $temp.properties | Add-Member -NotePropertyName kind -NotePropertyValue $temp.kind -Force
+                        if ($temp.kind -eq "Scheduled") {
+                            $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                        }
+
+                        $return += $temp.properties
+                    }
+                    else {
+                        Write-Verbose "Unable to find Rule: $rule"
                     }
                 }
                 return $return
@@ -109,14 +146,18 @@ function Get-AzSentinelAlertRule {
                         $playbookName = ""
                     }
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
-                    $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                    $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                    $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+                    if ($_.kind -eq "Scheduled") {
+                        $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                    }
 
                     return $_.properties
                 }
             }
         }
         else {
-            Write-Warning "No rules found on $($WorkspaceName)"
+            Write-Verbose "No rules found on $($WorkspaceName)"
         }
     }
 }
