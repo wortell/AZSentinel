@@ -86,7 +86,7 @@ Accept wildcard characters: False
 ```
 
 ### -Kind
-{{ Fill Kind Description }}
+The alert rule kind
 
 ```yaml
 Type: Kind
@@ -102,7 +102,7 @@ Accept wildcard characters: False
 ```
 
 ### -DisplayName
-Enter the Display name for the Alert rule
+The display name for alerts created by this alert rule.
 
 ```yaml
 Type: String
@@ -117,7 +117,7 @@ Accept wildcard characters: False
 ```
 
 ### -Description
-Enter the Description for the Alert rule
+The description of the alert rule.
 
 ```yaml
 Type: String
@@ -148,7 +148,7 @@ Accept wildcard characters: False
 ```
 
 ### -Enabled
-Set $true to enable the Alert Rule or $false to disable Alert Rule
+Determines whether this alert rule is enabled or disabled.
 
 ```yaml
 Type: Boolean
@@ -163,7 +163,7 @@ Accept wildcard characters: False
 ```
 
 ### -Query
-Enter the Query that you want to use
+The query that creates alerts for this rule.
 
 ```yaml
 Type: String
@@ -405,7 +405,7 @@ Accept wildcard characters: False
 ```
 
 ### -AlertRuleTemplateName
-Fusion & MLBehaviorAnalytics
+The Name of the alert rule template used to create this rule
 
 ```yaml
 Type: String
@@ -420,7 +420,7 @@ Accept wildcard characters: False
 ```
 
 ### -ProductFilter
-MicrosoftSecurityIncidentCreation
+The alerts' productName on which the cases will be generated
 
 ```yaml
 Type: String
@@ -435,7 +435,7 @@ Accept wildcard characters: False
 ```
 
 ### -SeveritiesFilter
-{{ Fill SeveritiesFilter Description }}
+The alerts' severities on which the cases will be generated
 
 ```yaml
 Type: String
@@ -450,7 +450,7 @@ Accept wildcard characters: False
 ```
 
 ### -DisplayNamesFilter
-{{ Fill DisplayNamesFilter Description }}
+The alerts' displayNames on which the cases will be generated
 
 ```yaml
 Type: String

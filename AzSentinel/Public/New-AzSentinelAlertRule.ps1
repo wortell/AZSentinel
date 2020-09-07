@@ -11,16 +11,18 @@ function New-AzSentinelAlertRule {
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
     Enter the Workspace name
+    .PARAMETER Kind
+    The alert rule kind
     .PARAMETER DisplayName
-    Enter the Display name for the Alert rule
+    The display name for alerts created by this alert rule.
     .PARAMETER Description
-    Enter the Description for the Alert rule
+    The description of the alert rule.
     .PARAMETER Severity
     Enter the Severity, valid values: Medium", "High", "Low", "Informational"
     .PARAMETER Enabled
-    Set $true to enable the Alert Rule or $false to disable Alert Rule
+    Determines whether this alert rule is enabled or disabled.
     .PARAMETER Query
-    Enter the Query that you want to use
+    The query that creates alerts for this rule.
     .PARAMETER QueryFrequency
     Enter the query frequency, example: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
     .PARAMETER QueryPeriod
@@ -51,6 +53,14 @@ function New-AzSentinelAlertRule {
     Grouping alerts into a single incident if the selected entities match:
     .PARAMETER AggregationKind
     Configure how rule query results are grouped into alerts
+    .PARAMETER AlertRuleTemplateName
+    The Name of the alert rule template used to create this rule
+    .PARAMETER ProductFilter
+    The alerts' productName on which the cases will be generated
+    .PARAMETER SeveritiesFilter
+    The alerts' severities on which the cases will be generated
+    .PARAMETER DisplayNamesFilter
+    The alerts' displayNames on which the cases will be generated
     .EXAMPLE
     New-AzSentinelAlertRule -WorkspaceName "" -DisplayName "" -Description "" -Severity -Enabled $true -Query '' -QueryFrequency "" -QueryPeriod "" -TriggerOperator -TriggerThreshold  -SuppressionDuration "" -SuppressionEnabled $false -Tactics @("","") -PlaybookName ""
     Example on how to create a scheduled rule

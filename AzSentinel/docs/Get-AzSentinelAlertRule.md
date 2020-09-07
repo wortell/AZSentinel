@@ -76,7 +76,7 @@ Accept wildcard characters: False
 ```
 
 ### -Kind
-{{ Fill Kind Description }}
+The alert rule kind
 
 ```yaml
 Type: Kind[]

@@ -13,6 +13,8 @@ function Get-AzSentinelAlertRule {
       Enter the Workspace name
       .PARAMETER RuleName
       Enter the name of the Alert rule
+      .PARAMETER Kind
+      The alert rule kind
       .EXAMPLE
       Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
       In this example you can get configuration of multiple alert rules in once
