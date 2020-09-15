@@ -79,7 +79,7 @@ function Remove-AzSentinelAlertRuleAction {
                 try {
                     $return = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
                     Write-Verbose $return
-                    Write-Output "Rule action $($result.properties.logicAppResourceId.Split('/')[-1]) removed for rule $($RuleName) with status: $($return.StatusCode)"
+                    Write-Verbose "Rule action $($result.properties.logicAppResourceId.Split('/')[-1]) removed for rule $($RuleName) with status: $($return.StatusCode)"
                     return $return.StatusCode
                 }
                 catch {

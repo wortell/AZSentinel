@@ -1,5 +1,5 @@
 {
-  "analytics": [
+  "Scheduled": [
     {
       "displayName": "AlertRule01",
       "description": "",
@@ -51,6 +51,34 @@
         "Collection"
       ],
       "playbookName": "Playbook01"
+    }
+  ],
+  "Fusion": [
+    {
+      "displayName": "Advanced Multistage Attack Detection",
+      "enabled": true,
+      "alertRuleTemplateName": "f71aba3d-28fb-450b-b192-4e76a83015c8"
+    }
+  ],
+  "MLBehaviorAnalytics": [
+    {
+      "displayName": "(Preview) Anomalous SSH Login Detection",
+      "enabled": true,
+      "alertRuleTemplateName": "fa118b98-de46-4e94-87f9-8e6d5060b60b"
+    }
+  ],
+  "MicrosoftSecurityIncidentCreation": [
+    {
+      "displayName": "Create incidents based on Azure Active Directory Identity Protection alerts",
+      "description": "Create incidents based on all alerts generated in Azure Active Directory Identity Protection",
+      "enabled": true,
+      "productFilter": "Microsoft Cloud App Security",
+      "severitiesFilter": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "displayNamesFilter": null
     }
   ]
 }
