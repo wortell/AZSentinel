@@ -79,7 +79,11 @@ function Update-AzSentinelIncident {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string]$ClosedReasonText
+        [string]$ClosedReasonText,
+		
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Description
     )
 
     begin {
@@ -129,26 +133,24 @@ function Update-AzSentinelIncident {
                         "endTimeUtc"                               = $($incident.endTimeUtc)
                         "lastUpdatedTimeUtc"                       = $($incident.lastUpdatedTimeUtc)
                         "lastComment"                              = ""
-                        "totalComments"                            = 0
-                        "metrics"                                  = @{ }
-                        [pscustomobject]"relatedAlertIds"          = @(
-                        )
-                        [pscustomobject]"relatedAlertProductNames" = @(
-                        )
+                        "totalComments"                            = $incident.TotalComments
+                        "metrics"                                  = $incident.Metrics
+                        "relatedAlertIds"          				   = $incident.RelatedAlertIds
+                        "relatedAlertProductNames" 				   = $incident.RelatedAlertProductNames
                         "severity"                                 = if ($Severity) { $Severity } else { $incident.severity }
                         "startTimeUtc"                             = $($incident.startTimeUtc)
                         "status"                                   = if ($Status) { $Status } else { $incident.status }
-                        "closeReason"                              = if ($Status -eq 'Closed') { if ($null -ne [CloseReason]$CloseReason) { $CloseReason } else { Write-Error "No Close Reasen provided" -ErrorAction Stop } } else { $null }
+                        "closeReason"                              = if ($Status -eq 'Closed') { if ($null -ne [CloseReason]$CloseReason) { $CloseReason } else { Write-Error "No close reason provided" -ErrorAction Stop } } else { $null }
                         "closedReasonText"                         = if ($Status -eq 'Closed') { if ($ClosedReasonText) { $ClosedReasonText } else { Write-Error 'No closed comment provided' } } else { $null }
                         [pscustomobject]"labels"                   = @( $LabelsUnique)
                         "title"                                    = $($incident.title)
-                        "description"                              = ""
-                        "firstAlertTimeGenerated"                  = ""
-                        "lastAlertTimeGenerated"                   = ""
+                        "description"                              = if ($Description) { $Description } else { $incident.Description } 
+                        "firstAlertTimeGenerated"                  = $incident.FirstAlertTimeGenerated
+                        "lastAlertTimeGenerated"                   = $incident.LastAlertTimeGenerated
                         "owner"                                    = @{
-                            "name"     = $null
-                            "email"    = $null
-                            "objectId" = $null
+                            "name"     = $incident.Owner.Name
+                            "email"    = $incident.Owner.Email
+                            "objectId" = $incident.Owner.ObjectId
                         }
                     }
                 }

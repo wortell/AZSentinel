@@ -59,7 +59,21 @@ To create a Azure Sentinel Rule, use the following JSON format.
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "string"
+      "playbookName": "string",
+      "aggregationKind": "string",
+      "createIncident": true,
+      "groupingConfiguration": {
+        "GroupingConfigurationEnabled": true,
+        "reopenClosedIncident": true,
+        "lookbackDuration": "PT6H",
+        "entitiesMatchingMethod": "string",
+        "groupByEntities": [
+          "Account",
+          "Ip",
+          "Host",
+          "Url"
+        ]
+      }
     }
   ]
 }
@@ -69,21 +83,28 @@ To create a Azure Sentinel Rule, use the following JSON format.
 
 The following tables describe the values you need to set in the schema.
 
-| Name                | Type   | Required | Allowed Values                                                                                                                                                      | Example                                                                                           |
-| ------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| displayName         | string | true     | *                                                                                                                                                                   | DisplayName                                                                                       |
-| description         | string | true     | *                                                                                                                                                                   | Description                                                                                       |
-| severity            | string | true     | Medium, High, Low, Informational                                                                                                                                    | Medium                                                                                            |
-| enabled             | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
-| query               | string | true     | special character need to be escaped by \                                                                                                                           | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
-| queryFrequency      | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 5H                                                                                                |
-| queryPeriod         | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 1440M                                                                                             |
-| triggerOperator     | string | true     | GreaterThan, FewerThan, EqualTo, NotEqualTo                                                                                                                         | GreaterThan                                                                                       |
-| triggerThreshold    | int    | true     | The value must be between 0 and 10000                                                                                                                               | 5                                                                                                 |
-| suppressionDuration | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 11H                                                                                               |
-| suppressionEnabled  | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
-| tactics             | array  | true     | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
-| playbookName        | string | false    | Enter the Logic App name that you want to configure as playbook trigger                                                                                             | LogicApp01                                                                                        |
+| Name                         | Type   | Required | Allowed Values                                                                                                                                                      | Example                                                                                           |
+| ---------------------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| displayName                  | string | true     | *                                                                                                                                                                   | DisplayName                                                                                       |
+| description                  | string | true     | *                                                                                                                                                                   | Description                                                                                       |
+| severity                     | string | true     | Medium, High, Low, Informational                                                                                                                                    | Medium                                                                                            |
+| enabled                      | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
+| query                        | string | true     | special character need to be escaped by \                                                                                                                           | SecurityEvent \| where EventID == \"4688\" \| where CommandLine contains \\"-noni -ep bypass $\\" |
+| queryFrequency               | string | true     | Value must be between 5 minutes and 24 hours                                                                                                                        | 30M                                                                                               |
+| queryPeriod                  | string | true     | Value must be between 5 minutes and 14 days                                                                                                                         | 6H                                                                                                |
+| triggerOperator              | string | true     | GreaterThan, FewerThan, EqualTo, NotEqualTo                                                                                                                         | GreaterThan                                                                                       |
+| triggerThreshold             | int    | true     | The value must be between 0 and 10000                                                                                                                               | 5                                                                                                 |
+| suppressionDuration          | string | true     | Value must be greater than 5 minutes                                                                                                                                | 1D                                                                                                |
+| suppressionEnabled           | bool   | true     | true, false                                                                                                                                                         | true                                                                                              |
+| tactics                      | array  | true     | InitialAccess, Persistence,Execution,PrivilegeEscalation,DefenseEvasion,CredentialAccess,LateralMovement,Discovery,Collection,Exfiltration,CommandAndControl,Impact | true                                                                                              |
+| playbookName                 | string | false    | Enter the Logic App name that you want to configure as playbook trigger                                                                                             | LogicApp01                                                                                        |
+| aggregationKind              | string | false    | SingleAlert, AlertPerRow                                                                                                                                            | SingleAlert                                                                                       |
+| createIncident               | bool   | false    | true, false                                                                                                                                                         | true                                                                                              |
+| GroupingConfigurationEnabled | bool   | false    | true, false                                                                                                                                                         | true                                                                                              |
+| reopenClosedIncident         | bool   | false    | true, false                                                                                                                                                         | true                                                                                              |
+| lookbackDuration             | string | false    | Value must be between 5 minutes and 24 hours.                                                                                                                       | PT6H                                                                                              |
+| entitiesMatchingMethod       | string | false    | All, None, Custom                                                                                                                                                   | All                                                                                               |
+| groupByEntities              | string | false    | Account, Ip, Host, Url                                                                                                                                              | Account                                                                                           |
 
 ## Find us
 

@@ -17,6 +17,39 @@
         "LateralMovement",
         "Collection"
       ],
+      "playbookName": "Playbook01",
+      "aggregationKind": "SingleAlert",
+      "createIncident": true,
+      "groupingConfiguration": {
+        "enabled": false,
+        "reopenClosedIncident": false,
+        "lookbackDuration": "PT5H",
+        "entitiesMatchingMethod": "All",
+        "groupByEntities": [
+          "Account",
+          "Ip",
+          "Host",
+          "Url"
+        ]
+      }
+    },
+    {
+      "displayName": "AlertRule02",
+      "description": "",
+      "severity": "Medium",
+      "enabled": true,
+      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+      "queryFrequency": "5H",
+      "queryPeriod": "6H",
+      "triggerOperator": "GreaterThan",
+      "triggerThreshold": 5,
+      "suppressionDuration": "6H",
+      "suppressionEnabled": false,
+      "tactics": [
+        "Persistence",
+        "LateralMovement",
+        "Collection"
+      ],
       "playbookName": "Playbook01"
     }
   ]
