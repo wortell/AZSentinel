@@ -60,7 +60,22 @@ function Get-AzSentinelIncident {
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
-        [Switch]$All
+        [Switch]$All,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline)]
+        [string[]]$Severity,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline)]
+        [string[]]$Status,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline)]
+        [string[]]$ProductName,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline)]
+        [datetime]$StartTime,
+
+        [Parameter(Mandatory = $false, ValueFromPipeline)]
+        [datetime]$EndTime
     )
 
     begin {
@@ -95,11 +110,13 @@ function Get-AzSentinelIncident {
             }
         }
         else {
-            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
+
+            #$uri = [uri]::EscapeUriString("$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview&startTime=$($StartTime.Tostring('dddd dd MMMM yyyy HH:mm:ss'))GMT&endTime=$($EndTime.Tostring('dddd dd MMMM yyyy HH:mm:ss'))GMT")
+            [string]$uri = "$script:baseUri/providers/Microsoft.SecurityInsights/aggregations/incidents?api-version=2019-01-01-preview&startTime=Mon%2C%2016%20Mar%202020%2011%3A52%3A19%20GMT&endTime=Tue%2C%2017%20Mar%202020%2011%3A52%3A19%20GMT"
             Write-Verbose -Message "Using URI: $($uri)"
 
             try {
-                $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+                $incidentRaw = (Invoke-RestMethod -Uri [string]$uri -Method Get -Headers $script:authHeader)
                 $incident += $incidentRaw.value
 
                 if ($All) {
