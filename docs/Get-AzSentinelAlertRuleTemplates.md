@@ -13,7 +13,7 @@ Get Azure Sentinel Alert Rules Templates
 ## SYNTAX
 
 ```
-Get-AzSentinelAlertRuleTemplates [-SubscriptionId <String>] -WorkspaceName <String> -Kind <Kind[]>
+Get-AzSentinelAlertRuleTemplates [-SubscriptionId <String>] -WorkspaceName <String> [-Kind <Kind[]>]
  [<CommonParameters>]
 ```
 
@@ -26,6 +26,12 @@ With this function you can get the configuration of the Azure Sentinel Alert Rul
 ```
 Get-AzSentinelAlertRuleTemplates -WorkspaceName ""
 In this example you can get Sentinel alert rules templates in once
+```
+
+### EXAMPLE 2
+```
+Get-AzSentinelAlertRuleTemplates -WorkspaceName "" -Kind Fusion, MicrosoftSecurityIncidentCreation
+Filter on the Kind
 ```
 
 ## PARAMETERS
@@ -69,7 +75,7 @@ Parameter Sets: (All)
 Aliases:
 Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

@@ -16,7 +16,9 @@ function Get-AzSentinelAlertRuleTemplates {
       .EXAMPLE
       Get-AzSentinelAlertRuleTemplates -WorkspaceName ""
       In this example you can get Sentinel alert rules templates in once
-      .OUTPUTS
+      .EXAMPLE
+      Get-AzSentinelAlertRuleTemplates -WorkspaceName "" -Kind Fusion, MicrosoftSecurityIncidentCreation
+      Filter on the Kind
     #>
 
     param (
@@ -29,7 +31,7 @@ function Get-AzSentinelAlertRuleTemplates {
         [ValidateNotNullOrEmpty()]
         [string]$WorkspaceName,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [Kind[]]$Kind
     )
