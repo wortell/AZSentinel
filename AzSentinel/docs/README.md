@@ -18,3 +18,4 @@
 16. [New-AzSentinelAlertRuleAction](New-AzSentinelAlertRuleAction.md)
 17. [Remove-AzSentinelAlertRuleAction](Remove-AzSentinelAlertRuleAction.md)
 18. [Get-AzSentinelAlertRuleTemplates](Get-AzSentinelAlertRuleTemplates.md)
+19. [Add-AzSentinelIncidentComment](Add-AzSentinelIncidentComment.md)
