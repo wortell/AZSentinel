@@ -82,7 +82,7 @@ function Get-AzSentinelAlertRule {
                     [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.properties.displayName -eq $rule }
                     if ($null -ne $temp) {
 
-                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)
+                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
 
                         if ($playbook) {
                             $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
@@ -95,6 +95,7 @@ function Get-AzSentinelAlertRule {
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
                         $temp.properties | Add-Member -NotePropertyName kind -NotePropertyValue $temp.kind -Force
+
                         if ($temp.kind -eq "Scheduled") {
                             $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
                         }
@@ -112,7 +113,7 @@ function Get-AzSentinelAlertRule {
                     [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.Kind -eq $rule }
                     if ($null -ne $temp) {
 
-                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)
+                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
 
                         if ($playbook) {
                             $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
@@ -139,7 +140,7 @@ function Get-AzSentinelAlertRule {
             }
             else {
                 $alertRules.value | ForEach-Object {
-                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($_.name)
+                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
 
                     if ($playbook) {
                         $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
