@@ -11,12 +11,16 @@ function Get-AzSentinelAlertRuleTemplates {
       Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
       .PARAMETER WorkspaceName
       Enter the Workspace name
+      .PARAMETER Kind
+      Enter the Kind to filter on the templates
       .EXAMPLE
       Get-AzSentinelAlertRuleTemplates -WorkspaceName ""
       In this example you can get Sentinel alert rules templates in once
+      .EXAMPLE
+      Get-AzSentinelAlertRuleTemplates -WorkspaceName "" -Kind Fusion, MicrosoftSecurityIncidentCreation
+      Filter on the Kind
     #>
 
-    [cmdletbinding(SupportsShouldProcess)]
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -25,7 +29,11 @@ function Get-AzSentinelAlertRuleTemplates {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string]$WorkspaceName
+        [string]$WorkspaceName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [Kind[]]$Kind
     )
 
     begin {
@@ -65,15 +73,20 @@ function Get-AzSentinelAlertRuleTemplates {
         if ($alertRulesTemplates.value) {
             Write-Verbose "Found $($alertRulesTemplates.value.count) Alert rules templates"
 
-            # This returns the objects for the alert rule templates which contains id, name, type, kind and properties[severity, query, ...]
-            # $alertRulesTemplates.Value | ForEach-Object {
-            #     $return += $_.properties
-            # }
-            $return =  $alertRulesTemplates.value
-            return  $return
+            if ($Kind) {
+                foreach ($item in $Kind) {
+                    $return += $alertRulesTemplates.value | Where-Object Kind -eq $item
+                }
+            }
+            else {
+                $return += $alertRulesTemplates.value
+            }
+
+            return $return
+
         }
         else {
-            Write-Warning "No rules templates found on $($WorkspaceName)"
+            Write-Host "No rules templates found on $($WorkspaceName)"
         }
     }
 }
