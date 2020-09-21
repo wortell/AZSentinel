@@ -5,27 +5,27 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelAlertRule
+# Add-AzSentinelIncidentComment
 
 ## SYNOPSIS
-Get Azure Sentinel Alert Rules
+Add Azure Sentinel Incident comment
 
 ## SYNTAX
 
 ```
-Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Kind <Kind[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Add-AzSentinelIncidentComment [-SubscriptionId <String>] -WorkspaceName <String> [-Name <Guid>]
+ [-CaseNumber <Int32>] -Comment <String> [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Alert rule from Azure Sentinel
+With this function you can add comment to existing Azure Sentinel Incident.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-In this example you can get configuration of multiple alert rules in once
+Add-AzSentinelIncidentComment -WorkspaceName "" CaseNumber "" -Comment
+Add a comment to existing incidnet
 ```
 
 ## PARAMETERS
@@ -60,11 +60,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RuleName
-Enter the name of the Alert rule
+### -Name
+Enter the name of the incidnet in GUID format
 
 ```yaml
-Type: String[]
+Type: Guid
 Parameter Sets: (All)
 Aliases:
 
@@ -75,19 +75,33 @@ Accept pipeline input: True (ByValue)
 Accept wildcard characters: False
 ```
 
-### -Kind
-The alert rule kind
+### -CaseNumber
+Enter the case number to get specfiek details of a open case
 
 ```yaml
-Type: Kind[]
+Type: Int32
 Parameter Sets: (All)
 Aliases:
-Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
 
 Required: False
 Position: Named
-Default value: None
+Default value: 0
 Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Comment
+Enter Comment tekst to add comment to the incident
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 

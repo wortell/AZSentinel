@@ -5,27 +5,33 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-AzSentinelAlertRule
+# Get-AzSentinelAlertRuleTemplates
 
 ## SYNOPSIS
-Get Azure Sentinel Alert Rules
+Get Azure Sentinel Alert Rules Templates
 
 ## SYNTAX
 
 ```
-Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Kind <Kind[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-AzSentinelAlertRuleTemplates [-SubscriptionId <String>] -WorkspaceName <String> [-Kind <Kind[]>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-With this function you can get the configuration of the Azure Sentinel Alert rule from Azure Sentinel
+With this function you can get the configuration of the Azure Sentinel Alert Rules Templates from Azure Sentinel
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
-In this example you can get configuration of multiple alert rules in once
+Get-AzSentinelAlertRuleTemplates -WorkspaceName ""
+In this example you can get Sentinel alert rules templates in once
+```
+
+### EXAMPLE 2
+```
+Get-AzSentinelAlertRuleTemplates -WorkspaceName "" -Kind Fusion, MicrosoftSecurityIncidentCreation
+Filter on the Kind
 ```
 
 ## PARAMETERS
@@ -60,60 +66,14 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RuleName
-Enter the name of the Alert rule
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
 ### -Kind
-The alert rule kind
+Enter the Kind to filter on the templates
 
 ```yaml
 Type: Kind[]
 Parameter Sets: (All)
 Aliases:
 Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
 
 Required: False
 Position: Named

@@ -15,7 +15,7 @@ Update Azure Sentinel Incident
 ```
 Update-AzSentinelIncident [-SubscriptionId <String>] -WorkspaceName <String> -CaseNumber <Int32>
  [-Severity <String>] [-Status <Status>] [-Comment <String>] [-Labels <String[]>] [-CloseReason <CloseReason>]
- [-ClosedReasonText <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-ClosedReasonText <String>] [-Description <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -168,6 +168,21 @@ Accept wildcard characters: False
 
 ### -ClosedReasonText
 When Status is equil to Closed, ClosedReasonText is required to be filled in.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Description
+{{ Fill Description Description }}
 
 ```yaml
 Type: String
