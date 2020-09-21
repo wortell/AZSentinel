@@ -84,18 +84,19 @@ function Import-AzSentinelAlertRule {
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
-                $analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json -ErrorAction Stop).analytics
-                Write-Verbose -Message "Found $($analytics.count) rules"
+                $rulesRaw = Get-Content $SettingsFile -Raw
+                $rules = $rulesRaw | ConvertFrom-Json -Depth 99
+                Write-Verbose -Message "Found $($rules.count) rules"
             }
             catch {
                 Write-Verbose $_
-                Write-Error -Message 'Unable to convert JSON file' -ErrorAction Stop
+                Write-Error -Message 'Unable to import JSON file' -ErrorAction Stop
             }
         }
         elseif ($SettingsFile.Extension -in '.yaml', '.yml') {
             try {
-                $analytics = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
-                $analytics | Add-Member -MemberType NoteProperty -Name DisplayName -Value $analytics.name
+                $rules = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
+                $rules | Add-Member -MemberType NoteProperty -Name DisplayName -Value $rules.name
                 Write-Verbose -Message 'Found compatibel yaml file'
             }
             catch {
@@ -109,39 +110,49 @@ function Import-AzSentinelAlertRule {
 
         $return = @()
 
-        foreach ($item in $analytics) {
+        <#
+        Test All rules first
+        #>
+        $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
+        $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName)
+
+        <#
+            analytics rule
+        #>
+        if ($rules.analytics) {
+            $scheduled = $rules.analytics
+        }
+        else {
+            $scheduled = $rules.Scheduled
+        }
+        foreach ($item in $scheduled) {
             Write-Verbose -Message "Started with rule: $($item.displayName)"
 
             $guid = (New-Guid).Guid
 
-            try {
-                Write-Verbose -Message "Get rule $($item.description)"
-                $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
+            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
 
-                if ($content) {
-                    Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
+            Write-Verbose -Message "Get rule $($item.description)"
 
-                    $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
-                    $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
-                    $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
+            if ($content) {
+                Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
 
-                    $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
-                }
-                else {
-                    Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
 
-                    $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
-                    $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
-                    $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
-                    $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
-                }
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
             }
-            catch {
-                Write-Verbose $_
-                Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
-            }
-            try {
+            else {
+                Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
 
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+            }
+
+            try {
                 $groupingConfiguration = [GroupingConfiguration]::new(
                     $item.groupingConfiguration.enabled,
                     $item.groupingConfiguration.reopenClosedIncident,
@@ -171,17 +182,15 @@ function Import-AzSentinelAlertRule {
                     $IncidentConfiguration,
                     $item.aggregationKind
                 )
-                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Scheduled')
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
             }
 
-
             if ($content) {
-
                 if ($item.playbookName -or $content.playbookName) {
-                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id,incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id,incidentConfiguration, queryResultsAggregationSettings)
+                    $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, incidentConfiguration, queryResultsAggregationSettings)
                 }
                 else {
                     $compareResult = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, PlaybookName, incidentConfiguration, queryResultsAggregationSettings) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, PlaybookName, incidentConfiguration, queryResultsAggregationSettings)
@@ -190,19 +199,23 @@ function Import-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
-                        New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                        $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
-                        Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     else {
                         #nothing
                     }
                     $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                    $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Scheduled" -Force
                     $return += $body.Properties
                 }
                 catch {
                     $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                    $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Scheduled" -Force
                     $return += $body.Properties
 
                     Write-Verbose $_
@@ -214,14 +227,19 @@ function Import-AzSentinelAlertRule {
 
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+
                     if ($body.Properties.playbookName) {
-                        New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
+                        $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
+
                     $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                    $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Scheduled" -Force
                     $return += $body.Properties
                 }
                 catch {
                     $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                    $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Scheduled" -Force
                     $return += $body.Properties
 
                     Write-Verbose $_
@@ -229,6 +247,173 @@ function Import-AzSentinelAlertRule {
                 }
             }
         }
+
+        <#
+            Fusion rule
+        #>
+        foreach ($item in $rules.fusion) {
+            Write-Verbose "Rule type is Fusion"
+
+            $guid = (New-Guid).Guid
+
+            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+
+            Write-Verbose -Message "Get rule $($item.description)"
+
+            if ($content) {
+                Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
+
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
+            }
+            else {
+                Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+            }
+
+            $bodyAlertProp = [Fusion]::new(
+                $item.enabled,
+                $item.alertRuleTemplateName
+            )
+
+            $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Fusion')
+
+            try {
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Fusion" -Force
+                $return += $body.Properties
+            }
+            catch {
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Fusion" -Force
+                $return += $body.Properties
+
+                Write-Verbose $_
+                Write-Verbose "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+            }
+        }
+
+        <#
+            MLBehaviorAnalytics
+        #>
+        foreach ($item in $rules.MLBehaviorAnalytics) {
+            Write-Verbose "Rule type is ML Behavior Analytics"
+
+            $guid = (New-Guid).Guid
+
+            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+
+            Write-Verbose -Message "Get rule $($item.description)"
+
+            if ($content) {
+                Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
+
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
+            }
+            else {
+                Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+            }
+
+            $bodyAlertProp = [MLBehaviorAnalytics]::new(
+                $item.enabled,
+                $item.alertRuleTemplateName
+            )
+
+            $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'MLBehaviorAnalytics')
+
+            try {
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "MLBehaviorAnalytics" -Force
+
+                $return += $body.Properties
+            }
+            catch {
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "MLBehaviorAnalytics" -Force
+                $return += $body.Properties
+
+                Write-Verbose $_
+                Write-Verbose "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+            }
+        }
+
+        <#
+            MicrosoftSecurityIncidentCreation
+        #>
+        foreach ($item in $rules.MicrosoftSecurityIncidentCreation) {
+            Write-Verbose "Rule type is Microsoft Security"
+
+            $guid = (New-Guid).Guid
+
+            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+
+            Write-Verbose -Message "Get rule $($item.description)"
+            $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
+
+            if ($content) {
+                Write-Verbose "Rule $($item.displayName) exists in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $content.name -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.etag -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
+
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
+            }
+            else {
+                Write-Verbose -Message "Rule $($item.displayName) doesn't exist in Azure Sentinel"
+
+                $item | Add-Member -NotePropertyName name -NotePropertyValue $guid -Force
+                $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
+                $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+            }
+
+            $bodyAlertProp = [MicrosoftSecurityIncidentCreation]::new(
+                $item.displayName,
+                $item.description,
+                $item.enabled,
+                $item.productFilter,
+                $item.severitiesFilter,
+                $item.displayNamesFilter
+            )
+
+            $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'MicrosoftSecurityIncidentCreation')
+
+            try {
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "MicrosoftSecurityIncidentCreation" -Force
+                $return += $body.Properties
+            }
+            catch {
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue "failed" -Force
+                $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "MicrosoftSecurityIncidentCreation" -Force
+                $return += $body.Properties
+
+                Write-Verbose $_
+                Write-Verbose "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+            }
+        }
+
         return $return
     }
 }

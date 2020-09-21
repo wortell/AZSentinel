@@ -39,47 +39,63 @@ See [docs](https://github.com/wortell/AzSentinel/tree/master/docs) folder for do
 
 To create a Azure Sentinel Rule, use the following JSON format.
 
+### Roor schema
 ```JSON
 {
-  "analytics": [
-    {
-      "displayName": "string",
-      "description": "string",
-      "severity": "High",
-      "enabled": true,
-      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
-      "queryFrequency": "5H",
-      "queryPeriod": "5H",
-      "triggerOperator": "GreaterThan",
-      "triggerThreshold": 5,
-      "suppressionDuration": "6H",
-      "suppressionEnabled": false,
-      "tactics": [
-        "Persistence",
-        "LateralMovement",
-        "Collection"
-      ],
-      "playbookName": "string",
-      "aggregationKind": "string",
-      "createIncident": true,
-      "groupingConfiguration": {
-        "GroupingConfigurationEnabled": true,
-        "reopenClosedIncident": true,
-        "lookbackDuration": "PT6H",
-        "entitiesMatchingMethod": "string",
-        "groupByEntities": [
-          "Account",
-          "Ip",
-          "Host",
-          "Url"
-        ]
-      }
-    }
+  "Scheduled": [
+    ...
+  ],
+  "Fusion": [
+    ...
+  ],
+  "MLBehaviorAnalytics": [
+    ...
+  ],
+  "MicrosoftSecurityIncidentCreation": [
+    ...
   ]
 }
 ```
 
-### Property values
+### Scheduled rule
+
+```JSON
+  {
+    "displayName": "string",
+    "description": "string",
+    "severity": "High",
+    "enabled": true,
+    "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+    "queryFrequency": "5H",
+    "queryPeriod": "5H",
+    "triggerOperator": "GreaterThan",
+    "triggerThreshold": 5,
+    "suppressionDuration": "6H",
+    "suppressionEnabled": false,
+    "tactics": [
+      "Persistence",
+      "LateralMovement",
+      "Collection"
+    ],
+    "playbookName": "string",
+    "aggregationKind": "string",
+    "createIncident": true,
+    "groupingConfiguration": {
+      "GroupingConfigurationEnabled": true,
+      "reopenClosedIncident": true,
+      "lookbackDuration": "PT6H",
+      "entitiesMatchingMethod": "string",
+      "groupByEntities": [
+        "Account",
+        "Ip",
+        "Host",
+        "Url"
+      ]
+    }
+  }
+```
+
+#### Scheduled property values
 
 The following tables describe the values you need to set in the schema.
 
@@ -106,9 +122,84 @@ The following tables describe the values you need to set in the schema.
 | entitiesMatchingMethod       | string | false    | All, None, Custom                                                                                                                                                   | All                                                                                               |
 | groupByEntities              | string | false    | Account, Ip, Host, Url                                                                                                                                              | Account                                                                                           |
 
+
+### Fusion rule
+```JSON
+  {
+    "displayName": "Advanced Multistage Attack Detection",
+    "enabled": true,
+    "alertRuleTemplateName": "f71aba3d-28fb-450b-b192-4e76a83015c8"
+  }
+```
+
+#### Scheduled property values
+
+The following tables describe the values you need to set in the schema.
+
+| Name                  | Type   | Required | Allowed Values | Example                              |
+| --------------------- | ------ | -------- | -------------- | ------------------------------------ |
+| displayName           | string | true     |                | Advanced Multistage Attack Detection |
+| enabled               | bool   | true     |                | true                                 |
+| alertRuleTemplateName | string | true     |                | f71aba3d-28fb-450b-b192-4e76a83015c8 |
+|                       |        |          |                |
+
+
+
+### MLBehaviorAnalytics rules
+
+```JSON
+  {
+    "displayName": "(Preview) Anomalous SSH Login Detection",
+    "enabled": true,
+    "alertRuleTemplateName": "fa118b98-de46-4e94-87f9-8e6d5060b60b"
+  }
+```
+
+#### Scheduled property values
+
+The following tables describe the values you need to set in the schema.
+
+| Name                  | Type   | Required | Allowed Values | Example                              |
+| --------------------- | ------ | -------- | -------------- | ------------------------------------ |
+| displayName           | string | true     |                | Advanced Multistage Attack Detection |
+| enabled               | bool   | true     |                | true                                 |
+| alertRuleTemplateName | string | true     |                | f71aba3d-28fb-450b-b192-4e76a83015c8 |
+|                       |        |          |                |
+
+
+### MicrosoftSecurityIncidentCreation rules
+```JSON
+  {
+    "displayName": "Create incidents based on Azure Active Directory Identity Protection alerts",
+    "description": "Create incidents based on all alerts generated in Azure Active Directory Identity Protection",
+    "enabled": true,
+    "productFilter": "Microsoft Cloud App Security",
+    "severitiesFilter": [
+      "High",
+      "Medium",
+      "Low"
+    ],
+    "displayNamesFilter": null
+  }
+```
+#### Scheduled property values
+
+The following tables describe the values you need to set in the schema.
+
+| Name               | Type   | Required | Allowed Values    | Example                                                                                      |
+| ------------------ | ------ | -------- | ----------------- | -------------------------------------------------------------------------------------------- |
+| displayName        | string | true     |                   | Create incidents based on Azure Active Directory Identity Protection alerts                  |
+| enabled            | bool   | true     |                   | true                                                                                         |
+| description        | string | true     |                   | Create incidents based on all alerts generated in Azure Active Directory Identity Protection |
+| productFilter      | string | true     |                   | Microsoft Cloud App Security                                                                 |
+| severitiesFilter   | string | true     | High, Medium, Low | High                                                                                         |
+| displayNamesFilter | string | false    |                   |                                                                                              |
+|                    |        |          |                   |                                                                                              |
+
+
+
 ## Find us
 
-* [Wortell](https://security.wortell.nl/)
 * [GitHub](https://github.com/wortell/AZSentinel)
 * [PowerShell Gallery](https://www.powershellgallery.com/packages/AzSentinel)
 
