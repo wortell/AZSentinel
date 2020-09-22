@@ -246,7 +246,7 @@ function New-AzSentinelAlertRule {
                     $AggregationKind
                 )
 
-                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id)
+                $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Scheduled')
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop
