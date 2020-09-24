@@ -72,7 +72,7 @@ function Get-AzSentinelHuntingRule {
 
         try {
             if ($Filter) {
-                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value | Where-Object {$_.properties.Category -match $Filter}
+                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value | Where-Object { $_.properties.Category -eq $Filter }
             }
             else {
                 $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
