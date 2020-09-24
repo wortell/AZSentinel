@@ -62,7 +62,7 @@ function Get-AzSentinelAlertRule {
         }
         Get-LogAnalyticWorkspace @arguments
 
-        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2019-01-01-preview"
+        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2020-01-01"
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
@@ -140,7 +140,7 @@ function Get-AzSentinelAlertRule {
             }
             else {
                 $alertRules.value | ForEach-Object {
-                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
+                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($_.name)[0]
 
                     if ($playbook) {
                         $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
