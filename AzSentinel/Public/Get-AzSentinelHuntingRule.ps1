@@ -41,7 +41,7 @@ function Get-AzSentinelHuntingRule {
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
-        [ValidateNotNullOrEmpty()]
+        [validateset("Hunting Queries", "Log Management", "General Exploration")]
         [string]$Filter
     )
 
