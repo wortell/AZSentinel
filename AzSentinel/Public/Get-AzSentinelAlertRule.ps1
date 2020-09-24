@@ -82,7 +82,7 @@ function Get-AzSentinelAlertRule {
                     [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.properties.displayName -eq $rule }
                     if ($null -ne $temp) {
 
-                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
+                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $temp.name
 
                         if ($playbook) {
                             $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
@@ -140,7 +140,7 @@ function Get-AzSentinelAlertRule {
             }
             else {
                 $alertRules.value | ForEach-Object {
-                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($_.name)[0]
+                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
 
                     if ($playbook) {
                         $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
