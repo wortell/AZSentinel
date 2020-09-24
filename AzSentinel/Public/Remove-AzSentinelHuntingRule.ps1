@@ -64,7 +64,7 @@ function Remove-AzSentinelHuntingRule {
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelHuntingRule @arguments -Filter 'HuntingQueries' -RuleName $rule
+                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule
                 if ($item) {
                     $uri = "$script:baseUri/savedSearches/$($item.name)?api-version=2017-04-26-preview"
 
@@ -90,7 +90,7 @@ function Remove-AzSentinelHuntingRule {
         }
         else {
             Write-Warning "No hunting rule selected, All hunting rules will be removed one by one!"
-            Get-AzSentinelHuntingRule @arguments -Filter 'HuntingQueries' | ForEach-Object {
+            Get-AzSentinelHuntingRule @arguments -Filter "Hunting Queries" | ForEach-Object {
                 $uri = "$script:baseUri/savedSearches/$($_.name)?api-version=2017-04-26-preview"
                 if ($PSCmdlet.ShouldProcess("Do you want to remove: $($_.displayName)")) {
                     try {
