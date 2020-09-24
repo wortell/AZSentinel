@@ -41,7 +41,7 @@ function Get-AzSentinelHuntingRule {
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
-        [ValidateNotNullOrEmpty()]
+        [validateset("Hunting Queries", "Log Management", "General Exploration")]
         [string]$Filter
     )
 
@@ -72,11 +72,10 @@ function Get-AzSentinelHuntingRule {
 
         try {
             if ($Filter) {
-                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader) | Where-Object $_.Category -eq $Filter
+                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value | Where-Object { $_.properties.Category -eq $Filter }
             }
             else {
-                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
-
+                $huntingRules = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
             }
         }
         catch {
@@ -86,11 +85,13 @@ function Get-AzSentinelHuntingRule {
 
         $return = @()
 
-        if ($huntingRules.value) {
-            Write-Verbose "Found $($huntingRules.value.count) hunting rules"
+        if ($huntingRules) {
+            Write-Verbose "Found $($huntingRules.count) hunting rules"
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = $huntingRules.value | Where-Object { $_.displayName -eq $rule }
+                    $temp = @()
+                    [PSCustomObject]$temp = $huntingRules | Where-Object { ($_.properties).DisplayName -eq $rule }
+
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
@@ -98,23 +99,23 @@ function Get-AzSentinelHuntingRule {
 
                         $return += $temp.Properties
                     }
-                    else {
-                        Write-Warning "Unable to find hunting rule: $rule"
-                    }
                 }
                 return $return
             }
             else {
-                $huntingRules.value | ForEach-Object {
+                $huntingRules | ForEach-Object {
+
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
-                    return $_.properties
+
+                    $return += $_.properties
                 }
+                return $return
             }
         }
         else {
-            Write-Warning "No hunting rules found on $($WorkspaceName)"
+            Write-Verbose "No hunting rules found on $($WorkspaceName)"
         }
     }
 }
