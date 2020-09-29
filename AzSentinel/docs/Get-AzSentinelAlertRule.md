@@ -14,7 +14,7 @@ Get Azure Sentinel Alert Rules
 
 ```
 Get-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-RuleName <String[]>]
- [-Kind <Kind[]>] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Kind <Kind[]>] [-LastModified <DateTime>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -26,6 +26,12 @@ With this function you can get the configuration of the Azure Sentinel Alert rul
 ```
 Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
 In this example you can get configuration of multiple alert rules in once
+```
+
+### EXAMPLE 2
+```
+Get-LogAnalyticWorkspace -SubscriptionId "" -WorkspaceName "" -LastModified 2020-09-21
+In this example you can get configuration of multiple alert rules only if modified after the 21st September 2020. The datetime must be in ISO8601 format.
 ```
 
 ## PARAMETERS
@@ -83,6 +89,21 @@ Type: Kind[]
 Parameter Sets: (All)
 Aliases:
 Accepted values: Scheduled, Fusion, MLBehaviorAnalytics, MicrosoftSecurityIncidentCreation
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -LastModified
+The minimum lastModified time to return
+
+```yaml
+Type: DateTime
+Parameter Sets: (All)
+Aliases:
 
 Required: False
 Position: Named
