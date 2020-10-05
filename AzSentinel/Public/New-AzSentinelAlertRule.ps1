@@ -148,7 +148,7 @@ function New-AzSentinelAlertRule {
         [string[]]$GroupByEntities,
 
         [Parameter(Mandatory = $false)]
-        [string]$AggregationKind,
+        [AggregationKind]$AggregationKind,
 
         #Fusion & MLBehaviorAnalytics
         [Parameter(Mandatory = $false)]

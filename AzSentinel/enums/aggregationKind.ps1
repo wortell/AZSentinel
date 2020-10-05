@@ -1,4 +1,4 @@
 enum AggregationKind {
     SingleAlert
-    AlertPerRow
+    AlertPerResult
 }

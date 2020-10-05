@@ -30,7 +30,7 @@ class ScheduledAlertProp {
 
     [IncidentConfiguration]$IncidentConfiguration
 
-    $queryResultsAggregationSettings
+    $eventGroupingSettings
 
     hidden [AggregationKind]$aggregationKind
 
@@ -94,7 +94,7 @@ class ScheduledAlertProp {
         $this.Tactics = $Tactics
         $this.PlaybookName = $PlaybookName
         $this.IncidentConfiguration = $IncidentConfiguration
-        $this.queryResultsAggregationSettings = @{
+        $this.eventGroupingSettings = @{
             aggregationKind = if ($aggregationKind) { $aggregationKind } else { "SingleAlert" }
         }
     }
