@@ -15,9 +15,14 @@ function Get-AzSentinelAlertRule {
       Enter the name of the Alert rule
       .PARAMETER Kind
       The alert rule kind
+      .PARAMETER LastModified
+      Filter for rules modified after this date/time
       .EXAMPLE
       Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
       In this example you can get configuration of multiple alert rules in once
+      .EXAMPLE
+      Get-LogAnalyticWorkspace -SubscriptionId "" -WorkspaceName "" -LastModified 2020-09-21
+      In this example you can get configuration of multiple alert rules only if modified after the 21st September 2020. The datetime must be in ISO8601 format.
     #>
 
     [cmdletbinding(SupportsShouldProcess)]
@@ -39,7 +44,12 @@ function Get-AzSentinelAlertRule {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [Kind[]]$Kind
+        [Kind[]]$Kind,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [DateTime]$LastModified
     )
 
     begin {
@@ -74,6 +84,10 @@ function Get-AzSentinelAlertRule {
         }
 
         $return = @()
+        if ($alertRules.value -and $LastModified) {
+            Write-Verbose "Filtering for rules modified after $LastModified"
+            $alertRules.value = $alertRules.value | Where-Object { $_.properties.lastModifiedUtc -gt $LastModified }
+        }
         if ($alertRules.value) {
             Write-Verbose "Found $($alertRules.value.count) Alert rules"
 
