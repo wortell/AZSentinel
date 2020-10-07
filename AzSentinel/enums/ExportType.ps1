@@ -1,0 +1,4 @@
+enum ExportType {
+    Analytic
+    Hunting
+}
