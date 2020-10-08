@@ -1,0 +1,35 @@
+enum DataSourceName {
+    ApplicationInsights
+    AzureActivityLog
+    AzureAuditLog
+    ChangeTrackingContentLocation
+    ChangeTrackingCustomPath
+    ChangeTrackingDataTypeConfiguration
+    ChangeTrackingDefaultRegistry
+    ChangeTrackingLinuxPath
+    ChangeTrackingPath
+    ChangeTrackingRegistry
+    ChangeTrackingServices
+    CustomLog
+    CustomLogCollection
+    DnsAnalytics
+    GenericDataSource
+    IISLogs
+    ImportComputerGroup
+    Itsm
+    LinuxChangeTrackingPath
+    LinuxPerformanceCollection
+    LinuxPerformanceObject
+    LinuxSyslog
+    LinuxSyslogCollection
+    NetworkMonitoring
+    Office365
+    SecurityCenterSecurityWindowsBaselineConfiguration
+    SecurityEventCollectionConfiguration
+    SecurityInsightsSecurityEventCollectionConfiguration
+    SecurityWindowsBaselineConfiguration
+    SqlDataClassification
+    WindowsEvent
+    WindowsPerformanceCounter
+    WindowsTelemetry
+}

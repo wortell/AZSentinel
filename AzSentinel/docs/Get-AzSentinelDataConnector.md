@@ -14,7 +14,7 @@ Get Azure Sentinel Data connector
 
 ```
 Get-AzSentinelDataConnector [-SubscriptionId <String>] -WorkspaceName <String> [-DataConnectorName <String[]>]
- [<CommonParameters>]
+ [-DataSourceName <DataSourceName[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -73,6 +73,22 @@ Enter the Connector ID
 Type: String[]
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -DataSourceName
+{{ Fill DataSourceName Description }}
+
+```yaml
+Type: DataSourceName[]
+Parameter Sets: (All)
+Aliases:
+Accepted values: ApplicationInsights, AzureActivityLog, AzureAuditLog, ChangeTrackingContentLocation, ChangeTrackingCustomPath, ChangeTrackingDataTypeConfiguration, ChangeTrackingDefaultRegistry, ChangeTrackingLinuxPath, ChangeTrackingPath, ChangeTrackingRegistry, ChangeTrackingServices, CustomLog, CustomLogCollection, DnsAnalytics, GenericDataSource, IISLogs, ImportComputerGroup, Itsm, LinuxChangeTrackingPath, LinuxPerformanceCollection, LinuxPerformanceObject, LinuxSyslog, LinuxSyslogCollection, NetworkMonitoring, Office365, SecurityCenterSecurityWindowsBaselineConfiguration, SecurityEventCollectionConfiguration, SecurityInsightsSecurityEventCollectionConfiguration, SecurityWindowsBaselineConfiguration, SqlDataClassification, WindowsEvent, WindowsPerformanceCounter, WindowsTelemetry
 
 Required: False
 Position: Named
