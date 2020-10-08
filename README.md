@@ -39,7 +39,7 @@ See [docs](https://github.com/wortell/AzSentinel/tree/master/docs) folder for do
 
 To create a Azure Sentinel Rule, use the following JSON format.
 
-### Roor schema
+### Root schema
 ```JSON
 {
   "Scheduled": [

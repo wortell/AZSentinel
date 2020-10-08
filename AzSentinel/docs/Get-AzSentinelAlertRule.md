@@ -98,7 +98,7 @@ Accept wildcard characters: False
 ```
 
 ### -LastModified
-The minimum lastModified time to return
+Filter for rules modified after this date/time
 
 ```yaml
 Type: DateTime

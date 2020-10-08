@@ -19,7 +19,7 @@ New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-Kin
  [-TriggerThreshold <Int32>] [-SuppressionDuration <String>] [-SuppressionEnabled <Boolean>]
  [-Tactics <String[]>] [-PlaybookName <String[]>] [-CreateIncident <Boolean>]
  [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>] [-LookbackDuration <String>]
- [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>] [-AggregationKind <String>]
+ [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>] [-AggregationKind <AggregationKind>]
  [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <String>]
  [-DisplayNamesFilter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
@@ -393,9 +393,10 @@ Accept wildcard characters: False
 Configure how rule query results are grouped into alerts
 
 ```yaml
-Type: String
+Type: AggregationKind
 Parameter Sets: (All)
 Aliases:
+Accepted values: SingleAlert, AlertPerResult
 
 Required: False
 Position: Named
