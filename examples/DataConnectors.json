@@ -1,0 +1,30 @@
+{
+  "AzureSecurityCenter": [
+    {
+      "subscriptionId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e",
+      "state": "Enabled"
+    },
+    {
+      "subscriptionId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e",
+      "state": "Enabled"
+    }
+  ],
+  "AzureActivityLog": [
+    {
+      "subscriptionId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e"
+    },
+    {
+      "subscriptionId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e"
+    }
+  ],
+  "ThreatIntelligenceTaxii": [
+    {
+      "friendlyName": "testserver",
+      "taxiiServer": "https://limo.anomali.com/api/v1/taxii2/feeds/",
+      "collectionId": "107",
+      "username": "guest",
+      "password": "guest",
+      "state": "enabled"
+    }
+  ]
+}
