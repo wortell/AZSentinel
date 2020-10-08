@@ -20,3 +20,4 @@
 18. [Remove-AzSentinelAlertRuleAction](Remove-AzSentinelAlertRuleAction.md)
 19. [Get-AzSentinelAlertRuleTemplates](Get-AzSentinelAlertRuleTemplates.md)
 20. [Get-AzSentinelDataConnector](Get-AzSentinelDataConnector.md)
+21. [Import-AzSentinelDataConnector](Import-AzSentinelDataConnector.md)

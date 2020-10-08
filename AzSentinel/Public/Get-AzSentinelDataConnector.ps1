@@ -34,7 +34,12 @@ function Get-AzSentinelDataConnector {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$DataConnectorName
+        [string[]]$DataConnectorName,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [DataSourceName[]]$DataSourceName
     )
 
     begin {
@@ -75,6 +80,24 @@ function Get-AzSentinelDataConnector {
                 }
             }
             return $dataConnectors
+        }
+        elseif ($DataSourceName) {
+            $dataSources = @()
+
+            foreach ($dataSource in $DataSourceName){
+                $uri = $($script:baseUri)+ "/dataSources?"+'$'+"filter=kind+eq+'"+$dataSource+"'&api-version=2020-08-01"
+
+                try {
+                    $result = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+
+                    $dataSources += $result
+                }
+                catch {
+                    Write-Verbose $_
+                    Write-Error "Unable to get alert rules with error code: $($_.Exception.Message)" -ErrorAction Stop
+                }
+            }
+            return $dataSources.value
         }
         else {
             $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/dataConnectors?api-version=2020-01-01"
