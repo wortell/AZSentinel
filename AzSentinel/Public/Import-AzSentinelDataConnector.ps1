@@ -78,7 +78,12 @@ function Import-AzSentinelDataConnector {
         $azureActivityLog = Get-AzSentinelDataConnector @arguments -DataSourceName 'AzureActivityLog' -ErrorAction SilentlyContinue
 
         foreach ($item in $connectors.AzureActivityLog) {
-            $azureActivity = $azureActivityLog | Where-Object { $_.properties.linkedResourceId.Split('/')[2] -eq $item.subscriptionId }
+            if ($null -ne $azureActivityLog){
+                $azureActivity = $azureActivityLog | Where-Object { $_.properties.linkedResourceId.Split('/')[2] -eq $item.subscriptionId }
+            }
+            else {
+                $azureActivity
+            }
 
             if ($azureActivity) {
                 Write-Host "AzureActivityLog is already enabled on '$($item.subscriptionId)'"
@@ -112,8 +117,12 @@ function Import-AzSentinelDataConnector {
 
         #AzureSecurityCenter connector
         foreach ($item in $connectors.AzureSecurityCenter) {
-
-            $azureSecurityCenter = $enabledDataConnectors | Where-Object { $_.Kind -eq "AzureSecurityCenter" -and $_.properties.subscriptionId -eq $item.subscriptionId }
+            if ($null -ne $enabledDataConnectors){
+                $azureSecurityCenter = $enabledDataConnectors | Where-Object { $_.Kind -eq "AzureSecurityCenter" -and $_.properties.subscriptionId -eq $item.subscriptionId }
+            }
+            else {
+                $azureSecurityCenter
+            }
             $skip = $false
 
             if ($null -ne $azureSecurityCenter) {
@@ -179,7 +188,12 @@ function Import-AzSentinelDataConnector {
 
         #ThreatIntelligenceTaxii
         foreach ($item in $connectors.ThreatIntelligenceTaxii) {
-            $threatIntelligenceTaxii = $enabledDataConnectors | Where-Object { $_.Kind -eq "ThreatIntelligenceTaxii" -and $_.properties.friendlyName -eq $item.friendlyName }
+            if ($enabledDataConnectors){
+                $threatIntelligenceTaxii = $enabledDataConnectors | Where-Object { $_.Kind -eq "ThreatIntelligenceTaxii" -and $_.properties.friendlyName -eq $item.friendlyName }
+            }
+            else {
+                $threatIntelligenceTaxii
+            }
             $skip = $false
 
             if ($null -ne $threatIntelligenceTaxii) {
