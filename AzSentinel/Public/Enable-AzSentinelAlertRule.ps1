@@ -60,14 +60,39 @@ function Enable-AzSentinelAlertRule {
                 $rule.enabled = $true
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($rule.name)?api-version=2019-01-01-preview"
 
-                $bodyAlertProp = [AlertProp]::new(
-                    ($rule | Select-Object * -ExcludeProperty lastModifiedUtc, etag, id)
+                $groupingConfiguration = [GroupingConfiguration]::new(
+                    $rule.incidentConfiguration.groupingConfiguration.GroupingConfigurationEnabled,
+                    $rule.incidentConfiguration.groupingConfiguration.ReopenClosedIncident,
+                    $rule.incidentConfiguration.groupingConfiguration.LookbackDuration,
+                    $rule.incidentConfiguration.groupingConfiguration.EntitiesMatchingMethod,
+                    $rule.incidentConfiguration.groupingConfiguration.GroupByEntities
                 )
 
-                $body = [AlertRule]::new(
-                    ($rule | Select-Object lastModifiedUtc, etag, id, name),
-                    $bodyAlertProp
+                $incidentConfiguration = [IncidentConfiguration]::new(
+                    $rule.incidentConfiguration.CreateIncident,
+                    $groupingConfiguration
                 )
+
+                $bodyAlertProp = [ScheduledAlertProp]::new(
+                    $rule.name,
+                    $rule.DisplayName,
+                    $rule.Description,
+                    $rule.Severity,
+                    $rule.Enabled,
+                    $rule.Query,
+                    $rule.QueryFrequency,
+                    $rule.QueryPeriod,
+                    $rule.TriggerOperator,
+                    $rule.TriggerThreshold,
+                    $rule.SuppressionDuration,
+                    $rule.SuppressionEnabled,
+                    $rule.Tactics,
+                    $rule.PlaybookName,
+                    $incidentConfiguration,
+                    $rule.AggregationKind
+                )
+
+                $body = [AlertRule]::new( $rule.name, $rule.etag, $bodyAlertProp, $rule.Id, 'Scheduled')
 
                 try {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
