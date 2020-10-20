@@ -8,13 +8,23 @@ function Export-AzSentinel {
       Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
       .PARAMETER WorkspaceName
       Enter the Workspace name
-      .PARAMETER Export
-      Enter the name of the Alert rule
+      .PARAMETER Kind
+      Select what you want to export: Alert, Hunting, Templates or All
+      .PARAMETER OutputFolder
+      The Path where you want to export the JSON files
+      .PARAMETER TemplatesKind
+      Select which Kind of templates you want to export, if empy all Templates will be exported
       .EXAMPLE
-      Export-AzSentinel -WorkspaceName "" -Export "",""
-      In this example you can get configuration of multiple alert rules in once
+      Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind All
+      In this example you export Alert, Hunting and Template rules
+      .EXAMPLE
+      Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind Templates
+      In this example you export only the Templates
+      .EXAMPLE
+      Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind Alert
+      In this example you export only the Scheduled Alert rules
     #>
-    [cmdletbinding(SupportsShouldProcess)]
+
     param (
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
@@ -25,10 +35,16 @@ function Export-AzSentinel {
         [ValidateNotNullOrEmpty()]
         [string]$WorkspaceName,
 
-        [Parameter(Mandatory = $false,
+        [Parameter(Mandatory)]
+        [System.IO.FileInfo]$OutputFolder,
+
+        [Parameter(Mandatory,
             ValueFromPipeline)]
+        [ExportType[]]$Kind,
+
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [ExportType[]]$Export
+        [Kind[]]$TemplatesKind
     )
 
     begin {
@@ -50,15 +66,117 @@ function Export-AzSentinel {
             }
         }
 
-        Get-LogAnalyticWorkspace @arguments
+        $date = Get-Date -Format HHmmss_ddMMyyyy
 
-
-        if ($Export -eq 'Analytic') {
-
+        <#
+        Test export path
+        #>
+        if (Test-Path $OutputFolder) {
+            Write-Verbose "Path Exists"
         }
-        if ($Export -eq 'Hunting') {
+        else {
+            try {
+                $null = New-Item -Path $OutputFolder -Force -ItemType Directory -ErrorAction Stop
+            }
+            catch {
+                $ErrorMessage = $_.Exception.Message
+                Write-Error $ErrorMessage
+                Write-Verbose $_
+                Break
+            }
+        }
 
+        <#
+        Export Alert rules section
+        #>
+        if (($Kind -like 'Alert') -or ($Kind -like 'All')) {
+
+            $rules = Get-AzSentinelAlertRule @arguments
+            if ($rules) {
+                $output = @{
+                    Scheduled                         = @()
+                    Fusion                            = @()
+                    MLBehaviorAnalytics               = @()
+                    MicrosoftSecurityIncidentCreation = @()
+                }
+                $rules.Kind | ForEach-Object {
+                    $output.$_ += $rules | Where-Object kind -eq $_
+                }
+
+                try {
+                    $fullPath = "$($OutputFolder)AlertRules_$date.json"
+                    $output | ConvertTo-Json -EnumsAsStrings -Depth 15 | Out-File $fullPath -ErrorAction Stop
+                    Write-Output "Alert rules exported to: $fullPath"
+                }
+                catch {
+                    $ErrorMessage = $_.Exception.Message
+                    Write-Error $ErrorMessage
+                    Write-Verbose $_
+                    Break
+                }
+            }
+        }
+
+        <#
+        Export Hunting rules section
+        #>
+        if (($Kind -like 'Hunting') -or ($Kind -like 'All')) {
+            $rules = Get-AzSentinelHuntingRule @arguments
+
+            if ($rules) {
+                $output = @{
+                    Hunting = @()
+                }
+                $output.Hunting += $rules
+                try {
+                    $fullPath = "$($OutputFolder)HuntingRules_$date.json"
+                    $output | ConvertTo-Json -EnumsAsStrings -Depth 15 | Out-File $fullPath -ErrorAction Stop
+                    Write-Output "Hunting rules exported to: $fullPath"
+                }
+                catch {
+                    $ErrorMessage = $_.Exception.Message
+                    Write-Error $ErrorMessage
+                    Write-Verbose $_
+                    Break
+                }
+            }
+        }
+
+        <#
+        Export Templates section
+        #>
+        if (($Kind -like 'Templates') -or ($Kind -like 'All')) {
+
+            if ($TemplatesKind) {
+                $templates = Get-AzSentinelAlertRuleTemplates @arguments -Kind $TemplatesKind
+            }
+            else {
+                $templates = Get-AzSentinelAlertRuleTemplates @arguments
+            }
+
+            if ($templates) {
+                $output = @{
+                    Scheduled                         = @()
+                    Fusion                            = @()
+                    MLBehaviorAnalytics               = @()
+                    MicrosoftSecurityIncidentCreation = @()
+                }
+                $templates.Kind | ForEach-Object {
+                    $output.$_ += $templates | Where-Object kind -eq $_
+                }
+
+                try {
+                    $fullPath = "$($OutputFolder)Templates_$date.json"
+                    $output | ConvertTo-Json -EnumsAsStrings -Depth 15 | Out-File $fullPath -ErrorAction Stop
+                    Write-Output "Templates xported to: $fullPath"
+                }
+                catch {
+                    $ErrorMessage = $_.Exception.Message
+                    Write-Error $ErrorMessage
+                    Write-Verbose $_
+                    Break
+                }
+            }
         }
     }
-
 }

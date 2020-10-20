@@ -1,4 +1,6 @@
 enum ExportType {
-    Analytic
+    Alert
     Hunting
+    All
+    Templates
 }
