@@ -96,6 +96,7 @@
         'Get-AzSentinelAlertRuleTemplates',
         'Add-AzSentinelIncidentComment',
         'Get-AzSentinelDataConnector',
+        'Export-AzSentinel'
         'Import-AzSentinelDataConnector'
     )
 

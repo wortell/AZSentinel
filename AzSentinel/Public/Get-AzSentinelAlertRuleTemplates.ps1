@@ -61,7 +61,7 @@ function Get-AzSentinelAlertRuleTemplates {
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
-            $alertRulesTemplates = Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader
+            $alertRulesTemplates = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader).value
         }
         catch {
             Write-Verbose $_
@@ -70,16 +70,28 @@ function Get-AzSentinelAlertRuleTemplates {
 
         $return = @()
 
-        if ($alertRulesTemplates.value) {
-            Write-Verbose "Found $($alertRulesTemplates.value.count) Alert rules templates"
+        if ($alertRulesTemplates) {
+            Write-Verbose "Found $($alertRulesTemplates.count) Alert rules templates"
 
             if ($Kind) {
                 foreach ($item in $Kind) {
-                    $return += $alertRulesTemplates.value | Where-Object Kind -eq $item
+                    $alertRulesTemplates | Where-Object Kind -eq $item | ForEach-Object {
+                        $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                        $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                        $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+
+                        $return += $_.properties
+                    }
                 }
             }
             else {
-                $return += $alertRulesTemplates.value
+                $alertRulesTemplates | ForEach-Object {
+                    $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                    $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                    $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+
+                    $return += $_.properties
+                }
             }
 
             return $return
