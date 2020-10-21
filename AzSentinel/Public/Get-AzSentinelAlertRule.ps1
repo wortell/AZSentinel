@@ -17,11 +17,13 @@ function Get-AzSentinelAlertRule {
       The alert rule kind
       .PARAMETER LastModified
       Filter for rules modified after this date/time
+      .PARAMETER SkipPlaybook
+      Use SkipPlaybook switch to only return the rule properties, this skips the Playbook resolve step.
       .EXAMPLE
       Get-AzSentinelAlertRule -WorkspaceName "" -RuleName "",""
       In this example you can get configuration of multiple alert rules in once
       .EXAMPLE
-      Get-LogAnalyticWorkspace -SubscriptionId "" -WorkspaceName "" -LastModified 2020-09-21
+      Get-AzSentinelAlertRule -SubscriptionId "" -WorkspaceName "" -LastModified 2020-09-21
       In this example you can get configuration of multiple alert rules only if modified after the 21st September 2020. The datetime must be in ISO8601 format.
     #>
 
@@ -49,7 +51,12 @@ function Get-AzSentinelAlertRule {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [DateTime]$LastModified
+        [DateTime]$LastModified,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$SkipPlaybook
     )
 
     begin {
@@ -93,41 +100,71 @@ function Get-AzSentinelAlertRule {
 
             if ($RuleName.Count -ge 1) {
                 foreach ($rule in $RuleName) {
-                    [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.properties.displayName -eq $rule }
-                    if ($null -ne $temp) {
+                    $alertRules.value | Where-Object { $_.properties.displayName -eq $rule } | ForEach-Object {
 
-                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $temp.name
+                        $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                        $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
+                        $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                        $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
 
-                        if ($playbook) {
-                            $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
+                        if (! $SkipPlaybook) {
+
+                            $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
+
+                            if ($playbook) {
+                                $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
+                            }
+                            else {
+                                $playbookName = ""
+                            }
+
+                            $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
                         }
-                        else {
-                            $playbookName = ""
-                        }
 
-                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
-                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
-                        $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
-                        $temp.properties | Add-Member -NotePropertyName kind -NotePropertyValue $temp.kind -Force
 
-                        if ($temp.kind -eq "Scheduled") {
-                            $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
-                        }
-
-                        $return += $temp.properties
-                    }
-                    else {
-                        Write-Verbose "Unable to find Rule: $rule"
+                        $return += $_.properties
                     }
                 }
                 return $return
             }
             elseif ($Kind.Count -ge 1) {
                 foreach ($rule in $Kind) {
-                    [PSCustomObject]$temp = $alertRules.value | Where-Object { $_.Kind -eq $rule }
-                    if ($null -ne $temp) {
+                    $alertRules.value | Where-Object { $_.Kind -eq $rule } | ForEach-Object {
 
-                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId ($temp.name)[0]
+                        $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                        $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
+                        $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                        $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+
+                        if (! $SkipPlaybook) {
+
+                            $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
+
+                            if ($playbook) {
+                                $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
+                            }
+                            else {
+                                $playbookName = ""
+                            }
+
+                            $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
+                        }
+
+                        $return += $_.properties
+                    }
+                }
+                return $return
+            }
+            else {
+                $alertRules.value | ForEach-Object {
+
+                    $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
+                    $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
+                    $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+
+                    if (! $SkipPlaybook) {
+
+                        $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
 
                         if ($playbook) {
                             $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
@@ -136,41 +173,12 @@ function Get-AzSentinelAlertRule {
                             $playbookName = ""
                         }
 
-                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
-                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
-                        $temp.properties | Add-Member -NotePropertyName id -NotePropertyValue $temp.id -Force
-                        $temp.properties | Add-Member -NotePropertyName kind -NotePropertyValue $temp.kind -Force
-                        if ($temp.kind -eq "Scheduled") {
-                            $temp.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
-                        }
-
-                        $return += $temp.properties
-                    }
-                    else {
-                        Write-Verbose "Unable to find Rule: $rule"
-                    }
-                }
-                return $return
-            }
-            else {
-                $alertRules.value | ForEach-Object {
-                    $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
-
-                    if ($playbook) {
-                        $playbookName = ($playbook.properties.logicAppResourceId).Split('/')[-1]
-                    }
-                    else {
-                        $playbookName = ""
-                    }
-                    $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
-                    $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
-                    $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
-                    if ($_.kind -eq "Scheduled") {
                         $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
                     }
 
-                    return $_.properties
+                    $return += $_.properties
                 }
+                return $return
             }
         }
         else {

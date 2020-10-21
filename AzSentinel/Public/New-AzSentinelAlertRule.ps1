@@ -159,7 +159,7 @@ function New-AzSentinelAlertRule {
         [string]$ProductFilter,
 
         [Parameter(Mandatory = $false)]
-        [string]$SeveritiesFilter,
+        [Severity[]]$SeveritiesFilter,
 
         [Parameter(Mandatory = $false)]
         [string]$DisplayNamesFilter
