@@ -65,8 +65,15 @@ function Import-AzSentinelHuntingRule {
 
         if ($SettingsFile.Extension -eq '.json') {
             try {
-                $analytics = (Get-Content $SettingsFile -Raw | ConvertFrom-Json -ErrorAction Stop).analytics
-                Write-Verbose -Message "Found $($analytics.count) rules"
+                $content = (Get-Content $SettingsFile -Raw | ConvertFrom-Json -ErrorAction Stop)
+                if ($content.analytics){
+                    $hunting = $content.analytics
+                }
+                else {
+                    $hunting = $content.Hunting
+                }
+
+                Write-Verbose -Message "Found $($hunting.count) rules"
             }
             catch {
                 Write-Verbose $_
@@ -75,8 +82,8 @@ function Import-AzSentinelHuntingRule {
         }
         elseif ($SettingsFile.Extension -in '.yaml', 'yml') {
             try {
-                $analytics = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
-                $analytics | Add-Member -MemberType NoteProperty -Name DisplayName -Value $analytics.name
+                $hunting = [pscustomobject](Get-Content $SettingsFile -Raw | ConvertFrom-Yaml -ErrorAction Stop)
+                $hunting | Add-Member -MemberType NoteProperty -Name DisplayName -Value $hunting.name
                 Write-Verbose -Message 'Found compatibel yaml file'
             }
             catch {
@@ -85,7 +92,7 @@ function Import-AzSentinelHuntingRule {
             }
         }
 
-        foreach ($item in $analytics) {
+        foreach ($item in $hunting) {
             Write-Output "Started with Hunting rule: $($item.displayName)"
 
             try {
