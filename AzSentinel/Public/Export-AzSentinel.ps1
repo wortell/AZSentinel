@@ -94,13 +94,18 @@ function Export-AzSentinel {
             $rules = Get-AzSentinelAlertRule @arguments
             if ($rules) {
                 $output = @{
-                    Scheduled                         = @()
-                    Fusion                            = @()
-                    MLBehaviorAnalytics               = @()
-                    MicrosoftSecurityIncidentCreation = @()
-                }
-                $rules.Kind | ForEach-Object {
-                    $output.$_ += $rules | Where-Object kind -eq $_
+                    Scheduled                         = @(
+                        $rules | Where-Object kind -eq Scheduled
+                    )
+                    Fusion                            = @(
+                        $rules | Where-Object kind -eq Fusion
+                    )
+                    MLBehaviorAnalytics               = @(
+                        $rules | Where-Object kind -eq MLBehaviorAnalytics
+                    )
+                    MicrosoftSecurityIncidentCreation = @(
+                        $rules | Where-Object kind -eq MicrosoftSecurityIncidentCreation
+                    )
                 }
 
                 try {
@@ -156,13 +161,18 @@ function Export-AzSentinel {
 
             if ($templates) {
                 $output = @{
-                    Scheduled                         = @()
-                    Fusion                            = @()
-                    MLBehaviorAnalytics               = @()
-                    MicrosoftSecurityIncidentCreation = @()
-                }
-                $templates.Kind | ForEach-Object {
-                    $output.$_ += $templates | Where-Object kind -eq $_
+                    Scheduled                         = @(
+                        $templates | Where-Object kind -eq Scheduled
+                    )
+                    Fusion                            = @(
+                        $templates | Where-Object kind -eq Fusion
+                    )
+                    MLBehaviorAnalytics               = @(
+                        $templates | Where-Object kind -eq MLBehaviorAnalytics
+                    )
+                    MicrosoftSecurityIncidentCreation = @(
+                        $templates | Where-Object kind -eq MicrosoftSecurityIncidentCreation
+                    )
                 }
 
                 try {
