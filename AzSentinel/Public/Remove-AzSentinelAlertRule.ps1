@@ -59,12 +59,19 @@ function Remove-AzSentinelAlertRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
 
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelAlertRule @arguments -RuleName $rule -WarningAction SilentlyContinue
+
+                try {
+                    $item = Get-AzSentinelAlertRule @arguments -RuleName $rule -WarningAction SilentlyContinue -ErrorAction Stop
+                }
+                catch {
+                    $return = $_.Exception.Message
+                    Write-Error $return
+                }
+
                 if ($item) {
                     $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($item.name)?api-version=2019-01-01-preview"
 

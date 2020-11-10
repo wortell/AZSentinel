@@ -59,7 +59,6 @@ function Import-AzSentinelHuntingRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
 
         $item = @{ }
 
@@ -92,12 +91,21 @@ function Import-AzSentinelHuntingRule {
             }
         }
 
+        try {
+            $allRulesContent = Get-AzSentinelHuntingRule @arguments -RuleName $($hunting.displayName) -WarningAction SilentlyContinue -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
+
         foreach ($item in $hunting) {
             Write-Output "Started with Hunting rule: $($item.displayName)"
 
             try {
                 Write-Verbose -Message "Get rule $($item.description)"
-                $content = Get-AzSentinelHuntingRule @arguments -RuleName $($item.displayName) -WarningAction SilentlyContinue
+
+                $content = $allRulesContent | Where-Object displayName -eq $item.displayName
 
                 if ($content) {
                     Write-Verbose -Message "Hunting rule $($item.displayName) exists in Azure Sentinel"

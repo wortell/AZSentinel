@@ -52,7 +52,14 @@ function Import-AzSentinelDataConnector {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
+
+        try {
+            Get-LogAnalyticWorkspace @arguments -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
 
         if ($SettingsFile.Extension -eq '.json') {
             try {

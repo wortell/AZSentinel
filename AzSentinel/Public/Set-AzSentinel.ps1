@@ -46,7 +46,14 @@ function Set-AzSentinel {
                 }
             }
         }
-        $workspaceResult = Get-LogAnalyticWorkspace @arguments -FullObject
+
+        try {
+            $workspaceResult = Get-LogAnalyticWorkspace @arguments -FullObject -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
 
         # Variables
         $errorResult = ''

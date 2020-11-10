@@ -50,7 +50,13 @@ function Enable-AzSentinelAlertRule {
             }
         }
 
-        $rules = Get-AzSentinelAlertRule @arguments -RuleName $RuleName -ErrorAction Stop
+        try {
+            $rules = Get-AzSentinelAlertRule @arguments -RuleName $RuleName -ErrorAction Stop
+        }
+        catch {
+            $return = $_.Exception.Message
+            Write-Error $return
+        }
 
         foreach ($rule in $rules) {
             if ($rule.enabled -eq $true) {

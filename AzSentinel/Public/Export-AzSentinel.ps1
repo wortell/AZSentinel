@@ -91,7 +91,14 @@ function Export-AzSentinel {
         #>
         if (($Kind -like 'Alert') -or ($Kind -like 'All')) {
 
-            $rules = Get-AzSentinelAlertRule @arguments
+            try {
+                $rules = Get-AzSentinelAlertRule @arguments -ErrorAction Stop
+            }
+            catch {
+                $return = $_.Exception.Message
+                Write-Error $return
+            }
+
             if ($rules) {
                 $output = @{
                     Scheduled                         = @(
@@ -126,8 +133,13 @@ function Export-AzSentinel {
         Export Hunting rules section
         #>
         if (($Kind -like 'Hunting') -or ($Kind -like 'All')) {
-            $rules = Get-AzSentinelHuntingRule @arguments
-
+            try {
+                $rules = Get-AzSentinelHuntingRule @arguments -ErrorAction Stop
+            }
+            catch {
+                $return = $_.Exception.Message
+                Write-Error $return
+            }
             if ($rules) {
                 $output = @{
                     Hunting = @()
@@ -153,10 +165,22 @@ function Export-AzSentinel {
         if (($Kind -like 'Templates') -or ($Kind -like 'All')) {
 
             if ($TemplatesKind) {
-                $templates = Get-AzSentinelAlertRuleTemplates @arguments -Kind $TemplatesKind
+                try {
+                    $templates = Get-AzSentinelAlertRuleTemplates @arguments -Kind $TemplatesKind
+                }
+                catch {
+                    $return = $_.Exception.Message
+                    Write-Error $return
+                }
             }
             else {
-                $templates = Get-AzSentinelAlertRuleTemplates @arguments
+                try {
+                    $templates = Get-AzSentinelAlertRuleTemplates @arguments
+                }
+                catch {
+                    $return = $_.Exception.Message
+                    Write-Error $return
+                }
             }
 
             if ($templates) {
