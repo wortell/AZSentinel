@@ -16,7 +16,7 @@ function precheck {
 
     if ($null -eq $script:accessToken) {
         Get-AuthToken
-    } elseif ([datetime]::UtcNow.AddMinutes(5) -lt $script:accessToken.ExpiresOn.DateTime ) {
+    } elseif ($script:accessToken.ExpiresOn.DateTime - [datetime]::UtcNow.AddMinutes(-5) -le 0) {
         # if token expires within 5 minutes, request a new one
         Get-AuthToken
     }
