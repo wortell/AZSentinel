@@ -54,7 +54,14 @@ function Get-AzSentinelAlertRuleTemplates {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
+
+        try {
+            Get-LogAnalyticWorkspace @arguments -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRuleTemplates?api-version=2019-01-01-preview"
 
