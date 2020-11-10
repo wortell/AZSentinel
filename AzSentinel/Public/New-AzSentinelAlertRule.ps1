@@ -188,8 +188,14 @@ function New-AzSentinelAlertRule {
 
         Write-Verbose -Message "Creating new rule: $($DisplayName)"
 
-        $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName
-
+        try {
+            $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
+        
         if ($content) {
             Write-Verbose -Message "Rule $($DisplayName) exists in Azure Sentinel"
 
