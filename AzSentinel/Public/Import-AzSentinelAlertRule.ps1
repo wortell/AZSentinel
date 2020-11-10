@@ -114,8 +114,13 @@ function Import-AzSentinelAlertRule {
         Test All rules first
         #>
         $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
-        $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName)
-
+        try {
+            $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
         <#
             analytics rule
         #>

@@ -60,7 +60,13 @@ function Get-AzSentinelAlertRuleAction {
         }
 
         if ($RuleName) {
-            $alertId = (Get-AzSentinelAlertRule @arguments -RuleName $RuleName).name
+            try {
+                $alertId = (Get-AzSentinelAlertRule @arguments -RuleName $RuleName -ErrorAction Stop).name
+            }
+            catch {
+                Write-Error $_.Exception.Message
+                break
+            }
         }
         elseif ($RuleId) {
             $alertId = $RuleId

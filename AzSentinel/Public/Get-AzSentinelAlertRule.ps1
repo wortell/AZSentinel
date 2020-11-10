@@ -77,7 +77,13 @@ function Get-AzSentinelAlertRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
+        try {
+            Get-LogAnalyticWorkspace @arguments -ErrorAction Stop
+        }
+        catch {
+            Write-Error $_.Exception.Message
+            break
+        }
 
         $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules?api-version=2020-01-01"
         Write-Verbose -Message "Using URI: $($uri)"
@@ -120,7 +126,6 @@ function Get-AzSentinelAlertRule {
 
                             $_.properties | Add-Member -NotePropertyName playbookName -NotePropertyValue $playbookName -Force
                         }
-
 
                         $return += $_.properties
                     }

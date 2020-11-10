@@ -59,12 +59,18 @@ function Remove-AzSentinelHuntingRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
 
         if ($RuleName) {
             # remove defined rules
             foreach ($rule in $RuleName) {
-                $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule
+                try {
+                    $item = Get-AzSentinelHuntingRule @arguments -RuleName $rule -ErrorAction Stop
+                }
+                catch {
+                    Write-Error $_.Exception.Message
+                    break
+                }
+
                 if ($item) {
                     $uri = "$script:baseUri/savedSearches/$($item.name)?api-version=2017-04-26-preview"
 

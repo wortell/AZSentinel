@@ -69,7 +69,7 @@ function New-AzSentinelHuntingRule {
                 }
             }
         }
-        Get-LogAnalyticWorkspace @arguments
+        
 
         $item = @{ }
         $content = $null
