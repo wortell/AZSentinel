@@ -26,5 +26,4 @@ function precheck {
         'Content-Type' = 'application/json'
         Authorization  = 'Bearer ' + $script:accessToken.AccessToken
     }
-
 }
