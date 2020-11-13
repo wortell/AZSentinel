@@ -14,7 +14,7 @@ function precheck {
   NAME: precheck
   #>
 
-    if ($null -eq $script:accessToken) {
+    if ($null -eq [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile) {
         Get-AuthToken
     }
     elseif ($script:accessToken.ExpiresOn.DateTime - [datetime]::UtcNow.AddMinutes(-5) -le 0) {
@@ -22,8 +22,6 @@ function precheck {
         Get-AuthToken
     }
 
-    $script:authHeader = @{
-        'Content-Type' = 'application/json'
-        Authorization  = 'Bearer ' + $script:accessToken.AccessToken
-    }
+    # Set the subscription from AzContext
+    $script:subscriptionId = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext.Subscription.Id
 }
