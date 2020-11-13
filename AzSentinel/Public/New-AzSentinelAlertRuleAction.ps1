@@ -73,6 +73,7 @@ function New-AzSentinelAlertRuleAction {
 
         $action = $null
 
+
         if ($SubscriptionId) {
             $playBook = Get-AzSentinelPlayBook -SubscriptionId $SubscriptionId -Name $PlayBookName
         }
@@ -81,7 +82,6 @@ function New-AzSentinelAlertRuleAction {
         }
 
         $action = Get-AzSentinelAlertRuleAction @arguments -RuleId $alertId -ErrorAction SilentlyContinue
-
 
         if ($null -eq $action) {
             $guid = New-Guid
@@ -98,6 +98,7 @@ function New-AzSentinelAlertRuleAction {
             }
 
             $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions/$($guid)?api-version=2019-01-01-preview"
+
             try {
                 $return = Invoke-WebRequest -Method Put -Uri $uri -Headers $Script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
                 Write-Verbose "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
@@ -105,8 +106,8 @@ function New-AzSentinelAlertRuleAction {
             }
             catch {
                 Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Error: $($_.Exception.Message)"
-                return $_.Exception.Message
                 Write-Verbose $_.
+                return $_.Exception.Message
             }
         }
         elseif ((($action.properties.logicAppResourceId).Split('/')[-1]) -eq $PlayBookName) {
