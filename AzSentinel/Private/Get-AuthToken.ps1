@@ -15,23 +15,19 @@ function Get-AuthToken {
     param (
     )
 
-    if ([Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile) {
-        Write-Verbose -Message "Using Subscription: $($script:azContext.Subscription.Name) from tenant $($script:azContext.Tenant.Id)"
+    $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
 
-        $script:subscriptionId =[Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext.Subscription.Id
-        $script:tenantId = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext.Tenant.Id
+    Write-Verbose -Message "Using Subscription: $($azProfile.DefaultContext.Subscription.Name) from tenant $($azProfile.DefaultContext.Tenant.Id)"
 
-        $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
-        $profileClient = [Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient]::new($azProfile)
-        $script:accessToken = $profileClient.AcquireAccessToken($script:tenantId)
+    $script:subscriptionId = $azProfile.DefaultContext.Subscription.Id
+    $script:tenantId = $azProfile.DefaultContext.Tenant.Id
 
-        $script:authHeader = @{
-            'Content-Type' = 'application/json'
-            Authorization  = 'Bearer ' + $script:accessToken.AccessToken
-        }
+    $profileClient = [Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient]::new($azProfile)
+    $script:accessToken = $profileClient.AcquireAccessToken($script:tenantId)
 
+    $script:authHeader = @{
+        'Content-Type' = 'application/json'
+        Authorization  = 'Bearer ' + $script:accessToken.AccessToken
     }
-    else {
-        throw 'No subscription available, Please use Connect-AzAccount to login and select the right subscription'
-    }
+
 }

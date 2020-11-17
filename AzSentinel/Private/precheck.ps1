@@ -14,14 +14,22 @@ function precheck {
   NAME: precheck
   #>
 
-    if ($null -eq [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile) {
-        Get-AuthToken
-    }
-    elseif ($script:accessToken.ExpiresOn.DateTime - [datetime]::UtcNow.AddMinutes(-5) -le 0) {
-        # if token expires within 5 minutes, request a new one
-        Get-AuthToken
-    }
+    $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
 
-    # Set the subscription from AzContext
-    $script:subscriptionId = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext.Subscription.Id
+    if ($azProfile.Contexts.Count -ne 0) {
+        if ($null -eq $script:accessToken ) {
+            Get-AuthToken
+        }
+        elseif ($script:accessToken.ExpiresOn.DateTime - [datetime]::UtcNow.AddMinutes(-5) -le 0) {
+            # if token expires within 5 minutes, request a new one
+            Get-AuthToken
+        }
+
+        # Set the subscription from AzContext
+        $script:subscriptionId = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile.DefaultContext.Subscription.Id
+    }
+    else {
+        Write-Error 'No subscription available, Please use Connect-AzAccount to login and select the right subscription'
+        break
+    }
 }
