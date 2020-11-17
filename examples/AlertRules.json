@@ -17,7 +17,7 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "",
+      "playbookName": "Playbook01",
       "aggregationKind": "SingleAlert",
       "createIncident": true,
       "groupingConfiguration": {
@@ -50,7 +50,7 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": ""
+      "playbookName": "Playbook01"
     }
   ],
   "Fusion": [
