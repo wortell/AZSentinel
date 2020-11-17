@@ -20,7 +20,7 @@ function Get-AzSentinelPlayBook {
     param (
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string] $SubscriptionId,
+        [string]$SubscriptionId,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
