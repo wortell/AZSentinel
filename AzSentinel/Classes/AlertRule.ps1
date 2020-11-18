@@ -1,5 +1,5 @@
 class AlertRule {
-    [guid] $Name
+    [string] $Name
 
     [string] $Etag
 
