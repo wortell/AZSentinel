@@ -25,11 +25,11 @@ function Get-AzSentinelAlertRuleAction {
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
         [ValidateNotNullOrEmpty()]
-        [string] $SubscriptionId,
+        [string]$SubscriptionId,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string] $WorkspaceName,
+        [string]$WorkspaceName,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]

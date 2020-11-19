@@ -92,7 +92,11 @@ class ScheduledAlertProp {
         }
         $this.SuppressionEnabled = if ($suppressionEnabled) { $suppressionEnabled } else { $false }
         $this.Tactics = $Tactics
-        $this.PlaybookName = $PlaybookName
+        $this.PlaybookName = if ($PlaybookName.Split('/').count -gt 1){
+            $PlaybookName.Split('/')[-1]
+        } else {
+            $PlaybookName
+        }
         $this.IncidentConfiguration = $IncidentConfiguration
         $this.eventGroupingSettings = @{
             aggregationKind = if ($aggregationKind) { $aggregationKind } else { "SingleAlert" }

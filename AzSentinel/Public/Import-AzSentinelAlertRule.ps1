@@ -135,7 +135,7 @@ function Import-AzSentinelAlertRule {
 
             $guid = (New-Guid).Guid
 
-            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+            $content = $allRulesContent | Where-Object {$_.kind -eq 'Scheduled' -and $_.displayName -eq $item.displayName}
 
             Write-Verbose -Message "Get rule $($item.description)"
 
@@ -204,11 +204,11 @@ function Import-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
-                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($item.playbookName) -RuleId $($body.Name)
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
-                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $body.Name -Confirm:$false
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     else {
@@ -261,7 +261,7 @@ function Import-AzSentinelAlertRule {
 
             $guid = (New-Guid).Guid
 
-            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+            $content = $allRulesContent | Where-Object {$_.kind -eq 'Fusion' -and $_.displayName -eq $item.displayName}
 
             Write-Verbose -Message "Get rule $($item.description)"
 
@@ -314,7 +314,7 @@ function Import-AzSentinelAlertRule {
 
             $guid = (New-Guid).Guid
 
-            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+            $content = $allRulesContent | Where-Object {$_.kind -eq 'MLBehaviorAnalytics' -and $_.displayName -eq $item.displayName}
 
             Write-Verbose -Message "Get rule $($item.description)"
 
@@ -368,7 +368,7 @@ function Import-AzSentinelAlertRule {
 
             $guid = (New-Guid).Guid
 
-            $content = $allRulesContent | Where-Object displayName -eq $item.displayName
+            $content = $allRulesContent | Where-Object {$_.kind -eq 'MicrosoftSecurityIncidentCreation' -and $_.displayName -eq $item.displayName}
 
             Write-Verbose -Message "Get rule $($item.description)"
             $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction SilentlyContinue
