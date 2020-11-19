@@ -204,11 +204,11 @@ function Import-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
-                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($body.Properties.playbookName) -RuleId $($body.Name)
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($item.playbookName) -RuleId $($body.Name)
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
-                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $body.Name -Confirm:$false
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     else {

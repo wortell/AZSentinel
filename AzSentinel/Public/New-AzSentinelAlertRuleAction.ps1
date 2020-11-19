@@ -28,15 +28,15 @@ function New-AzSentinelAlertRuleAction {
         [Parameter(Mandatory = $false,
             ParameterSetName = "Sub")]
         [ValidateNotNullOrEmpty()]
-        [string] $SubscriptionId,
+        [string]$SubscriptionId,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string] $WorkspaceName,
+        [string]$WorkspaceName,
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string] $PlayBookName,
+        [string]$PlayBookName,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -73,6 +73,7 @@ function New-AzSentinelAlertRuleAction {
 
         $action = $null
 
+
         if ($SubscriptionId) {
             $playBook = Get-AzSentinelPlayBook -SubscriptionId $SubscriptionId -Name $PlayBookName
         }
@@ -82,8 +83,7 @@ function New-AzSentinelAlertRuleAction {
 
         $action = Get-AzSentinelAlertRuleAction @arguments -RuleId $alertId -ErrorAction SilentlyContinue
 
-
-        if ($null -eq $action) {
+        if (($null -eq $action) -or ((($action.properties.logicAppResourceId).Split('/')[-1]) -ne $PlayBookName.Split('/')[-1])) {
             $guid = New-Guid
 
             $body = @{
@@ -98,6 +98,7 @@ function New-AzSentinelAlertRuleAction {
             }
 
             $uri = "$($Script:baseUri)/providers/Microsoft.SecurityInsights/alertRules/$($alertId)/actions/$($guid)?api-version=2019-01-01-preview"
+
             try {
                 $return = Invoke-WebRequest -Method Put -Uri $uri -Headers $Script:authHeader -Body ($body | ConvertTo-Json -Depth 10)
                 Write-Verbose "Successfully created Action for Rule: $($RuleName) with Playbook $($PlayBookName) Status: $($return.StatusDescription)"
@@ -105,16 +106,14 @@ function New-AzSentinelAlertRuleAction {
             }
             catch {
                 Write-Error "Unable to create Action for Rule: $($RuleName) with Playbook $($PlayBookName) Error: $($_.Exception.Message)"
+                Write-Verbose $_
                 return $_.Exception.Message
-                Write-Verbose $_.
             }
         }
         elseif ((($action.properties.logicAppResourceId).Split('/')[-1]) -eq $PlayBookName) {
-            Write-Output "Alert Rule: $($alertId) has already playbook assigned: $(($action.properties.logicAppResourceId).Split('/')[-1])"
+            Write-Output "Alert Rule: $($alertId) is already assigned to playbook: $(($action.properties.logicAppResourceId).Split('/')[-1])"
         }
-        elseif ((($action.properties.logicAppResourceId).Split('/')[-1]) -ne $PlayBookName) {
-            Write-Output "Alert rule $($RuleName) assigned to a different playbook with name $(($action.properties.logicAppResourceId).Split('/')[-1])"
-        }
+
         else {
             #nothing?
         }
