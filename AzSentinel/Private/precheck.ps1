@@ -2,7 +2,7 @@
 #requires -version 6.2
 
 function precheck {
-    <#
+  <#
   .SYNOPSIS
   PreCheck
   .DESCRIPTION
