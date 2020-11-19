@@ -17,7 +17,7 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "Playbook01",
+      "playbookName": "playbook01",
       "aggregationKind": "SingleAlert",
       "createIncident": true,
       "groupingConfiguration": {
@@ -50,7 +50,7 @@
         "LateralMovement",
         "Collection"
       ],
-      "playbookName": "Playbook01"
+      "playbookName": "/subscriptions/SUBSCRIPTIONID/resourceGroups/RESOURCEGROUPNAME/providers/Microsoft.Logic/workflows/playbook02"
     }
   ],
   "Fusion": [
