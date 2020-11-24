@@ -3,4 +3,5 @@ enum GroupByEntities {
     Ip
     Host
     Url
+    FileHash
 }
