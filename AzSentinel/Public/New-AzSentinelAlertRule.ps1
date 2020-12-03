@@ -126,7 +126,7 @@ function New-AzSentinelAlertRule {
         [string[]]$Tactics,
 
         [Parameter(Mandatory = $false)]
-        [string[]]$PlaybookName = $null,
+        [string[]]$PlaybookName = '',
 
         [Parameter(Mandatory = $false)]
         [bool]$CreateIncident,
@@ -195,7 +195,7 @@ function New-AzSentinelAlertRule {
             Write-Error $_.Exception.Message
             break
         }
-        
+
         if ($content) {
             Write-Verbose -Message "Rule $($DisplayName) exists in Azure Sentinel"
 
@@ -271,12 +271,12 @@ function New-AzSentinelAlertRule {
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
                         foreach ($playbook in ($body.Properties.PlaybookName)) {
-                            New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Properties.Name) -confirm:$false
+                            $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Properties.Name) -confirm:$false
                             $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                         }
                     }
                     elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
-                        Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
+                        $PlaybookResult = Remove-AzSentinelAlertRuleAction @arguments -RuleId $($body.Name) -Confirm:$false
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     else {
