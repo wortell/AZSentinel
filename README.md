@@ -89,7 +89,8 @@ To create a Azure Sentinel Rule, use the following JSON format.
         "Account",
         "Ip",
         "Host",
-        "Url"
+        "Url",
+        "FileHash"
       ]
     }
   }
@@ -120,7 +121,7 @@ The following tables describe the values you need to set in the schema.
 | reopenClosedIncident         | bool   | false    | true, false                                                                                                                                                         | true                                                                                                                       |
 | lookbackDuration             | string | false    | Value must be between 5 minutes and 24 hours.                                                                                                                       | PT6H                                                                                                                       |
 | entitiesMatchingMethod       | string | false    | All, None, Custom                                                                                                                                                   | All                                                                                                                        |
-| groupByEntities              | string | false    | Account, Ip, Host, Url                                                                                                                                              | Account                                                                                                                    |
+| groupByEntities              | string | false    | Account, Ip, Host, Url, FileHash                                                                                                                                | Account                                                                                                                    |
 
 
 ### Fusion rule

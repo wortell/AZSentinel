@@ -24,7 +24,8 @@ Describe ScheduledAlertProp {
                     "Account",
                     "Ip",
                     "Host",
-                    "Url"
+                    "Url",
+                    "FileHash"
                 )
             )
             $groupingConfiguration | Should -Not -BeNullOrEmpty
@@ -42,7 +43,8 @@ Describe ScheduledAlertProp {
                     "Account",
                     "Ip",
                     "Host",
-                    "Url"
+                    "Url",
+                    "FileHash"
                 )
             )
             $groupingConfiguration | Should -Not -BeNullOrEmpty

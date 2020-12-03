@@ -29,7 +29,8 @@
           "Account",
           "Ip",
           "Host",
-          "Url"
+          "Url",
+          "FileHash"
         ]
       }
     },
