@@ -17,6 +17,14 @@
       "subscriptionId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e"
     }
   ],
+  "Office365": [
+    {
+      "exchange_state": "Enabled",
+      "sharepoint_state": "Enabled",
+      "teams_state": "Enabled",
+      "tenantId": "ebdab2f1-0b79-4181-a70d-82f0ff39243e"
+    }
+  ],
   "ThreatIntelligenceTaxii": [
     {
       "friendlyName": "testserver",

@@ -193,6 +193,94 @@ function Import-AzSentinelDataConnector {
             }
         }
 
+        # Office365 connector
+        foreach ($item in $connectors.Office365) {
+            if (-Not (Get-Member -InputObject $item -Name "tenantId" -MemberType Properties)) {
+                Write-Error "TenantId missing"
+                break
+            }
+
+            if ($null -ne $enabledDataConnectors){
+                $office365 = $enabledDataConnectors | Where-Object { $_.kind -eq "Office365" -and $_.properties.tenantId -eq $item.tenantId }
+            }
+            else {
+                $office365
+            }
+            $skip = $false
+
+            if ($null -ne $office365) {
+                if ($office365) {
+                    Write-Host "Office365 is already enabled on tenant '$($office365.properties.tenantId)'"
+                    $skip = $true
+                }
+                else {
+                    $connectorBody = @{
+                        id         = $office365.id
+                        name       = $office365.name
+                        etag       = $office365.etag
+                        type       = 'Microsoft.SecurityInsights/dataConnectors'
+                        kind       = 'Office365'
+                        properties = @{
+                            tenantId = $item.tenantId
+                            dataTypes = @{
+                                exchange = @{
+                                    state = $item.exchange_state
+                                }
+                                sharepoint = @{
+                                    state = $item.sharepoint_state
+                                }
+                                teams = @{
+                                    state = $item.teams_state
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                $guid = (New-Guid).Guid
+
+                $connectorBody = @{
+                    id         = "$script:Workspace/providers/Microsoft.SecurityInsights/dataConnectors/$guid"
+                    name       = $guid
+                    type       = 'Microsoft.SecurityInsights/dataConnectors'
+                    kind       = 'Office365'
+                    properties = @{
+                        tenantId = $item.tenantId
+                        dataTypes = @{
+                            exchange = @{
+                                state = $item.exchange_state
+                            }
+                            sharepoint = @{
+                                state = $item.sharepoint_state
+                            }
+                            teams = @{
+                                state = $item.teams_state
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($skip -eq $false) {
+                # Enable or update Office365 with http put method
+                $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/dataConnectors/$($connectorBody.name)?api-version=2020-01-01"
+
+                try {
+                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($connectorBody | ConvertTo-Json -Depth 4 -EnumsAsStrings)
+
+                    Write-Host "Successfully enabled Office365 with status: $($result.StatusDescription) for tenant '$($item.tenantId)'"
+
+                }
+                catch {
+                    $errorReturn = $_
+                    $errorResult = ($errorReturn | ConvertFrom-Json ).error
+                    Write-Verbose $_
+                    Write-Error "Unable to invoke webrequest with error message: $($errorResult.message)" -ErrorAction Stop
+                }
+            }
+        }
+
         #ThreatIntelligenceTaxii
         foreach ($item in $connectors.ThreatIntelligenceTaxii) {
             if ($enabledDataConnectors){
