@@ -1,4 +1,4 @@
-$Enums = @( Get-ChildItem -Path $PSScriptRoot\Enums\*.ps1 -ErrorAction SilentlyContinue )
+$Enums = @( Get-ChildItem -Path $PSScriptRoot\enums\*.ps1 -ErrorAction SilentlyContinue )
 Foreach ($import in @($Enums)) {
     Try {
         Write-Verbose "Importing $($import.FullName)"
