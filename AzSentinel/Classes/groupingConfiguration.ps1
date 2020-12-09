@@ -45,7 +45,8 @@ class GroupingConfiguration {
                 "Account",
                 "Ip",
                 "Host",
-                "Url"
+                "Url",
+                "FileHash"
             )
         }
     }
