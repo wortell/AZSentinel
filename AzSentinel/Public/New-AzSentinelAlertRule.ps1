@@ -150,7 +150,7 @@ function New-AzSentinelAlertRule {
         [Parameter(Mandatory = $false)]
         [AggregationKind]$AggregationKind,
 
-        #Fusion & MLBehaviorAnalytics
+        #Fusion & MLBehaviorAnalytics & Scheduled
         [Parameter(Mandatory = $false)]
         [string]$AlertRuleTemplateName,
 
@@ -233,24 +233,53 @@ function New-AzSentinelAlertRule {
                     $groupingConfiguration
                 )
 
-                $bodyAlertProp = [ScheduledAlertProp]::new(
-                    $item.name,
-                    $DisplayName,
-                    $Description,
-                    $Severity,
-                    $Enabled,
-                    $Query,
-                    $QueryFrequency,
-                    $QueryPeriod,
-                    $TriggerOperator,
-                    $TriggerThreshold,
-                    $SuppressionDuration,
-                    $SuppressionEnabled,
-                    $Tactics,
-                    $PlaybookName,
-                    $incidentConfiguration,
-                    $AggregationKind
-                )
+                if (($AlertRuleTemplateName -and ! $content) -or $content.AlertRuleTemplateName) {
+                    if ($content.AlertRuleTemplateName){
+                        <#
+                            If alertRule is already created with a TemplateName then Always use template name from existing rule.
+                            You can't attach existing scheduled rule to another templatename or remove the link to the template
+                        #>
+                        $AlertRuleTemplateName = $content.AlertRuleTemplateName
+                    }
+                    $bodyAlertProp = [ScheduledAlertProp]::new(
+                        $item.name,
+                        $DisplayName,
+                        $Description,
+                        $Severity,
+                        $Enabled,
+                        $Query,
+                        $QueryFrequency,
+                        $QueryPeriod,
+                        $TriggerOperator,
+                        $TriggerThreshold,
+                        $SuppressionDuration,
+                        $SuppressionEnabled,
+                        $Tactics,
+                        $PlaybookName,
+                        $incidentConfiguration,
+                        $AggregationKind,
+                        $AlertRuleTemplateName
+                    )
+                } else {
+                    $bodyAlertProp = [ScheduledAlertProp]::new(
+                        $item.name,
+                        $DisplayName,
+                        $Description,
+                        $Severity,
+                        $Enabled,
+                        $Query,
+                        $QueryFrequency,
+                        $QueryPeriod,
+                        $TriggerOperator,
+                        $TriggerThreshold,
+                        $SuppressionDuration,
+                        $SuppressionEnabled,
+                        $Tactics,
+                        $PlaybookName,
+                        $incidentConfiguration,
+                        $AggregationKind
+                    )
+                }
 
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Scheduled')
             }
@@ -294,10 +323,10 @@ function New-AzSentinelAlertRule {
                     $body.Properties | Add-Member -NotePropertyName Kind -NotePropertyValue "Scheduled" -Force
                     $return += $body.Properties
 
-                    return $return
-
                     Write-Verbose $_
                     Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
+
+                    return $return
                 }
             }
             else {
