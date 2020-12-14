@@ -2,6 +2,7 @@
   "Scheduled": [
     {
       "displayName": "AlertRule01",
+      "AlertRuleTemplateName": "826bb2f8-7894-4785-9a6b-a8a855d8366f",
       "description": "",
       "severity": "Medium",
       "enabled": true,
@@ -37,6 +38,7 @@
     {
       "displayName": "AlertRule02",
       "description": "",
+      "AlertRuleTemplateName": "",
       "severity": "Medium",
       "enabled": true,
       "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
@@ -52,6 +54,24 @@
         "Collection"
       ],
       "playbookName": "/subscriptions/SUBSCRIPTIONID/resourceGroups/RESOURCEGROUPNAME/providers/Microsoft.Logic/workflows/playbook02"
+    },
+    {
+      "displayName": "AlertRule03",
+      "description": "",
+      "severity": "Medium",
+      "enabled": true,
+      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+      "queryFrequency": "5H",
+      "queryPeriod": "6H",
+      "triggerOperator": "GreaterThan",
+      "triggerThreshold": 5,
+      "suppressionDuration": "6H",
+      "suppressionEnabled": false,
+      "tactics": [
+        "Persistence",
+        "LateralMovement",
+        "Collection"
+      ]
     }
   ],
   "Fusion": [

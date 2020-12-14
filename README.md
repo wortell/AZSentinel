@@ -63,6 +63,7 @@ To create a Azure Sentinel Rule, use the following JSON format.
   {
     "displayName": "string",
     "description": "string",
+    "AlertRuleTemplateName": "string",
     "severity": "High",
     "enabled": true,
     "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
@@ -122,7 +123,7 @@ The following tables describe the values you need to set in the schema.
 | lookbackDuration             | string | false    | Value must be between 5 minutes and 24 hours.                                                                                                                       | PT6H                                                                                                                       |
 | entitiesMatchingMethod       | string | false    | All, None, Custom                                                                                                                                                   | All                                                                                                                        |
 | groupByEntities              | string | false    | Account, Ip, Host, Url, FileHash                                                                                                                                | Account                                                                                                                    |
-
+| AlertRuleTemplateName | string | false | Name of the alert rule template | 826bb2f8-7894-4785-9a6b-a8a855d8366f |
 
 ### Fusion rule
 ```JSON
@@ -196,7 +197,6 @@ The following tables describe the values you need to set in the schema.
 | severitiesFilter   | string | true     | High, Medium, Low | High                                                                                         |
 | displayNamesFilter | string | false    |                   |                                                                                              |
 |                    |        |          |                   |                                                                                              |
-
 
 
 ## Find us
