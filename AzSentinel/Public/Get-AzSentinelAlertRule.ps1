@@ -113,6 +113,13 @@ function Get-AzSentinelAlertRule {
                         $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
                         $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
 
+                        # Updating incidentConfiguration output to match JSON input
+                        if ($_.properties.kind -eq 'Scheduled'){
+                            $_.properties | Add-Member -NotePropertyName createIncident -NotePropertyValue $_.properties.incidentConfiguration.createIncident -Force
+                            $_.properties | Add-Member -NotePropertyName groupingConfiguration -NotePropertyValue $_.properties.incidentConfiguration.groupingConfiguration -Force
+                            $_.properties.PSObject.Properties.Remove('incidentConfiguration')
+                        }
+
                         if (! $SkipPlaybook) {
 
                             $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
@@ -141,6 +148,13 @@ function Get-AzSentinelAlertRule {
                         $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
                         $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
 
+                        # Updating incidentConfiguration output to match JSON input
+                        if ($_.properties.kind -eq 'Scheduled'){
+                            $_.properties | Add-Member -NotePropertyName createIncident -NotePropertyValue $_.properties.incidentConfiguration.createIncident -Force
+                            $_.properties | Add-Member -NotePropertyName groupingConfiguration -NotePropertyValue $_.properties.incidentConfiguration.groupingConfiguration -Force
+                            $_.properties.PSObject.Properties.Remove('incidentConfiguration')
+                        }
+
                         if (! $SkipPlaybook) {
 
                             $playbook = Get-AzSentinelAlertRuleAction @arguments -RuleId $_.name
@@ -166,6 +180,13 @@ function Get-AzSentinelAlertRule {
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                     $_.properties | Add-Member -NotePropertyName id -NotePropertyValue $_.id -Force
                     $_.properties | Add-Member -NotePropertyName kind -NotePropertyValue $_.kind -Force
+
+                    # Updating incidentConfiguration output to match JSON input
+                    if ($_.properties.kind -eq 'Scheduled'){
+                        $_.properties | Add-Member -NotePropertyName createIncident -NotePropertyValue $_.properties.incidentConfiguration.createIncident -Force
+                        $_.properties | Add-Member -NotePropertyName groupingConfiguration -NotePropertyValue $_.properties.incidentConfiguration.groupingConfiguration -Force
+                        $_.properties.PSObject.Properties.Remove('incidentConfiguration')
+                    }
 
                     if (! $SkipPlaybook) {
 

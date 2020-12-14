@@ -169,24 +169,54 @@ function Import-AzSentinelAlertRule {
                     $item.createIncident,
                     $groupingConfiguration
                 )
-                $bodyAlertProp = [ScheduledAlertProp]::new(
-                    $item.name,
-                    $item.displayName,
-                    $item.description,
-                    $item.severity,
-                    $item.enabled,
-                    $item.query,
-                    $item.queryFrequency,
-                    $item.queryPeriod,
-                    $item.triggerOperator,
-                    $item.triggerThreshold,
-                    $item.suppressionDuration,
-                    $item.suppressionEnabled,
-                    $item.Tactics,
-                    $item.playbookName,
-                    $IncidentConfiguration,
-                    $item.aggregationKind
-                )
+
+                if (($item.AlertRuleTemplateName -and ! $content) -or $content.AlertRuleTemplateName){
+                    if ($content.AlertRuleTemplateName){
+                        <#
+                            If alertRule is already created with a TemplateName then Always use template name from existing rule.
+                            You can't attach existing scheduled rule to another templatename or remove the link to the template
+                        #>
+                        $item | Add-Member -NotePropertyName AlertRuleTemplateName -NotePropertyValue $content.AlertRuleTemplateName -Force
+                    }
+                    $bodyAlertProp = [ScheduledAlertProp]::new(
+                        $item.name,
+                        $item.displayName,
+                        $item.description,
+                        $item.severity,
+                        $item.enabled,
+                        $item.query,
+                        $item.queryFrequency,
+                        $item.queryPeriod,
+                        $item.triggerOperator,
+                        $item.triggerThreshold,
+                        $item.suppressionDuration,
+                        $item.suppressionEnabled,
+                        $item.Tactics,
+                        $item.playbookName,
+                        $IncidentConfiguration,
+                        $item.aggregationKind,
+                        $item.AlertRuleTemplateName
+                    )
+                } else {
+                    $bodyAlertProp = [ScheduledAlertProp]::new(
+                        $item.name,
+                        $item.displayName,
+                        $item.description,
+                        $item.severity,
+                        $item.enabled,
+                        $item.query,
+                        $item.queryFrequency,
+                        $item.queryPeriod,
+                        $item.triggerOperator,
+                        $item.triggerThreshold,
+                        $item.suppressionDuration,
+                        $item.suppressionEnabled,
+                        $item.Tactics,
+                        $item.playbookName,
+                        $IncidentConfiguration,
+                        $item.aggregationKind
+                    )
+                }
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Scheduled')
             }
             catch {
