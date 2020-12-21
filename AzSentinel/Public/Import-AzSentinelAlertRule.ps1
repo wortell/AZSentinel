@@ -113,29 +113,42 @@ function Import-AzSentinelAlertRule {
         <#
         Test All rules first
         #>
-        $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
-        try {
-            $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
+        if($rules.analytics -or $rules.Scheduled -or $rules.fusion -or $rules.MLBehaviorAnalytics -or $rules.MicrosoftSecurityIncidentCreation)
+        {
+            $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
+            try {
+                Write-Verbose -Message "$($allRules.displayName)"
+                $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
+            }
+            catch {
+                Write-Error $_.Exception.Message
+                break
+            }
         }
-        catch {
-            Write-Error $_.Exception.Message
-            break
-        }
+        
         <#
             analytics rule
         #>
         if ($rules.analytics) {
             $scheduled = $rules.analytics
         }
-        else {
+        elseif ($rules.Scheduled){
             $scheduled = $rules.Scheduled
+        }
+        else{
+            $scheduled = $rules
         }
         foreach ($item in $scheduled) {
             Write-Verbose -Message "Started with rule: $($item.displayName)"
 
             $guid = (New-Guid).Guid
-
-            $content = $allRulesContent | Where-Object {$_.kind -eq 'Scheduled' -and $_.displayName -eq $item.displayName}
+            if($allRulesContent)
+            {
+                $content = $allRulesContent | Where-Object {$_.kind -eq 'Scheduled' -and $_.displayName -eq $item.displayName}
+            }
+            else{
+                $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction Stop
+            }
 
             Write-Verbose -Message "Get rule $($item.description)"
 
