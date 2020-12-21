@@ -135,6 +135,7 @@ function Import-AzSentinelAlertRule {
         elseif ($rules.Scheduled){
             $scheduled = $rules.Scheduled
         }
+        # Take the raw rule configuration if it is not nested in "analytics", "Scheduled", "fusion", "MLBehaviorAnalytics" or "MicrosoftIncidentCreation"
         else{
             $scheduled = $rules
         }
