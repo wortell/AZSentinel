@@ -157,16 +157,17 @@ function Import-AzSentinelAlertRule {
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
             }
 
+            # The official API schema indicates that the grouping configuration is part of the incident configuration
             try {
                 $groupingConfiguration = [GroupingConfiguration]::new(
-                    $item.groupingConfiguration.enabled,
-                    $item.groupingConfiguration.reopenClosedIncident,
-                    $item.groupingConfiguration.lookbackDuration,
-                    $item.groupingConfiguration.entitiesMatchingMethod,
-                    $item.groupingConfiguration.groupByEntities
+                    $item.incidentConfiguration.groupingConfiguration.enabled,
+                    $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
+                    $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
+                    $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
+                    $item.incidentConfiguration.groupingConfiguration.groupByEntities
                 )
-                $IncidentConfiguration = [IncidentConfiguration]::new(
-                    $item.createIncident,
+                $incidentConfiguration = [IncidentConfiguration]::new(
+                    $item.incidentConfiguration.createIncident,
                     $groupingConfiguration
                 )
 
@@ -193,7 +194,7 @@ function Import-AzSentinelAlertRule {
                         $item.suppressionEnabled,
                         $item.Tactics,
                         $item.playbookName,
-                        $IncidentConfiguration,
+                        $incidentConfiguration,
                         $item.aggregationKind,
                         $item.AlertRuleTemplateName
                     )
@@ -213,7 +214,7 @@ function Import-AzSentinelAlertRule {
                         $item.suppressionEnabled,
                         $item.Tactics,
                         $item.playbookName,
-                        $IncidentConfiguration,
+                        $incidentConfiguration,
                         $item.aggregationKind
                     )
                 }
