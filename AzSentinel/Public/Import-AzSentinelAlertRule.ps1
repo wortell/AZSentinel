@@ -117,7 +117,7 @@ function Import-AzSentinelAlertRule {
         {
             $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
             try {
-                Write-Verbose -Message "$($allRules.displayName)"
+                Write-Verbose -Message "Found $($allRules.displayName.Count) rules in the settings file."
                 $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
             }
             catch {
@@ -127,18 +127,20 @@ function Import-AzSentinelAlertRule {
         }
         
         <#
-            analytics rule
+            Analytics rule
+            Take the raw rule configuration if it is not nested in "analytics", "Scheduled", "fusion", "MLBehaviorAnalytics" or "MicrosoftIncidentCreation"
         #>
-        if ($rules.analytics) {
-            $scheduled = $rules.analytics
-        }
-        elseif ($rules.Scheduled){
-            $scheduled = $rules.Scheduled
-        }
-        # Take the raw rule configuration if it is not nested in "analytics", "Scheduled", "fusion", "MLBehaviorAnalytics" or "MicrosoftIncidentCreation"
-        else{
+        if (-not $rules.analytics -and -not $rules.Scheduled -and -not $rules.fusion -and -not $rules.MLBehaviorAnalytics -and -not $rules.MicrosoftSecurityIncidentCreation){
+            Write-Verbose -Message "Settings file is not nested in root schema, using raw configuration."
             $scheduled = $rules
         }
+        elseif ($rules.analytics) {
+            $scheduled = $rules.analytics
+        }
+        else{
+            $scheduled = $rules.Scheduled
+        }
+        
         foreach ($item in $scheduled) {
             Write-Verbose -Message "Started with rule: $($item.displayName)"
 
@@ -173,18 +175,35 @@ function Import-AzSentinelAlertRule {
 
             # The official API schema indicates that the grouping configuration is part of the incident configuration
             try {
-                $groupingConfiguration = [GroupingConfiguration]::new(
-                    $item.incidentConfiguration.groupingConfiguration.enabled,
-                    $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
-                    $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
-                    $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
-                    $item.incidentConfiguration.groupingConfiguration.groupByEntities
-                )
-                $incidentConfiguration = [IncidentConfiguration]::new(
-                    $item.incidentConfiguration.createIncident,
-                    $groupingConfiguration
-                )
-
+                # Added if/else statement for backwards compatibility
+                if($item.incidentConfiguration){
+                    $groupingConfiguration = [GroupingConfiguration]::new(
+                        $item.incidentConfiguration.groupingConfiguration.enabled,
+                        $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
+                        $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
+                        $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
+                        $item.incidentConfiguration.groupingConfiguration.groupByEntities
+                    )
+                    $incidentConfiguration = [IncidentConfiguration]::new(
+                        $item.incidentConfiguration.createIncident,
+                        $groupingConfiguration
+                    )
+                }
+                else{
+                    $groupingConfiguration = [GroupingConfiguration]::new(
+                        $item.groupingConfiguration.enabled,
+                        $item.groupingConfiguration.reopenClosedIncident,
+                        $item.groupingConfiguration.lookbackDuration,
+                        $item.groupingConfiguration.entitiesMatchingMethod,
+                        $item.groupingConfiguration.groupByEntities
+                    )
+                    $incidentConfiguration = [IncidentConfiguration]::new(
+                        $item.createIncident,
+                        $groupingConfiguration
+                    )
+                    Write-Warning -Message "`"$($item.displayName)`" configuration is not following the official API schema, consider updating the incident and grouping configuration."
+                }
+                
                 if (($item.AlertRuleTemplateName -and ! $content) -or $content.AlertRuleTemplateName){
                     if ($content.AlertRuleTemplateName){
                         <#
