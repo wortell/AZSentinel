@@ -80,19 +80,21 @@ To create a Azure Sentinel Rule, use the following JSON format.
     ],
     "playbookName": "string",
     "aggregationKind": "string",
-    "createIncident": true,
-    "groupingConfiguration": {
-      "GroupingConfigurationEnabled": true,
-      "reopenClosedIncident": true,
-      "lookbackDuration": "PT6H",
-      "entitiesMatchingMethod": "string",
-      "groupByEntities": [
-        "Account",
-        "Ip",
-        "Host",
-        "Url",
-        "FileHash"
-      ]
+    "incidentConfiguration": {
+      "createIncident": true,
+      "groupingConfiguration": {
+        "GroupingConfigurationEnabled": true,
+        "reopenClosedIncident": true,
+        "lookbackDuration": "PT6H",
+        "entitiesMatchingMethod": "string",
+        "groupByEntities": [
+          "Account",
+          "Ip",
+          "Host",
+          "Url",
+          "FileHash"
+        ]
+      }
     }
   }
 ```

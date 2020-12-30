@@ -20,7 +20,7 @@ New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-Kin
  [-Tactics <String[]>] [-PlaybookName <String[]>] [-CreateIncident <Boolean>]
  [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>] [-LookbackDuration <String>]
  [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>] [-AggregationKind <AggregationKind>]
- [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <String>]
+ [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <Severity[]>]
  [-DisplayNamesFilter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
@@ -439,9 +439,10 @@ Accept wildcard characters: False
 The alerts' severities on which the cases will be generated
 
 ```yaml
-Type: String
+Type: Severity[]
 Parameter Sets: (All)
 Aliases:
+Accepted values: Medium, High, Low, Informational
 
 Required: False
 Position: Named
