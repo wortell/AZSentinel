@@ -20,7 +20,7 @@ New-AzSentinelAlertRule [-SubscriptionId <String>] -WorkspaceName <String> [-Kin
  [-Tactics <String[]>] [-PlaybookName <String[]>] [-CreateIncident <Boolean>]
  [-GroupingConfigurationEnabled <Boolean>] [-ReopenClosedIncident <Boolean>] [-LookbackDuration <String>]
  [-EntitiesMatchingMethod <MatchingMethod>] [-GroupByEntities <String[]>] [-AggregationKind <AggregationKind>]
- [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <String>]
+ [-AlertRuleTemplateName <String>] [-ProductFilter <String>] [-SeveritiesFilter <Severity[]>]
  [-DisplayNamesFilter <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
@@ -59,7 +59,7 @@ Example on how to create a MicrosoftSecurityIncidentCreation rule
 Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -74,7 +74,7 @@ Accept wildcard characters: False
 Enter the Workspace name
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -105,7 +105,7 @@ Accept wildcard characters: False
 The display name for alerts created by this alert rule.
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -120,7 +120,7 @@ Accept wildcard characters: False
 The description of the alert rule.
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -151,7 +151,7 @@ Accept wildcard characters: False
 Determines whether this alert rule is enabled or disabled.
 
 ```yaml
-Type: Boolean
+Type: System.Boolean
 Parameter Sets: (All)
 Aliases:
 
@@ -166,7 +166,7 @@ Accept wildcard characters: False
 The query that creates alerts for this rule.
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -181,7 +181,7 @@ Accept wildcard characters: False
 Enter the query frequency, example: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -196,7 +196,7 @@ Accept wildcard characters: False
 Enter the query period, exmaple: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -227,7 +227,7 @@ Accept wildcard characters: False
 Enter the trigger treshold
 
 ```yaml
-Type: Int32
+Type: System.Int32
 Parameter Sets: (All)
 Aliases:
 
@@ -242,7 +242,7 @@ Accept wildcard characters: False
 Enter the suppression duration, example: 5H, 5M, 5D (H stands for Hour, M stands for Minute and D stands for Day)
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -257,7 +257,7 @@ Accept wildcard characters: False
 Set $true to enable Suppression or $false to disable Suppression
 
 ```yaml
-Type: Boolean
+Type: System.Boolean
 Parameter Sets: (All)
 Aliases:
 
@@ -272,7 +272,7 @@ Accept wildcard characters: False
 Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
 
 ```yaml
-Type: String[]
+Type: System.String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -287,7 +287,7 @@ Accept wildcard characters: False
 Enter the Logic App name that you want to configure as playbook trigger
 
 ```yaml
-Type: String[]
+Type: System.String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -302,7 +302,7 @@ Accept wildcard characters: False
 Create incidents from alerts triggered by this analytics rule
 
 ```yaml
-Type: Boolean
+Type: System.Boolean
 Parameter Sets: (All)
 Aliases:
 
@@ -317,7 +317,7 @@ Accept wildcard characters: False
 Group related alerts, triggered by this analytics rule, into incidents
 
 ```yaml
-Type: Boolean
+Type: System.Boolean
 Parameter Sets: (All)
 Aliases:
 
@@ -332,7 +332,7 @@ Accept wildcard characters: False
 Re-open closed matching incidents
 
 ```yaml
-Type: Boolean
+Type: System.Boolean
 Parameter Sets: (All)
 Aliases:
 
@@ -347,7 +347,7 @@ Accept wildcard characters: False
 Limit the group to alerts created within the selected time frame
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -378,7 +378,7 @@ Accept wildcard characters: False
 Grouping alerts into a single incident if the selected entities match:
 
 ```yaml
-Type: String[]
+Type: System.String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -409,7 +409,7 @@ Accept wildcard characters: False
 The Name of the alert rule template used to create this rule
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -424,7 +424,7 @@ Accept wildcard characters: False
 The alerts' productName on which the cases will be generated
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -439,9 +439,10 @@ Accept wildcard characters: False
 The alerts' severities on which the cases will be generated
 
 ```yaml
-Type: String
+Type: Severity[]
 Parameter Sets: (All)
 Aliases:
+Accepted values: Medium, High, Low, Informational
 
 Required: False
 Position: Named
@@ -454,7 +455,7 @@ Accept wildcard characters: False
 The alerts' displayNames on which the cases will be generated
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -470,7 +471,7 @@ Shows what would happen if the cmdlet runs.
 The cmdlet is not run.
 
 ```yaml
-Type: SwitchParameter
+Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
 Aliases: wi
 
@@ -485,7 +486,7 @@ Accept wildcard characters: False
 Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: SwitchParameter
+Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
 

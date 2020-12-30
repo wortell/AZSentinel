@@ -34,7 +34,7 @@ This example will get the Workspace ands return the full data object
 Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -49,7 +49,7 @@ Accept wildcard characters: False
 Enter the Workspace name
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -64,7 +64,7 @@ Accept wildcard characters: False
 Enter the name of the Alert rule
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -79,7 +79,7 @@ Accept wildcard characters: False
 Enter the Rule Id to skip Get-AzSentinelAlertRule step
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
