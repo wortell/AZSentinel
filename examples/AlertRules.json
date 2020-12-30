@@ -20,19 +20,21 @@
       ],
       "playbookName": "playbook01",
       "aggregationKind": "SingleAlert",
-      "createIncident": true,
-      "groupingConfiguration": {
-        "enabled": false,
-        "reopenClosedIncident": false,
-        "lookbackDuration": "PT5H",
-        "entitiesMatchingMethod": "All",
-        "groupByEntities": [
-          "Account",
-          "Ip",
-          "Host",
-          "Url",
-          "FileHash"
-        ]
+      "incidentConfiguration": {
+        "createIncident": true,
+        "groupingConfiguration": {
+          "enabled": false,
+          "reopenClosedIncident": false,
+          "lookbackDuration": "PT5H",
+          "entitiesMatchingMethod": "All",
+          "groupByEntities": [
+            "Account",
+            "Ip",
+            "Host",
+            "Url",
+            "FileHash"
+          ]
+        }
       }
     },
     {
@@ -53,6 +55,20 @@
         "LateralMovement",
         "Collection"
       ],
+      "createIncident": true,
+      "groupingConfiguration": {
+        "enabled": false,
+        "reopenClosedIncident": false,
+        "lookbackDuration": "PT5H",
+        "entitiesMatchingMethod": "All",
+        "groupByEntities": [
+          "Account",
+          "Ip",
+          "Host",
+          "Url",
+          "FileHash"
+        ]
+      },
       "playbookName": "/subscriptions/SUBSCRIPTIONID/resourceGroups/RESOURCEGROUPNAME/providers/Microsoft.Logic/workflows/playbook02"
     },
     {

@@ -300,7 +300,7 @@ function New-AzSentinelAlertRule {
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
                         foreach ($playbook in ($body.Properties.PlaybookName)) {
-                            $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Properties.Name) -confirm:$false
+                            $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Name) -confirm:$false
                             $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                         }
                     }
@@ -336,7 +336,7 @@ function New-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
                     if (($body.Properties.PlaybookName)) {
                         foreach ($playbook in ($body.Properties.PlaybookName)) {
-                            New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Properties.Name) -confirm:$false
+                            New-AzSentinelAlertRuleAction @arguments -PlayBookName $playbook -RuleId $($body.Name) -confirm:$false
                             $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                         }
                     }

@@ -47,7 +47,7 @@ In this example you can select multiple JSON files and Pipeline it to the Settin
 Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -62,7 +62,7 @@ Accept wildcard characters: False
 Enter the Workspace name
 
 ```yaml
-Type: String
+Type: System.String
 Parameter Sets: (All)
 Aliases:
 
@@ -77,7 +77,7 @@ Accept wildcard characters: False
 Path to the JSON or YAML file for the Hunting rules
 
 ```yaml
-Type: FileInfo
+Type: System.IO.FileInfo
 Parameter Sets: (All)
 Aliases:
 
@@ -93,7 +93,7 @@ Shows what would happen if the cmdlet runs.
 The cmdlet is not run.
 
 ```yaml
-Type: SwitchParameter
+Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
 Aliases: wi
 
@@ -108,7 +108,7 @@ Accept wildcard characters: False
 Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: SwitchParameter
+Type: System.Management.Automation.SwitchParameter
 Parameter Sets: (All)
 Aliases: cf
 

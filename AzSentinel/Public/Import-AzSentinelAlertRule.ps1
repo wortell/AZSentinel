@@ -113,29 +113,45 @@ function Import-AzSentinelAlertRule {
         <#
         Test All rules first
         #>
-        $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
-        try {
-            $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
+        if($rules.analytics -or $rules.Scheduled -or $rules.fusion -or $rules.MLBehaviorAnalytics -or $rules.MicrosoftSecurityIncidentCreation)
+        {
+            $allRules = $rules.analytics + $rules.Scheduled + $rules.fusion + $rules.MLBehaviorAnalytics + $rules.MicrosoftSecurityIncidentCreation | Select-Object displayName
+            try {
+                Write-Verbose -Message "Found $($allRules.displayName.Count) rules in the settings file."
+                $allRulesContent = Get-AzSentinelAlertRule @arguments -RuleName $($allRules.displayName) -ErrorAction Stop
+            }
+            catch {
+                Write-Error $_.Exception.Message
+                break
+            }
         }
-        catch {
-            Write-Error $_.Exception.Message
-            break
-        }
+        
         <#
-            analytics rule
+            Analytics rule
+            Take the raw rule configuration if it is not nested in "analytics", "Scheduled", "fusion", "MLBehaviorAnalytics" or "MicrosoftIncidentCreation"
         #>
-        if ($rules.analytics) {
+        if (-not $rules.analytics -and -not $rules.Scheduled -and -not $rules.fusion -and -not $rules.MLBehaviorAnalytics -and -not $rules.MicrosoftSecurityIncidentCreation){
+            Write-Verbose -Message "Settings file is not nested in root schema, using raw configuration."
+            $scheduled = $rules
+        }
+        elseif ($rules.analytics) {
             $scheduled = $rules.analytics
         }
-        else {
+        else{
             $scheduled = $rules.Scheduled
         }
+        
         foreach ($item in $scheduled) {
             Write-Verbose -Message "Started with rule: $($item.displayName)"
 
             $guid = (New-Guid).Guid
-
-            $content = $allRulesContent | Where-Object {$_.kind -eq 'Scheduled' -and $_.displayName -eq $item.displayName}
+            if($allRulesContent)
+            {
+                $content = $allRulesContent | Where-Object {$_.kind -eq 'Scheduled' -and $_.displayName -eq $item.displayName}
+            }
+            else{
+                $content = Get-AzSentinelAlertRule @arguments -RuleName $($item.displayName) -ErrorAction Stop
+            }
 
             Write-Verbose -Message "Get rule $($item.description)"
 
@@ -157,19 +173,37 @@ function Import-AzSentinelAlertRule {
                 $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
             }
 
+            # The official API schema indicates that the grouping configuration is part of the incident configuration
             try {
-                $groupingConfiguration = [GroupingConfiguration]::new(
-                    $item.groupingConfiguration.enabled,
-                    $item.groupingConfiguration.reopenClosedIncident,
-                    $item.groupingConfiguration.lookbackDuration,
-                    $item.groupingConfiguration.entitiesMatchingMethod,
-                    $item.groupingConfiguration.groupByEntities
-                )
-                $IncidentConfiguration = [IncidentConfiguration]::new(
-                    $item.createIncident,
-                    $groupingConfiguration
-                )
-
+                # Added if/else statement for backwards compatibility
+                if($item.incidentConfiguration){
+                    $groupingConfiguration = [GroupingConfiguration]::new(
+                        $item.incidentConfiguration.groupingConfiguration.enabled,
+                        $item.incidentConfiguration.groupingConfiguration.reopenClosedIncident,
+                        $item.incidentConfiguration.groupingConfiguration.lookbackDuration,
+                        $item.incidentConfiguration.groupingConfiguration.entitiesMatchingMethod,
+                        $item.incidentConfiguration.groupingConfiguration.groupByEntities
+                    )
+                    $incidentConfiguration = [IncidentConfiguration]::new(
+                        $item.incidentConfiguration.createIncident,
+                        $groupingConfiguration
+                    )
+                }
+                else{
+                    $groupingConfiguration = [GroupingConfiguration]::new(
+                        $item.groupingConfiguration.enabled,
+                        $item.groupingConfiguration.reopenClosedIncident,
+                        $item.groupingConfiguration.lookbackDuration,
+                        $item.groupingConfiguration.entitiesMatchingMethod,
+                        $item.groupingConfiguration.groupByEntities
+                    )
+                    $incidentConfiguration = [IncidentConfiguration]::new(
+                        $item.createIncident,
+                        $groupingConfiguration
+                    )
+                    Write-Warning -Message "`"$($item.displayName)`" configuration is not following the official API schema, consider updating the incident and grouping configuration."
+                }
+                
                 if (($item.AlertRuleTemplateName -and ! $content) -or $content.AlertRuleTemplateName){
                     if ($content.AlertRuleTemplateName){
                         <#
@@ -193,7 +227,7 @@ function Import-AzSentinelAlertRule {
                         $item.suppressionEnabled,
                         $item.Tactics,
                         $item.playbookName,
-                        $IncidentConfiguration,
+                        $incidentConfiguration,
                         $item.aggregationKind,
                         $item.AlertRuleTemplateName
                     )
@@ -213,7 +247,7 @@ function Import-AzSentinelAlertRule {
                         $item.suppressionEnabled,
                         $item.Tactics,
                         $item.playbookName,
-                        $IncidentConfiguration,
+                        $incidentConfiguration,
                         $item.aggregationKind
                     )
                 }
@@ -234,7 +268,7 @@ function Import-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                     if (($compareResult | Where-Object PropertyName -eq "playbookName").DiffValue) {
-                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName ($item.playbookName) -RuleId $($body.Name)
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $($item.playbookName) -RuleId $($body.Name)
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
                     elseif (($compareResult | Where-Object PropertyName -eq "playbookName").RefValue) {
@@ -264,7 +298,7 @@ function Import-AzSentinelAlertRule {
                     $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | Select-Object * -ExcludeProperty Properties.PlaybookName | ConvertTo-Json -Depth 10 -EnumsAsStrings)
 
                     if ($body.Properties.playbookName) {
-                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $($body.Properties.playbookName) -RuleId $($body.Properties.Name) -confirm:$false
+                        $PlaybookResult = New-AzSentinelAlertRuleAction @arguments -PlayBookName $($item.playbookName) -RuleId $($body.Name) -confirm:$false
                         $body.Properties | Add-Member -NotePropertyName PlaybookStatus -NotePropertyValue $PlaybookResult -Force
                     }
 
