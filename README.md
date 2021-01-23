@@ -212,13 +212,11 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Contributors
 
-* A big thank you goes out to [@bgelens](https://github.com/bgelens) and [@MauRiEEZZZ](https://github.com/MauRiEEZZZ) for their contributions!
+* A big thank you goes out to all the [contributors](https://github.com/wortell/AzSentinel/contributors) for their contributions!
 
 ## Authors
 
 * **Pouyan Khabazi** - *Developer and Maintainer* - [GitHub](https://github.com/pkhabazi) / [Blog](https://pkm-technology.com)
-
-See also the list of [contributors](https://github.com/wortell/AzSentinel/contributors) who participated in this project.
 
 ## Versioning
 
