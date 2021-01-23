@@ -85,7 +85,7 @@ function Get-AzSentinelIncident {
             break
         }
 
-        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/Cases?api-version=2019-01-01-preview"
+        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
@@ -126,7 +126,7 @@ function Get-AzSentinelIncident {
             }
             elseif ($CaseNumber.Count -ge 1) {
                 foreach ($rule in $CaseNumber) {
-                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.caseNumber -eq $rule }
+                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.incidentNumber -eq $rule }
 
                     if ($null -ne $temp) {
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
