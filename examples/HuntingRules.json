@@ -1,9 +1,9 @@
 {
   "Hunting": [
     {
-      "displayName": "HuntingRule01",
-      "description": "test",
-      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+      "displayName": "HuntingRule01111",
+      "description": "test ewfwef",
+      "query": "SecurityEvent ",
       "tactics": [
         "Persistence",
         "LateralMovement",
@@ -12,8 +12,8 @@
     },
     {
       "displayName": "HuntingRule02",
-      "description": "test",
-      "query": "SecurityEvent | where EventID == \"4688\" | where CommandLine contains \"-noni -ep bypass $\"",
+      "description": "test2",
+      "query": "SecurityEvent",
       "tactics": [
         "Persistence",
         "LateralMovement"
