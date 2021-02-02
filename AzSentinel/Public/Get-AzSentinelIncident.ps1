@@ -25,8 +25,8 @@ function Get-AzSentinelIncident {
     Get-AzSentinelIncident -WorkspaceName "" -All
     Get a list of all Incidents
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
-    Get information of a specifiek incident with providing the casenumber
+    Get-AzSentinelIncident -WorkspaceName "" -incidentNumber
+    Get information of a specifiek incident with providing the incidentNumber
     .EXAMPLE
     Get-AzSentinelIncident -WorkspaceName "" -IncidentName "", ""
     Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
@@ -46,16 +46,25 @@ function Get-AzSentinelIncident {
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$IncidentName,
+        [string[]]$Name,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
-        [int[]]$CaseNumber,
+        [string[]]$Title,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline)]
-        [Switch]$All
+        [ValidateNotNullOrEmpty()]
+        [int[]]$IncidentNumber,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [Switch]$All,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline)]
+        [Switch]$Preview
     )
 
     begin {
@@ -85,14 +94,21 @@ function Get-AzSentinelIncident {
             break
         }
 
-        $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
+        if($Preview) {
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/incidents?api-version=2019-01-01-preview"
+        }
+        else {
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/incidents?api-version=2020-01-01"
+        }
+
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
             $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+
             $incident += $incidentRaw.value
 
-            if ($All){
+            if ($All) {
                 while ($incidentRaw.nextLink) {
                     $incidentRaw = (Invoke-RestMethod -Uri $($incidentRaw.nextLink) -Headers $script:authHeader -Method Get)
                     $incident += $incidentRaw.value
@@ -109,8 +125,22 @@ function Get-AzSentinelIncident {
         if ($incident) {
             Write-Verbose "Found $($incident.count) incidents"
 
-            if ($IncidentName.Count -ge 1) {
-                foreach ($rule in $IncidentName) {
+            if ($Name.Count -ge 1) {
+                foreach ($rule in $Name) {
+                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.name -like $rule }
+
+                    if ($null -ne $temp) {
+                        $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
+                        $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
+                        $return += $temp.properties
+                    }
+                    else {
+                        Write-Error "Unable to find incident: $rule"
+                    }
+                }
+            }
+            elseif ($title.Count -ge 1) {
+                foreach ($rule in $title) {
                     [PSCustomObject]$temp = $incident | Where-Object { $_.properties.title -eq $rule }
 
                     if ($null -ne $temp) {
@@ -122,10 +152,9 @@ function Get-AzSentinelIncident {
                         Write-Error "Unable to find incident: $rule"
                     }
                 }
-                return $return
             }
-            elseif ($CaseNumber.Count -ge 1) {
-                foreach ($rule in $CaseNumber) {
+            elseif ($incidentNumber.Count -ge 1) {
+                foreach ($rule in $incidentNumber) {
                     [PSCustomObject]$temp = $incident | Where-Object { $_.properties.incidentNumber -eq $rule }
 
                     if ($null -ne $temp) {
@@ -144,8 +173,9 @@ function Get-AzSentinelIncident {
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                 }
-                return $incident.properties
+                $return += $incident.properties
             }
+            return $return
         }
         else {
             Write-Warning "No incident found on $($WorkspaceName)"
