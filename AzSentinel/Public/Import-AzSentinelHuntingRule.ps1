@@ -65,7 +65,7 @@ function Import-AzSentinelHuntingRule {
         if ($SettingsFile.Extension -eq '.json') {
             try {
                 $content = (Get-Content $SettingsFile -Raw | ConvertFrom-Json -ErrorAction Stop)
-                if ($content.analytics){
+                if ($content.analytics) {
                     $hunting = $content.analytics
                 }
                 else {
@@ -99,8 +99,10 @@ function Import-AzSentinelHuntingRule {
             break
         }
 
+        $return = @()
+
         foreach ($item in $hunting) {
-            Write-Output "Started with Hunting rule: $($item.displayName)"
+            Write-Verbose "Started with Hunting rule: $($item.displayName)"
 
             try {
                 Write-Verbose -Message "Get rule $($item.description)"
@@ -133,77 +135,39 @@ function Import-AzSentinelHuntingRule {
                 Write-Error "Unable to connect to APi to get Analytic rules with message: $($_.Exception.Message)" -ErrorAction Stop
             }
 
-            [PSCustomObject]$body = @{
-                "name"       = $item.name
-                "eTag"       = $item.etag
-                "id"         = $item.id
-                "properties" = @{
-                    'Category'             = 'Hunting Queries'
-                    'DisplayName'          = [string]$item.displayName
-                    'Query'                = [string]$item.query
-                    [pscustomobject]'Tags' = @(
-                        @{
-                            'Name'  = "description"
-                            'Value' = [string]$item.description
-                        },
-                        @{
-                            "Name"  = "tactics"
-                            "Value" = [Tactics[]] $item.tactics -join ','
-                        },
-                        @{
-                            "Name"  = "createdBy"
-                            "Value" = ""
-                        },
-                        @{
-                            "Name"  = "createdTimeUtc"
-                            "Value" = ""
-                        }
-                    )
-                }
+            <#
+                Build Class
+            #>
+            try {
+                $bodyProp = [Hunting]::new(
+                    $item.displayName,
+                    $item.query,
+                    $item.description,
+                    $item.tactics
+                )
+
+                $body = [HuntingRule]::new( $item.name, $item.eTag, $item.Id, $bodyProp)
+            }
+            catch {
+                Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Continue
             }
 
-            if ($content) {
-                $compareResult1 = Compare-Policy -ReferenceTemplate ($content | Select-Object * -ExcludeProperty lastModifiedUtc, alertRuleTemplateName, name, etag, id, Tags, Version) -DifferenceTemplate ($body.Properties | Select-Object * -ExcludeProperty name, Tags, Version)
-                $compareResult2 = Compare-Policy -ReferenceTemplate ($content.Tags | Where-Object { $_.name -eq "tactics" }) -DifferenceTemplate ($body.Properties.Tags | Where-Object { $_.name -eq "tactics" })
-                $compareResult = [PSCustomObject]$compareResult1 + [PSCustomObject]$compareResult2
+            <#
+            Try to create or update Hunting Rule
+            #>
+            try {
+                $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
+                $body.Properties | Add-Member -NotePropertyName status -NotePropertyValue $($result.StatusDescription) -Force
+                $return += $body.Properties
 
-                if ($compareResult) {
-                    Write-Output "Found Differences for hunting rule: $($item.displayName)"
-                    Write-Output ($compareResult | Format-Table | Out-String)
-
-                    if ($PSCmdlet.ShouldProcess("Do you want to update hunting rule: $($body.Properties.DisplayName)")) {
-                        try {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
-                            Write-Output "Successfully updated hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
-                            Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
-                        }
-                        catch {
-                            Write-Verbose $_
-                            Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
-                        }
-                    }
-                    else {
-                        Write-Output "No change have been made for hunting rule $($item.displayName), deployment aborted"
-                    }
-                }
-                else {
-                    Write-Output "Hunting rule $($item.displayName) is compliance, nothing to do"
-                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
-                }
+                Write-Verbose "Successfully updated hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
             }
-            else {
-                Write-Verbose "Creating new rule: $($item.displayName)"
+            catch {
+                Write-Verbose $_
+                Write-Error "Unable to invoke webrequest for rule $($item.displayName) with error message: $($_.Exception.Message)" -ErrorAction Continue
 
-                try {
-                    $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json -Depth 10 -EnumsAsStrings)
-                    Write-Output "Successfully created hunting rule: $($item.displayName) with status: $($result.StatusDescription)"
-                    Write-Output ($body.Properties | Format-List | Format-Table | Out-String)
-                }
-                catch {
-                    Write-Verbose $_
-                    Write-Error "Unable to invoke webrequest with error message: $($_.Exception.Message)" -ErrorAction Continue
-                }
             }
         }
+        return $return
     }
 }

@@ -202,7 +202,7 @@ function Export-AzSentinel {
                 try {
                     $fullPath = "$($OutputFolder)Templates_$date.json"
                     $output | ConvertTo-Json -EnumsAsStrings -Depth 15 | Out-File $fullPath -ErrorAction Stop
-                    Write-Output "Templates xported to: $fullPath"
+                    Write-Output "Templates exported to: $fullPath"
                 }
                 catch {
                     $ErrorMessage = $_.Exception.Message
