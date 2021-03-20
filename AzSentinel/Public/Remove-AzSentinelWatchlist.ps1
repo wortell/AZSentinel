@@ -4,24 +4,21 @@
 function Remove-AzSentinelWatchlist {
     <#
     .SYNOPSIS
-    Remove Azure Sentinal Watchlist
+    Remove Azure Sentinal Watchlist rule
     .DESCRIPTION
-    With this function you can remove Azure Sentinal Alert rules from Powershell, if you don't provide andy Rule name all rules will be removed
+    With this function you can remove Azure Sentinal Watchlist rules
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
     Enter the Workspace name
-    .PARAMETER RuleName
-    Enter the name of the rule that you wnat to remove
+    .PARAMETER Name
+    Enter the name of the watchlist rule that you wnat to remove
     .EXAMPLE
-    Remove-AzSentinelWatchlist -WorkspaceName "" -DisplayName ""
-    In this example the defined rule will be removed from Azure Sentinel
+    Remove-AzSentinelWatchlist -WorkspaceName "" -Name ""
+    In this example the defined watchlist rule will be removed from Azure Sentinel
     .EXAMPLE
-    Remove-AzSentinelWatchlist -WorkspaceName "" -DisplayName "","", ""
-    In this example you can define multiple rules that will be removed
-    .EXAMPLE
-    Remove-AzSentinelWatchlist -WorkspaceName ""
-    In this example no rule is specified, all rules will be removed one by one. For each rule you need to confirm the action
+    Remove-AzSentinelWatchlist -WorkspaceName "" -Name "","", ""
+    In this example you can define multiple watchlist rules that will be removed
     #>
 
     param (
@@ -36,7 +33,7 @@ function Remove-AzSentinelWatchlist {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$DisplayName
+        [string[]]$Name
     )
 
     begin {
@@ -58,9 +55,9 @@ function Remove-AzSentinelWatchlist {
             }
         }
 
-        foreach ($rule in $DisplayName) {
+        foreach ($rule in $Name) {
             try {
-                $item = Get-AzSentinelWatchlist @arguments -DisplayName $rule -ErrorAction Stop
+                $item = Get-AzSentinelWatchlist @arguments -Name $rule -ErrorAction Stop
             }
             catch {
                 $return = $_.Exception.Message
@@ -72,15 +69,12 @@ function Remove-AzSentinelWatchlist {
 
                 try {
                     $result = Invoke-WebRequest -Uri $uri -Method DELETE -Headers $script:authHeader
-                    Write-Output "Successfully removed rule: $($rule) with status: $($result.StatusDescription)"
+                    Write-Host "Successfully removed watchlist rule '$rule' with status: $($result.StatusDescription)" -ForegroundColor Green
                 }
                 catch {
                     Write-Verbose $_
-                    Write-Error "Unable to remove rule: $($rule) with error message: $($_.Exception.Message)" -ErrorAction Continue
+                    Write-Error "Failed to remove watchlist rule '$rule' with error message: '$($_.Exception.Message)'" -ErrorAction Continue
                 }
-            }
-            else {
-                Write-Warning "$rule not found in $WorkspaceName"
             }
         }
     }

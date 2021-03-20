@@ -6,30 +6,28 @@ function Get-AzSentinelWatchlist {
     .SYNOPSIS
     Get Azure Sentinel Watchlist
     .DESCRIPTION
-    With this function you can get a list of open incidents from Azure Sentinel.
-    You can can also filter to Incident with speciefiek case namber or Case name
+    With this function you can get a list of open watchLists from Azure Sentinel.
+    You can can also filter to watchList with speciefiek case namber or Case name
     .PARAMETER SubscriptionId
     Enter the subscription ID, if no subscription ID is provided then current AZContext subscription will be used
     .PARAMETER WorkspaceName
     Enter the Workspace name
-    .PARAMETER IncidentName
-    Enter incident name, this is the same name as the alert rule that triggered the incident
-    .PARAMETER CaseNumber
-    Enter the case number to get specfiek details of a open case
+    .PARAMETER DisplayName
+    Enter watchList name, this is the same name as the alert rule that triggered the watchList
     .PARAMETER All
-    Use -All switch to get a list of all the incidents
+    Use -All switch to get a list of all the watchLists
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName ""
-    Get a list of the last 200 Incidents
+    Get-AzSentinelwatchList -WorkspaceName ""
+    Get a list of the last 200 watchLists
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName "" -All
-    Get a list of all Incidents
+    Get-AzSentinelwatchList -WorkspaceName "" -All
+    Get a list of all watchLists
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName "" -CaseNumber
-    Get information of a specifiek incident with providing the casenumber
+    Get-AzSentinelwatchList -WorkspaceName "" -Name
+    Get information of a specifiek watchList with providing the name
     .EXAMPLE
-    Get-AzSentinelIncident -WorkspaceName "" -IncidentName "", ""
-    Get information of one or more incidents with providing a incident name, this is the name of the alert rule that triggered the incident
+    Get-AzSentinelwatchList -WorkspaceName "" -Name "", ""
+    Get information of one or more watchLists with providing a watchList name, this is the name of the alert rule that triggered the watchList
     #>
 
     [cmdletbinding(SupportsShouldProcess)]
@@ -45,7 +43,7 @@ function Get-AzSentinelWatchlist {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [string[]]$DisplayName
+        [string[]]$Name
 
     )
 
@@ -80,12 +78,12 @@ function Get-AzSentinelWatchlist {
         Write-Verbose -Message "Using URI: $($uri)"
 
         try {
-            $incidentRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
-            $incident += $incidentRaw.value
+            $watchListRaw = (Invoke-RestMethod -Uri $uri -Method Get -Headers $script:authHeader)
+            $watchList += $watchListRaw.value
 
-            while ($incidentRaw.nextLink) {
-                $incidentRaw = (Invoke-RestMethod -Uri $($incidentRaw.nextLink) -Headers $script:authHeader -Method Get)
-                $incident += $incidentRaw.value
+            while ($watchListRaw.nextLink) {
+                $watchListRaw = (Invoke-RestMethod -Uri $($watchListRaw.nextLink) -Headers $script:authHeader -Method Get)
+                $watchList += $watchListRaw.value
             }
         }
         catch {
@@ -95,34 +93,35 @@ function Get-AzSentinelWatchlist {
 
         $return = @()
 
-        if ($incident) {
-            Write-Verbose "Found $($incident.count) watchlists"
+        if ($watchList) {
+            Write-Verbose "Found $($watchList.count) watchlists"
 
-            if ($DisplayName.Count -ge 1) {
-                foreach ($rule in $IncidentName) {
-                    [PSCustomObject]$temp = $incident | Where-Object { $_.properties.name -like $rule }
+            if ($Name.Count -ge 1) {
+                foreach ($rule in $Name) {
 
-                    if ($null -ne $temp) {
+                    [PSCustomObject]$temp = $watchList | Where-Object { $_.name -like $rule }
+
+                    if ($temp) {
                         $temp.properties | Add-Member -NotePropertyName etag -NotePropertyValue $temp.etag -Force
                         $temp.properties | Add-Member -NotePropertyName name -NotePropertyValue $temp.name -Force
                         $return += $temp.properties
                     }
                     else {
-                        Write-Error "Unable to find incident: $rule"
+                        Write-Error "WatchList ruole '$rule' could not be found"
                     }
                 }
                 return $return
             }
             else {
-                $incident | ForEach-Object {
+                $watchList | ForEach-Object {
                     $_.properties | Add-Member -NotePropertyName etag -NotePropertyValue $_.etag -Force
                     $_.properties | Add-Member -NotePropertyName name -NotePropertyValue $_.name -Force
                 }
-                return $incident.properties
+                return $watchList.properties
             }
         }
         else {
-            Write-Verbose "No incident found on $($WorkspaceName)"
+            Write-Verbose "No watchList found on $($WorkspaceName)"
         }
     }
 }
