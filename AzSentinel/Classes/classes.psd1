@@ -7,7 +7,8 @@
         ,'IncidentConfiguration'
         ,'ScheduledAlertProp'
         ,'AlertRule'
-        , 'Hunting'
-        , 'HuntingRule'
+        ,'Hunting'
+        ,'HuntingRule'
+        ,'Watchlist'
     )
 }
