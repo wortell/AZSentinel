@@ -190,6 +190,10 @@ function New-AzSentinelAlertRule {
 
         try {
             $content = Get-AzSentinelAlertRule @arguments -RuleName $DisplayName -ErrorAction Stop
+
+            if ($content.count -gt 1) {
+                Write-Error "Multiple Rules with the name: '$($DisplayName)' found on workspace: '$($WorkspaceName)' "
+            }
         }
         catch {
             Write-Error $_.Exception.Message
