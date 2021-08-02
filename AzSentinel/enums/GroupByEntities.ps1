@@ -1,7 +1,21 @@
 enum GroupByEntities {
     Account
-    Ip
     Host
-    Url
+    IP
+    Malware
+    File
+    Process
+    CloudApplication
+    DNS
+    AzureResource
     FileHash
+    RegistryKey
+    RegistryValue
+    SecurityGroup
+    URL
+    IoTDevice
+    Mailbox
+    MailCluster
+    MailMessage
+    SubmissionMail
 }
