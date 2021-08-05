@@ -141,7 +141,7 @@ function New-AzSentinelAlertRule {
         [string]$LookbackDuration,
 
         [Parameter(Mandatory = $false)]
-        [MatchingMethod]$EntitiesMatchingMethod,
+        [MatchingMethod]$matchingMethod, ##############
 
         [Parameter(Mandatory = $false)]
         #[groupByEntities[]]$GroupByEntities,
@@ -162,7 +162,13 @@ function New-AzSentinelAlertRule {
         [Severity[]]$SeveritiesFilter,
 
         [Parameter(Mandatory = $false)]
-        [string]$DisplayNamesFilter
+        [string]$DisplayNamesFilter,
+
+        #alertDetailsOverride
+        [Parameter(Mandatory = $false)] [string]$alertDisplayNameFormat,
+        [Parameter(Mandatory = $false)] [string]$alertDescriptionFormat,
+        [Parameter(Mandatory = $false)] [string]$alertTacticsColumnName,
+        [Parameter(Mandatory = $false)] [string]$alertSeverityColumnName
     )
 
     begin {
@@ -207,7 +213,7 @@ function New-AzSentinelAlertRule {
             $item | Add-Member -NotePropertyName etag -NotePropertyValue $content.eTag -Force
             $item | Add-Member -NotePropertyName Id -NotePropertyValue $content.id -Force
 
-            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2019-01-01-preview"
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($content.name)?api-version=2021-03-01-preview"
         }
         else {
             Write-Verbose -Message "Rule $($DisplayName) doesn't exists in Azure Sentinel"
@@ -218,17 +224,25 @@ function New-AzSentinelAlertRule {
             $item | Add-Member -NotePropertyName etag -NotePropertyValue $null -Force
             $item | Add-Member -NotePropertyName Id -NotePropertyValue "$script:Workspace/providers/Microsoft.SecurityInsights/alertRules/$guid" -Force
 
-            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2019-01-01-preview"
+            $uri = "$script:baseUri/providers/Microsoft.SecurityInsights/alertRules/$($guid)?api-version=2021-03-01-preview"
         }
 
         if ($Kind -eq 'Scheduled') {
 
             try {
+
+                $alertDetailsOverride = [alertDetailsOverride]::new(
+                    $alertDisplayNameFormat,
+                    $alertDescriptionFormat,
+                    $alertTacticsColumnName,
+                    $alertSeverityColumnName
+                )
+
                 $groupingConfiguration = [GroupingConfiguration]::new(
                     $GroupingConfigurationEnabled,
                     $ReopenClosedIncident,
                     $LookbackDuration,
-                    $EntitiesMatchingMethod,
+                    $matchingMethod,
                     $GroupByEntities
                 )
 
@@ -238,7 +252,7 @@ function New-AzSentinelAlertRule {
                 )
 
                 if (($AlertRuleTemplateName -and ! $content) -or $content.AlertRuleTemplateName) {
-                    if ($content.AlertRuleTemplateName){
+                    if ($content.AlertRuleTemplateName) {
                         <#
                             If alertRule is already created with a TemplateName then Always use template name from existing rule.
                             You can't attach existing scheduled rule to another templatename or remove the link to the template
@@ -264,7 +278,8 @@ function New-AzSentinelAlertRule {
                         $AggregationKind,
                         $AlertRuleTemplateName
                     )
-                } else {
+                }
+                else {
                     $bodyAlertProp = [ScheduledAlertProp]::new(
                         $item.name,
                         $DisplayName,
@@ -281,11 +296,13 @@ function New-AzSentinelAlertRule {
                         $Tactics,
                         $PlaybookName,
                         $incidentConfiguration,
-                        $AggregationKind
+                        $AggregationKind,
+                        $alertDetailsOverride
                     )
                 }
 
                 $body = [AlertRule]::new( $item.name, $item.etag, $bodyAlertProp, $item.Id, 'Scheduled')
+                # return $body
             }
             catch {
                 Write-Error "Unable to initiate class with error: $($_.Exception.Message)" -ErrorAction Stop

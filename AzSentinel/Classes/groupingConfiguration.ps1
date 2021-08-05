@@ -5,7 +5,7 @@ class GroupingConfiguration {
 
     [string]$lookbackDuration
 
-    [MatchingMethod]$entitiesMatchingMethod
+    [MatchingMethod]$matchingMethod
 
     [GroupByEntities[]]$groupByEntities
 
@@ -31,15 +31,17 @@ class GroupingConfiguration {
         $this.enabled = $properties.enabled
         $this.reopenClosedIncident = $properties.reopenClosedIncident
         $this.lookbackDuration = $properties.lookbackDuration
-        $this.entitiesMatchingMethod = $properties.entitiesMatchingMethod
+        # $this.entitiesMatchingMethod = $properties.entitiesMatchingMethod
         $this.groupByEntities = $properties.groupByEntities
+        $this.matchingMethod = "AllEntities"
     }
 
-    GroupingConfiguration ($enabled, $reopenClosedIncident, $lookbackDuration, $entitiesMatchingMethod, $groupByEntities) {
+    GroupingConfiguration ($enabled, $reopenClosedIncident, $lookbackDuration, $matchingMethod, $groupByEntities) {
         $this.enabled = if ($null -ne $enabled ) { $enabled } else { $false }
         $this.reopenClosedIncident = if ($null -ne $reopenClosedIncident) { $reopenClosedIncident } else { $false }
         $this.lookbackDuration = if ($lookbackDuration) { [groupingConfiguration]::TimeString($lookbackDuration) } else { "PT5H" }
-        $this.entitiesMatchingMethod = if ($entitiesMatchingMethod) { $entitiesMatchingMethod } else { "All" }
+        # $this.entitiesMatchingMethod = if ($entitiesMatchingMethod) { $entitiesMatchingMethod } else { "All" }
+        $this.matchingMethod = "AllEntities"
         $this.groupByEntities = if ($groupByEntities) { $groupByEntities } else {
             @(
                 "Account",

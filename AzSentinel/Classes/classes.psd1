@@ -9,5 +9,6 @@
         ,'AlertRule'
         , 'Hunting'
         , 'HuntingRule'
+        , 'alertDetailsOverride'
     )
 }
