@@ -24,19 +24,19 @@ With this function you can export Azure Sentinel configuration
 
 ### EXAMPLE 1
 ```
-Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind All
+Export-AzSentinel -WorkspaceName '' -OutputFolder C:\Temp\ -Kind All
 In this example you export Alert, Hunting and Template rules
 ```
 
 ### EXAMPLE 2
 ```
-Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind Templates
+Export-AzSentinel -WorkspaceName '' -OutputFolder C:\Temp\ -Kind Templates
 In this example you export only the Templates
 ```
 
 ### EXAMPLE 3
 ```
-Export-AzSentinel -WorkspaceName '' -Path C:\Temp\ -Kind Alert
+Export-AzSentinel -WorkspaceName '' -OutputFolder C:\Temp\ -Kind Alert
 In this example you export only the Scheduled Alert rules
 ```
 
