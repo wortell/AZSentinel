@@ -102,27 +102,28 @@ function Set-AzSentinel {
                     'workspaceResourceId' = $workspaceResult.id
                 }
                 'plan'       = @{
-                    'name'          = 'SecurityInsights($workspace)'
+                    'name'          = "SecurityInsights($($workspaceResult.name))"  # Changed to include the actual workspace
                     'publisher'     = 'Microsoft'
                     'product'       = 'OMSGallery/SecurityInsights'
                     'promotionCode' = ''
                 }
             }
-            $uri = "$(($Script:baseUri).Split('microsoft.operationalinsights')[0])Microsoft.OperationsManagement/solutions/SecurityInsights($WorkspaceName)?api-version=2015-11-01-preview"
+            $splittedBaseUri = ($Script:baseUri -split 'microsoft.operationalinsights')[0] #Using -split is case insensitive.
+            $uri = "$($splittedBaseUri)/Microsoft.OperationsManagement/solutions/SecurityInsights($WorkspaceName)?api-version=2015-11-01-preview"
 
             try {
-                $solutionResult = Invoke-webrequest -Uri $uri -Method Get -Headers $script:authHeader
+                $solutionResult = Invoke-WebRequest -Uri $uri -Method Get -Headers $script:authHeader
                 Write-Output "Azure Sentinel is already enabled on $WorkspaceName and status is: $($solutionResult.StatusDescription)"
             }
             catch {
                 $errorReturn = $_
                 $errorResult = ($errorReturn | ConvertFrom-Json ).error
                 if ($errorResult.Code -eq 'ResourceNotFound') {
-                    Write-Output "Azure Sentinetal is not enabled on workspace: $($WorkspaceName)"
+                    Write-Output "Azure Sentinel is not enabled on workspace: $($WorkspaceName)"
                     try {
                         if ($PSCmdlet.ShouldProcess("Do you want to enable Sentinel for Workspace: $workspace")) {
-                            $result = Invoke-webrequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
-                            Write-Output "Successfully enabled Sentinel on workspae: $WorkspaceName with result code $($result.StatusDescription)"
+                            $result = Invoke-WebRequest -Uri $uri -Method Put -Headers $script:authHeader -Body ($body | ConvertTo-Json)
+                            Write-Output "Successfully enabled Sentinel on workspace: $WorkspaceName with result code $($result.StatusDescription)"
                         }
                         else {
                             Write-Output "No change have been made for $WorkspaceName, deployment aborted"
