@@ -16,7 +16,7 @@ function New-AzSentinelHuntingRule {
     .PARAMETER Description
     Enter the Description for the hunting rule
     .PARAMETER Tactics
-    Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+    Enter the Tactics, valid values: "InitialAccess", "ResourceDevelopment", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "Reconnaissance", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
     .PARAMETER Query
     Enter the querry in KQL format
     .EXAMPLE

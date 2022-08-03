@@ -36,7 +36,7 @@ function New-AzSentinelAlertRule {
     .PARAMETER SuppressionEnabled
     Set $true to enable Suppression or $false to disable Suppression
     .PARAMETER Tactics
-    Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+    Enter the Tactics, valid values: "InitialAccess", "ResourceDevelopment", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "Reconnaissance", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
     .PARAMETER PlaybookName
     Enter the Logic App name that you want to configure as playbook trigger
     .PARAMETER CreateIncident

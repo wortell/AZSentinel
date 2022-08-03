@@ -269,7 +269,7 @@ Accept wildcard characters: False
 ```
 
 ### -Tactics
-Enter the Tactics, valid values: "InitialAccess", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
+Enter the Tactics, valid values: "InitialAccess", "ResourceDevelopment", "Persistence", "Execution", "PrivilegeEscalation", "DefenseEvasion", "Reconnaissance", "CredentialAccess", "LateralMovement", "Discovery", "Collection", "Exfiltration", "CommandAndControl", "Impact"
 
 ```yaml
 Type: System.String[]
